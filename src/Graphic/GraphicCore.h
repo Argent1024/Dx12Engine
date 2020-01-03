@@ -10,7 +10,7 @@ namespace Graphic
 	public:
 		GraphicCore(UINT t_width, UINT t_height, LPCTSTR t_title=L"playground"):
 			m_width(t_width), m_height(t_height), m_title(t_title){
-			m_DxCore = new DXCore(t_width, t_height, t_title);
+			m_dxCore = new DXCore(t_width, t_height);
 			
 		}
 		UINT GetWidth() { return m_width; }
@@ -18,13 +18,14 @@ namespace Graphic
 		LPCTSTR GetTitle() { return m_title; }
 
 		void Init(const HWND m_appHwnd) {
-			m_DxCore->Init(m_appHwnd);
+			m_dxCore->Init(m_appHwnd);
 			std::wstring path = L"D:\\work\\tEngine\\src\\Shaders\\shaders.hlsl";
-			shader = new Shader(*m_DxCore, L"test", path, path);
+			shader = new Shader(*m_dxCore, L"test", path, path);
 		}
 
 		void Render() {
 			shader->Render();
+			m_dxCore->WaitFrame();
 		}
 
 	private:
@@ -33,7 +34,7 @@ namespace Graphic
 		const LPCTSTR m_title;
 
 
-		DXCore* m_DxCore;
+		DXCore* m_dxCore;
 		Shader* shader;
 	};
 }

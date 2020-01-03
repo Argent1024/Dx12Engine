@@ -17,22 +17,23 @@ namespace Graphic {
 	class Shader {
 		/* Store Shader used in render process */
 	public:
-		Shader(const DXCore& pDXCore,
-			const std::wstring& pName,
+		Shader(const DXCore& pDXCore, const std::wstring& pName,
 			const std::wstring& pVertexPath, const std::wstring& pPixelPath)
-			:m_DXCore(pDXCore), m_Name(pName), m_VertexPath(pVertexPath), m_PixelPath(pPixelPath)
+			:m_DXCore(pDXCore), m_Name(pName), 
+			m_VertexPath(pVertexPath), m_PixelPath(pPixelPath)
 		{
 			Init();
 		}
 
 		std::wstring GetName() const { return m_Name; }
+
 		void Render() {
 			 // Execute the command list.
 			ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
 			m_DXCore.m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 			 // Present the frame.
-				ThrowIfFailed(m_DXCore.m_swapChain->Present(1, 0));
+			ThrowIfFailed(m_DXCore.m_swapChain->Present(0, 0));
 		}
 
 		void Init();

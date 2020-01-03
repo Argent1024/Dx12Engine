@@ -155,4 +155,34 @@ namespace Graphic {
 		//TODO Create Resource???
 	}
 
+	void DXCore::WaitFrame() {
+		 // Schedule a Signal command in the queue.
+		const UINT64 currentFenceValue = m_fenceValues[m_frameIndex];
+		ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), currentFenceValue));
+
+		// Update the frame index.
+		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+
+		// If the next frame is not ready to be rendered yet, wait until it is ready.
+		if (m_fence->GetCompletedValue() < m_fenceValues[m_frameIndex])
+		{
+			ThrowIfFailed(m_fence->SetEventOnCompletion(m_fenceValues[m_frameIndex], m_fenceEvent));
+			WaitForSingleObjectEx(m_fenceEvent, INFINITE, FALSE);
+		}
+
+		// Set the fence value for the next frame.
+		m_fenceValues[m_frameIndex] = currentFenceValue + 1;
+	}
+
+	void DXCore::WaitGPU() {
+		 // Schedule a Signal command in the queue.
+		ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), m_fenceValues[m_frameIndex]));
+
+		// Wait until the fence has been processed.
+		ThrowIfFailed(m_fence->SetEventOnCompletion(m_fenceValues[m_frameIndex], m_fenceEvent));
+		WaitForSingleObjectEx(m_fenceEvent, INFINITE, FALSE);
+
+		// Increment the fence value for the current frame.
+		m_fenceValues[m_frameIndex]++;
+	}
 }
