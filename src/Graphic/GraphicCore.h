@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include "DXCore.h"
-#include "Shader.h"
 
 namespace Graphic 
 {
@@ -19,13 +18,11 @@ namespace Graphic
 
 		void Init(const HWND m_appHwnd) {
 			m_dxCore->Init(m_appHwnd);
-			std::wstring path = L"D:\\work\\tEngine\\src\\Shaders\\shaders.hlsl";
-			shader = new Shader(*m_dxCore, L"test", path, path);
+
 		}
 
 		void Render() {
-			shader->Render();
-			m_dxCore->WaitFrame();
+			m_dxCore->Render();
 		}
 
 	private:
@@ -35,6 +32,5 @@ namespace Graphic
 
 
 		DXCore* m_dxCore;
-		Shader* shader;
 	};
 }

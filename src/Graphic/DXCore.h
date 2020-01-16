@@ -1,8 +1,17 @@
 #pragma once
 #include "DXHelper.h"
+#include "CommandQueue.h"
+#include "CommandList.h"
+#include "PipelineState.h"
 
 namespace Graphic 
 {
+	using namespace DirectX;
+	struct Vertex
+    {
+        XMFLOAT3 position;
+        XMFLOAT4 color;
+    };
 
 	class DXCore {
 	public:
@@ -16,11 +25,9 @@ namespace Graphic
 			return;
 		}
 
-		void InitPipeline(const HWND t_appHwnd);
 		void Init(const HWND m_appHwnd);
-
-		void WaitFrame();
-		void WaitGPU();
+		void RecordCommandList();
+		void Render();
 
 		UINT GetWidth() { return m_width; }
 		UINT GetHeight() {return m_height; }
@@ -32,11 +39,19 @@ namespace Graphic
 		CD3DX12_VIEWPORT m_viewport;
 		CD3DX12_RECT m_scissorRect;
 		ComPtr<ID3D12Device> m_device;
-		ComPtr<ID3D12CommandQueue> m_commandQueue;
+		
+		// Temp
+		CommandQueue* m_commandQueue;
+		CommandList* m_commandList;
+		GraphicsPSO* pso;
+		ComPtr<ID3D12RootSignature> m_rootSignature;
+
+		ComPtr<ID3D12Resource> m_vertexBuffer;
+		D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
+
 		ComPtr<IDXGISwapChain3> m_swapChain;
 		ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
 		ComPtr<ID3D12Resource> m_renderTargets[FrameCount];
-		ComPtr<ID3D12CommandAllocator> m_commandAllocator;
 		UINT m_rtvDescriptorSize;
 
 
@@ -56,12 +71,9 @@ namespace Graphic
 
 		UINT dxgiFactoryFlags;
 
-		
-
 		void EnableDebug();
 		void GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter);
 		void CreateDevice();
-		void CreateQueue();
 		void CreateSwapChain(const HWND t_appHwnd);
 		void CreateDescriptorHeap();
 		void CreateRTV();
