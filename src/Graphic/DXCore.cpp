@@ -155,6 +155,8 @@ namespace Graphic {
 		CreateDescriptorHeap();
 		CreateRTV();
 
+
+		// Init asset below
 		// Define the geometry for a triangle.
 		Vertex triangleVertices[] =
 		{
@@ -163,11 +165,11 @@ namespace Graphic {
 			{ { -0.25f, -0.25f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
 		};
 		const UINT vertexBufferSize = sizeof(triangleVertices);
-		// Note: using upload heaps to transfer static data like vert buffers is not 
+		/// Note: using upload heaps to transfer static data like vert buffers is not 
 		// recommended. Every time the GPU needs it, the upload heap will be marshalled 
 		// over. Please read up on Default Heap usage. An upload heap is used here for 
 		// code simplicity and because there are very few verts to actually transfer.
-		ThrowIfFailed(m_device->CreateCommittedResource(
+		/*ThrowIfFailed(m_device->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize),
@@ -181,12 +183,15 @@ namespace Graphic {
 		ThrowIfFailed(m_vertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
 		memcpy(pVertexDataBegin, triangleVertices, sizeof(triangleVertices));
 		m_vertexBuffer->Unmap(0, nullptr);
-
+		
 		// Initialize the vertex buffer view.
 		m_vertexBufferView.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();
 		m_vertexBufferView.StrideInBytes = sizeof(Vertex);
 		m_vertexBufferView.SizeInBytes = vertexBufferSize;
-
+		*/
+		m_vertexBuffer = new VertexGPUBuffer(vertexBufferSize, sizeof(Vertex));
+		m_vertexBuffer->Initialize(m_device);
+		m_vertexBuffer->copyData(triangleVertices, sizeof(triangleVertices));
 	}
 
 	void DXCore::RecordCommandList() 
@@ -210,7 +215,7 @@ namespace Graphic {
 		const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 		list->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 		list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		list->IASetVertexBuffers(0, 1, &m_vertexBufferView);
+		list->IASetVertexBuffers(0, 1, m_vertexBuffer->GetBufferView());
 		list->DrawInstanced(3, 1, 0, 0);
 
 		// Indicate that the back buffer will now be used to present.
@@ -224,6 +229,6 @@ namespace Graphic {
 		uint64_t fenceValue = m_commandQueue->Execute(m_commandList->GetCommandList());
 		m_commandQueue->WaitCPU(fenceValue);	
 		ThrowIfFailed(m_swapChain->Present(1, 0));
-		m_commandQueue->WaitIdleCPU();
+		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "DXHelper.h"
 #include "PipelineState.h"
+#include "GPUBuffer.h"
 
 namespace Graphic {
 	
@@ -43,9 +44,9 @@ namespace Graphic {
 			m_commandList->IASetVertexBuffers(startSlot, count, vertexBufferViews);
 		}
 
+		// TODO Write API
 		
-		ID3D12GraphicsCommandList* GetCommandList() { return m_commandList.Get(); }
-		
+		ID3D12GraphicsCommandList* GetCommandList() const { return m_commandList.Get(); }	
 		const D3D12_COMMAND_LIST_TYPE type;
 
 	private:

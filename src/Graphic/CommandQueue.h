@@ -48,7 +48,4 @@ namespace Graphic {
 		HANDLE m_fenceEvent;
 		ComPtr<ID3D12Fence> m_fence;
 	};
-
-
-
 }

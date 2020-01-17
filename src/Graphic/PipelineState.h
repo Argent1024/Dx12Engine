@@ -9,7 +9,10 @@ namespace Graphic {
 
 		ID3D12PipelineState* GetPSO() const { return m_pipelineState.Get(); }
 
+		std::wstring GetName() const { return pso_name; }
+
 	protected:
+		const std::wstring pso_name;
 		ComPtr<ID3D12PipelineState> m_pipelineState;
 	};
 	
