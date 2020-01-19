@@ -51,6 +51,7 @@ namespace Graphic
 		D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;*/
 		GPUMemory* m_GPUmem;
 		VertexBuffer* m_vertexBuffer;
+		IndexBuffer* m_indexBuffer;
 
 
 		ComPtr<IDXGISwapChain3> m_swapChain;
