@@ -10,6 +10,8 @@
 //*********************************************************
 
 #pragma once
+#define D3D12_GPU_VIRTUAL_ADDRESS_NULL      ((D3D12_GPU_VIRTUAL_ADDRESS)0)
+
 #include <stdexcept>
 #include "stdafx.h"
 

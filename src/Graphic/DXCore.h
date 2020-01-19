@@ -49,7 +49,9 @@ namespace Graphic
 
 		/*ComPtr<ID3D12Resource> m_vertexBuffer;
 		D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;*/
-		VertexGPUBuffer* m_vertexBuffer;
+		GPUMemory* m_GPUmem;
+		VertexBuffer* m_vertexBuffer;
+
 
 		ComPtr<IDXGISwapChain3> m_swapChain;
 		ComPtr<ID3D12DescriptorHeap> m_rtvHeap;

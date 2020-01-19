@@ -189,9 +189,12 @@ namespace Graphic {
 		m_vertexBufferView.StrideInBytes = sizeof(Vertex);
 		m_vertexBufferView.SizeInBytes = vertexBufferSize;
 		*/
-		m_vertexBuffer = new VertexGPUBuffer(vertexBufferSize, sizeof(Vertex));
-		m_vertexBuffer->Initialize(m_device);
-		m_vertexBuffer->copyData(triangleVertices, sizeof(triangleVertices));
+		m_GPUmem = new GPUMemory();
+		m_GPUmem->Initialize(m_device, vertexBufferSize, D3D12_HEAP_TYPE_UPLOAD);
+
+		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
+		m_vertexBuffer->Initialize();
+		m_vertexBuffer->copyData(triangleVertices);
 	}
 
 	void DXCore::RecordCommandList() 
