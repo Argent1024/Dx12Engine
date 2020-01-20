@@ -12,7 +12,6 @@ namespace Graphic {
 
 	class PipelineStateObject {
 	public:
-		
 		virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
 
 		void SetRootSigature(ID3D12RootSignature* rootSignature) { m_rootSignature = rootSignature; } 
@@ -21,11 +20,6 @@ namespace Graphic {
 	protected:
 		ComPtr<ID3D12PipelineState> m_pipelineState;	
 		ID3D12RootSignature* m_rootSignature;
-
-	};
-	
-	class GraphicsInputLayout {
-
 
 	};
 
@@ -39,7 +33,8 @@ namespace Graphic {
 		void SetDomainShader( const D3D12_SHADER_BYTECODE& Binary ) { m_psoDesc.DS = Binary; }
 
 		void SetTopologyType(const D3D12_PRIMITIVE_TOPOLOGY_TYPE type) { m_psoDesc.PrimitiveTopologyType = type; }
-		// void SetInoutLayout();
+		// TODO maybe a new class of input layout
+		void SetInoutLayout(UINT NumElements, D3D12_INPUT_ELEMENT_DESC* InputDescs) {m_psoDesc.InputLayout = D3D12_INPUT_LAYOUT_DESC{ InputDescs, NumElements};}
 		
 		//TODO Modify
 		void SetDefault() {
@@ -51,16 +46,11 @@ namespace Graphic {
 			m_psoDesc.SampleDesc.Count = 1;
 		}
 
-		void Initialize(ComPtr<ID3D12Device> device) override {
+		virtual void Initialize(ComPtr<ID3D12Device> device) override {
+			// Make Sure we did set a root signature
 			assert(m_rootSignature != nullptr);
 			m_psoDesc.pRootSignature = m_rootSignature;
 			SetDefault();
-			D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-			};
-			m_psoDesc.InputLayout = D3D12_INPUT_LAYOUT_DESC{ inputElementDescs, _countof(inputElementDescs)};
 			ThrowIfFailed(device->CreateGraphicsPipelineState(&m_psoDesc, IID_PPV_ARGS(&m_pipelineState)));
 		}
 
