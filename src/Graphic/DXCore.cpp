@@ -147,8 +147,19 @@ namespace Graphic {
 			ThrowIfFailed(m_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
 		}
 
+		UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+		const std::wstring path = L"D:\\work\\tEngine\\Shaders\\shaders.hlsl";
+		ComPtr<ID3DBlob> VS;
+		ComPtr<ID3DBlob> PS;
+		ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &VS, nullptr));
+		ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &PS, nullptr));
+		
 		pso = new GraphicsPSO();
-		pso->Initialize(m_device, m_rootSignature.Get());
+		pso->SetRootSigature(m_rootSignature.Get());
+		pso->SetVertexShader(CD3DX12_SHADER_BYTECODE(VS.Get()));
+		pso->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
+		pso->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+		pso->Initialize(m_device);
 	
 		// TODO abstract this
 		CreateSwapChain(t_appHwnd);
@@ -193,9 +204,10 @@ namespace Graphic {
 		// Record Start
 		m_commandList->Reset();
 		list->SetGraphicsRootSignature(m_rootSignature.Get());
+		list->SetPipelineState(pso->GetPSO());
+
 		list->RSSetViewports(1, &m_viewport);
 		list->RSSetScissorRects(1, &m_scissorRect);
-		list->SetPipelineState(pso->GetPSO());
 
 
 		// Indicate that the back buffer will be used as a render target.
