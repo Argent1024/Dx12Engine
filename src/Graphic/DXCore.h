@@ -2,6 +2,7 @@
 #include "DXHelper.h"
 #include "CommandQueue.h"
 #include "CommandList.h"
+#include "GPUResource.h"
 #include "GPUBuffer.h"
 #include "PipelineState.h"
 

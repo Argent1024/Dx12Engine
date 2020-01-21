@@ -193,8 +193,8 @@ namespace Graphic {
 		const UINT vertexBufferSize = sizeof(triangleVertices);
 		const UINT indexBufferSize = sizeof(index_list);
 
-		m_GPUmem = new GPUMemory();
-		m_GPUmem->Initialize(m_device, vertexBufferSize + indexBufferSize, D3D12_HEAP_TYPE_UPLOAD);
+		m_GPUmem = new GPUUploadMemory();
+		m_GPUmem->Initialize(m_device, vertexBufferSize + indexBufferSize);
 
 		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
 		m_vertexBuffer->Initialize();

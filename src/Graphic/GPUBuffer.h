@@ -1,41 +1,15 @@
 #pragma once
 
 #include <DXHelper.h>
+#include "GPUResource.h"
 
 namespace Graphic {
-	// TODO add default heap type
-
-	// Class manage a block of memory, use the offset as the pointer
-	class GPUMemory {
-	public:
-		GPUMemory() : m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL), m_size(0), m_memAllocated(0) {}
-
-		void Initialize(ComPtr<ID3D12Device> device, const UINT bufferSize, D3D12_HEAP_TYPE heapType);
-		void Destroy();
-		
-		// Return offset of the memory, the user need to stored this
-		UINT MemAlloc(const UINT size);
-
-		// User should choose which method to use according the heap type
-		// This method only for upload heap
-		void UploadData(void* data, size_t size, size_t offset=0);
-
-		// TODO barrier stuff
-		inline D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddr() const { return m_GPUAddr; }
-
-	private:
-		D3D12_HEAP_TYPE m_heapType;
-		UINT m_size;
-		UINT m_memAllocated;
-
-		ComPtr<ID3D12Resource> m_resource;
-		D3D12_GPU_VIRTUAL_ADDRESS m_GPUAddr;
-	};
-
 	class GPUBuffer {
 	public:
 		GPUBuffer(GPUMemory* gpuMem, const UINT bufferSize) 
 			: m_gpuMem(gpuMem), m_bufferSize(bufferSize) {}
+
+		void Initialize(void* data) { Initialize(); copyData(data); }
 		virtual void Initialize() = 0;
 		virtual void copyData(void* data) = 0;
 
