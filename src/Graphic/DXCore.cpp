@@ -192,18 +192,33 @@ namespace Graphic {
 
 		const UINT vertexBufferSize = sizeof(triangleVertices);
 		const UINT indexBufferSize = sizeof(index_list);
+		
+		//m_GPUmem = new GPUUploadMemory();
 
-		m_GPUmem = new GPUUploadMemory();
+		// Test default type buffer start
+		CommandList copyCL;
+		copyCL.Initialize(m_device);
+
+		m_GPUmem = new GPUDefaultMemory(copyCL.GetCommandList());
 		m_GPUmem->Initialize(m_device, vertexBufferSize + indexBufferSize);
-
+		
+		copyCL.Reset();
 		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
 		m_vertexBuffer->Initialize();
 		m_vertexBuffer->copyData(triangleVertices);
+		// Do copy
+		copyCL.Close();
+		m_commandQueue->Execute(copyCL.GetCommandList());
+		m_commandQueue->WaitIdleCPU();
 
+		copyCL.Reset();
 		m_indexBuffer = new IndexBuffer(m_GPUmem, indexBufferSize);
 		m_indexBuffer->Initialize();
 		m_indexBuffer->copyData(index_list);
-		
+		// Do copy
+		copyCL.Close();
+		m_commandQueue->Execute(copyCL.GetCommandList());
+		m_commandQueue->WaitIdleCPU();
 	}
 
 	void DXCore::RecordCommandList() 
