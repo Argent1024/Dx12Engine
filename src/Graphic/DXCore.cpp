@@ -148,12 +148,13 @@ namespace Graphic {
 		}
 
 		UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-		const std::wstring path = L"D:\\work\\tEngine\\Shaders\\shaders.hlsl";
+		
+		const std::wstring path = L"D:\\work\\tEngine\\Shaders\\ray.hlsl";
 		ComPtr<ID3DBlob> VS;
 		ComPtr<ID3DBlob> PS;
 		ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &VS, nullptr));
 		ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &PS, nullptr));
-		
+
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 		{
 				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -167,7 +168,7 @@ namespace Graphic {
 		pso->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 		pso->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
 		pso->Initialize(m_device);
-	
+
 		// TODO abstract this
 		CreateSwapChain(t_appHwnd);
 		CreateDescriptorHeap();
@@ -178,10 +179,10 @@ namespace Graphic {
 		// Define the geometry for a triangle.
 		Vertex triangleVertices[] =
 		{
-			{ { 0.5f,  0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-			{ { 0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
-			{ { -0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f } },
-			{ { -0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f} }
+			{ { 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
+			{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+			{ { -1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+			{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f} }
 		};
 
 		UINT index_list[] = {
@@ -193,7 +194,7 @@ namespace Graphic {
 		const UINT indexBufferSize = sizeof(index_list);
 
 		m_GPUmem = new GPUMemory();
-		m_GPUmem->Initialize(m_device, vertexBufferSize+indexBufferSize, D3D12_HEAP_TYPE_UPLOAD);
+		m_GPUmem->Initialize(m_device, vertexBufferSize + indexBufferSize, D3D12_HEAP_TYPE_UPLOAD);
 
 		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
 		m_vertexBuffer->Initialize();
@@ -202,7 +203,7 @@ namespace Graphic {
 		m_indexBuffer = new IndexBuffer(m_GPUmem, indexBufferSize);
 		m_indexBuffer->Initialize();
 		m_indexBuffer->copyData(index_list);
-
+		
 	}
 
 	void DXCore::RecordCommandList() 

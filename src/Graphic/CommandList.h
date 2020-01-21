@@ -12,35 +12,35 @@ namespace Graphic {
 
 		void Initialize(ComPtr<ID3D12Device> device);
 		
-		inline void Reset() {
+		inline void Reset() const {
 			ThrowIfFailed(m_commandAllocator->Reset());
 			ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), nullptr));
 		}
 
-		inline void Close() {
+		inline void Close() const {
 			ThrowIfFailed(m_commandList->Close());
 		}
 		
-		inline void SetPipelineState(const PipelineStateObject& newPSO) {
+		inline void SetPipelineState(const PipelineStateObject& newPSO) const {
 			ID3D12PipelineState* newPipelineState = newPSO.GetPSO();
 			if(newPipelineState !=m_CurPipelineState) {
 				m_commandList->SetPipelineState(newPipelineState);
 			}
 		}
 		
-		inline void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topo) {
+		inline void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topo) const {
 			m_commandList->IASetPrimitiveTopology(topo);
 		}
 		
-		inline void SetVertexBuffer(D3D12_VERTEX_BUFFER_VIEW* vertexBufferView) {
+		inline void SetVertexBuffer(D3D12_VERTEX_BUFFER_VIEW* vertexBufferView) const {
 			m_commandList->IASetVertexBuffers(0, 1, vertexBufferView);
 		}
 
-		inline void SetVertexBuffer(UINT startSlot, D3D12_VERTEX_BUFFER_VIEW* vertexBufferView) {
+		inline void SetVertexBuffer(UINT startSlot, D3D12_VERTEX_BUFFER_VIEW* vertexBufferView) const {
 			m_commandList->IASetVertexBuffers(startSlot, 1, vertexBufferView);
 		}
 
-		inline void SetVertexBuffers(UINT startSlot, UINT count, D3D12_VERTEX_BUFFER_VIEW* vertexBufferViews) {
+		inline void SetVertexBuffers(UINT startSlot, UINT count, D3D12_VERTEX_BUFFER_VIEW* vertexBufferViews) const {
 			m_commandList->IASetVertexBuffers(startSlot, count, vertexBufferViews);
 		}
 

@@ -26,9 +26,9 @@ namespace Graphic
 			return;
 		}
 
-		void Init(const HWND m_appHwnd);
-		void RecordCommandList();
-		void Render();
+		virtual void Init(const HWND m_appHwnd);
+		virtual void RecordCommandList();
+		virtual void Render();
 
 		UINT GetWidth() { return m_width; }
 		UINT GetHeight() {return m_height; }
@@ -58,15 +58,8 @@ namespace Graphic
 		ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
 		ComPtr<ID3D12Resource> m_renderTargets[FrameCount];
 		UINT m_rtvDescriptorSize;
-
-
-		// Synchronization objects.
 		UINT m_frameIndex;
-		HANDLE m_fenceEvent;
-		ComPtr<ID3D12Fence> m_fence;
-		UINT64 m_fenceValues[FrameCount];
-
-
+	
 		const UINT m_width;
 		const UINT m_height;
 		

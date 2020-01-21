@@ -4,7 +4,6 @@
 
 namespace Graphic 
 {
-
 	class GraphicCore {
 	public:
 		GraphicCore(UINT t_width, UINT t_height, LPCTSTR t_title=L"playground"):
@@ -18,7 +17,6 @@ namespace Graphic
 
 		void Init(const HWND m_appHwnd) {
 			m_dxCore->Init(m_appHwnd);
-
 		}
 
 		void Render() {
@@ -29,7 +27,6 @@ namespace Graphic
 		const UINT m_width;
 		const UINT m_height;
 		const LPCTSTR m_title;
-
 
 		DXCore* m_dxCore;
 	};
