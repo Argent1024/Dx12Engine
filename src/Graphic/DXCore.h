@@ -3,7 +3,7 @@
 #include "CommandQueue.h"
 #include "CommandList.h"
 #include "GPUResource.h"
-#include "GPUBuffer.h"
+#include "Descriptor.h"
 #include "PipelineState.h"
 
 namespace Graphic 

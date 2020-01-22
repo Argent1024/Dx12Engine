@@ -69,4 +69,17 @@ namespace Graphic {
 		return m_fenceValue;
 	}
 
+	void CommandAllocator::Initialize(ComPtr<ID3D12Device> device) {
+		for (UINT i = 0; i < m_Size; ++i) {
+			ComPtr<ID3D12CommandAllocator> allocator;
+			ThrowIfFailed(device->CreateCommandAllocator(m_Type, IID_PPV_ARGS(&allocator)));
+			m_Allocators.push_back(allocator);
+		}
+	}
+	
+	ID3D12CommandAllocator* CommandAllocator::GetAllocator(UINT index) {
+		assert(index < m_Size);
+		return m_Allocators[index].Get();
+	}
+
 }

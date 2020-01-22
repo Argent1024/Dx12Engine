@@ -35,3 +35,4 @@
 #include <wrl.h>
 #include <shellapi.h>
 #include <algorithm>
+#include <vector>

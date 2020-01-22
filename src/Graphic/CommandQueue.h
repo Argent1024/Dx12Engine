@@ -3,7 +3,6 @@
 #include "DXHelper.h"
 #include "CommandList.h"
 
-
 namespace Graphic {
 
 	//TODO Consider multi threading
@@ -47,5 +46,20 @@ namespace Graphic {
 		uint64_t m_fenceValue;
 		HANDLE m_fenceEvent;
 		ComPtr<ID3D12Fence> m_fence;
+	};
+
+
+	class CommandAllocator {
+	public:
+		CommandAllocator(D3D12_COMMAND_LIST_TYPE Type, UINT Size)
+			: m_Size(Size), m_Type(Type) {}
+
+		void Initialize(ComPtr<ID3D12Device> device);
+		ID3D12CommandAllocator* GetAllocator(UINT index);
+
+	private:
+		const UINT m_Size;
+		const D3D12_COMMAND_LIST_TYPE m_Type;
+		std::vector<ComPtr<ID3D12CommandAllocator>> m_Allocators;
 	};
 }

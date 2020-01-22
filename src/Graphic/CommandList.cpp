@@ -10,4 +10,5 @@ namespace Graphic {
 		m_commandList->Close();
 	}
 
+
 }

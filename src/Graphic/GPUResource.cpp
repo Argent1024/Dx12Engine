@@ -1,14 +1,6 @@
 #include "GPUResource.h"
 
 namespace Graphic {
-
-	UINT GPUMemory::MemAlloc(const UINT size) {
-		assert(m_memAllocated + size <= m_size);
-		UINT offset = m_memAllocated;
-		m_memAllocated += size;
-		return offset;	
-	}
-
 	// Upload Type
 	void GPUUploadMemory::Initialize(ComPtr<ID3D12Device> device, const UINT bufferSize) {
 		Destroy();
