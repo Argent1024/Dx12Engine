@@ -34,7 +34,7 @@ namespace Graphic {
 	public:
 		void Initialize(ComPtr<ID3D12Device> device, const UINT bufferSize);
 		void Destroy();
-		void copyData(void* data, size_t size, size_t offset=0);
+		void copyData(void* data, size_t size, size_t offset);
 
 	private:
 		static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_UPLOAD;

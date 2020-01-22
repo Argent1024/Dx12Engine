@@ -71,7 +71,6 @@ namespace Graphic {
 	}
 
 	void GPUDefaultMemory::copyData(void* data, size_t size, size_t offset) {
-		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_resource.Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_COPY_DEST));
 		assert(offset + size <= m_size);
 		ThrowIfFailed(
 			m_device->CreateCommittedResource(
@@ -83,8 +82,17 @@ namespace Graphic {
 				IID_PPV_ARGS(&m_upload))
 		);
 		NAME_D3D12_OBJECT(m_upload);
+		// Upload to upload buffer
+		UINT8* memDataBegin;
+		CD3DX12_RANGE readRange(0, 0);        // We do not intend to read from this resource on the CPU.
+		ThrowIfFailed(m_upload->Map(0, &readRange, reinterpret_cast<void**>(&memDataBegin)));
+		memcpy(memDataBegin, data, size);
+		m_upload->Unmap(0, nullptr);
+
+		// Copy to resource buffer
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_resource.Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_COPY_DEST));
 		m_commandList->CopyBufferRegion(m_resource.Get(), offset, m_upload.Get(), 0, size);
 		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_resource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ));
-
 	}
+
 }

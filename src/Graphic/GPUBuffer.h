@@ -19,6 +19,7 @@ namespace Graphic {
 		UINT m_memOffset;
 	};
 
+
 	// TODO add template? More option in creating this stuff
 	class VertexBuffer : public GPUBuffer {
 	public:

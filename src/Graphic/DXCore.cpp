@@ -9,10 +9,10 @@ namespace Graphic {
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
 		{
 			debugController->EnableDebugLayer();
-
 			// Enable additional debug layers.
 			dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 		}
+			
 	}
 
 	// Helper function for acquiring the first available hardware adapter that supports Direct3D 12.
@@ -192,8 +192,17 @@ namespace Graphic {
 
 		const UINT vertexBufferSize = sizeof(triangleVertices);
 		const UINT indexBufferSize = sizeof(index_list);
-		
-		//m_GPUmem = new GPUUploadMemory();
+		/*
+		// Use upload type buffer
+		m_GPUmem = new GPUUploadMemory();
+		m_GPUmem->Initialize(m_device, vertexBufferSize + indexBufferSize);
+		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
+		m_vertexBuffer->Initialize();
+		m_vertexBuffer->copyData(triangleVertices);
+		m_indexBuffer = new IndexBuffer(m_GPUmem, indexBufferSize);
+		m_indexBuffer->Initialize();
+		m_indexBuffer->copyData(index_list);
+		*/
 
 		// Test default type buffer start
 		CommandList copyCL;
@@ -206,7 +215,6 @@ namespace Graphic {
 		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
 		m_vertexBuffer->Initialize();
 		m_vertexBuffer->copyData(triangleVertices);
-		// Do copy
 		copyCL.Close();
 		m_commandQueue->Execute(copyCL.GetCommandList());
 		m_commandQueue->WaitIdleCPU();
@@ -215,7 +223,6 @@ namespace Graphic {
 		m_indexBuffer = new IndexBuffer(m_GPUmem, indexBufferSize);
 		m_indexBuffer->Initialize();
 		m_indexBuffer->copyData(index_list);
-		// Do copy
 		copyCL.Close();
 		m_commandQueue->Execute(copyCL.GetCommandList());
 		m_commandQueue->WaitIdleCPU();
@@ -246,6 +253,10 @@ namespace Graphic {
 		list->IASetVertexBuffers(0, 1, m_vertexBuffer->GetBufferView());
 		list->IASetIndexBuffer(m_indexBuffer->GetIndexView());
 		list->DrawIndexedInstanced(6, 1, 0, 0, 0);
+
+		// Draw without index buffer
+		//list->DrawInstanced(3, 1, 0, 0);
+		//list->DrawInstanced(3, 1, 2, 0);
 
 		// Indicate that the back buffer will now be used to present.
 		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_renderTargets[m_frameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
