@@ -194,8 +194,8 @@ namespace Graphic {
 		const UINT indexBufferSize = sizeof(index_list);
 		/*
 		// Use upload type buffer
-		m_GPUmem = new GPUUploadMemory();
-		m_GPUmem->Initialize(m_device, vertexBufferSize + indexBufferSize);
+		m_GPUmem = new GPUUploadBuffer(vertexBufferSize + indexBufferSize);
+		m_GPUmem->Initialize(m_device);
 		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
 		m_vertexBuffer->Initialize();
 		m_vertexBuffer->copyData(triangleVertices);
@@ -208,8 +208,8 @@ namespace Graphic {
 		CommandList copyCL;
 		copyCL.Initialize(m_device);
 
-		m_GPUmem = new GPUDefaultMemory(copyCL.GetCommandList());
-		m_GPUmem->Initialize(m_device, vertexBufferSize + indexBufferSize);
+		m_GPUmem = new GPUDefaultBuffer(vertexBufferSize + indexBufferSize, copyCL.GetCommandList());
+		m_GPUmem->Initialize(m_device);
 		
 		copyCL.Reset();
 		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));

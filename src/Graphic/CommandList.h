@@ -2,7 +2,6 @@
 
 #include "DXHelper.h"
 #include "PipelineState.h"
-#include "GPUBuffer.h"
 
 namespace Graphic {
 	

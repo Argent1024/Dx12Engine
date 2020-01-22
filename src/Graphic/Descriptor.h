@@ -1,5 +1,5 @@
 #pragma once
-#include "GPUBuffer.h"
+#include "GPUMemory.h"
 #include "GPUHeap.h"
 
 namespace Graphic {
