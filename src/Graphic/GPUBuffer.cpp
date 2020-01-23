@@ -1,10 +1,34 @@
 #include "GPUBuffer.h"
 namespace Graphic {
-	UINT GPUBuffer::MemAlloc(const UINT size) {
-		assert(m_memAllocated + size <= m_size);
-		UINT offset = m_memAllocated;
-		m_memAllocated += size;
-		return offset;
+	void GPUPlacedUploadBuffer::Initialize(ComPtr<ID3D12Device> device) {
+		Destroy();
+		m_HeapOffset = m_Heap->MemAlloc(m_size);
+		ThrowIfFailed(
+			device->CreatePlacedResource(
+				m_Heap->GetHeap(),
+				m_HeapOffset,
+				&m_ResourceDesc,
+				D3D12_RESOURCE_STATE_COMMON,
+				nullptr,
+                IID_PPV_ARGS(&m_resource)
+			)
+		);
+		m_GPUAddr = m_resource->GetGPUVirtualAddress();
+	}
+
+	void GPUPlacedUploadBuffer::Destroy() {
+		//TODO
+		m_resource = nullptr;
+	}
+
+	void GPUPlacedUploadBuffer::copyData(void* data, size_t size, size_t offset) {
+		//assert(size == m_size);
+		//assert(offset ==m_HeapOffset);
+		UINT8* memDataBegin;
+		CD3DX12_RANGE readRange(0, 0);        // We do not intend to read from this resource on the CPU.
+		ThrowIfFailed(m_resource->Map(0, &readRange, reinterpret_cast<void**>(&memDataBegin)));
+		memcpy(memDataBegin + m_HeapOffset, data, m_size);
+		m_resource->Unmap(0, nullptr);
 	}
 
 	void GPUUploadBuffer::Initialize(ComPtr<ID3D12Device> device) {

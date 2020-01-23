@@ -50,7 +50,7 @@ namespace Graphic
 
 		/*ComPtr<ID3D12Resource> m_vertexBuffer;
 		D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;*/
-		GPUMemory* m_GPUmem;
+		GPUCommittedBuffer* m_GPUmem;
 		VertexBuffer* m_vertexBuffer;
 		IndexBuffer* m_indexBuffer;
 

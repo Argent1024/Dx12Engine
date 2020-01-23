@@ -14,7 +14,12 @@ namespace Graphic {
 		virtual void Destroy() = 0;
 
 		// Return offset of the memory, the user need to stored this
-		virtual UINT MemAlloc(const UINT size) = 0;
+		UINT MemAlloc(const UINT size) {
+			assert(m_memAllocated + size <= m_size);
+			UINT offset = m_memAllocated;
+			m_memAllocated += size;
+			return offset;
+		}
 
 		// TODO barrier stuff
 		inline D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddr() const { 

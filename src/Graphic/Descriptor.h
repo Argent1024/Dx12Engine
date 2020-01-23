@@ -1,6 +1,8 @@
 #pragma once
 #include "GPUMemory.h"
+#include "GPUBuffer.h"
 #include "GPUHeap.h"
+#include "DescriptorHeap.h"
 
 namespace Graphic {
 	class Descriptor {
@@ -19,7 +21,7 @@ namespace Graphic {
 	// TODO add template? More option in creating this stuff
 	class VertexBuffer : public Descriptor {
 	public:
-		VertexBuffer(GPUMemory* gpuMem, const UINT bufferSize, const UINT strideSize) 
+		VertexBuffer(GPUCommittedBuffer* gpuMem, const UINT bufferSize, const UINT strideSize) 
 			:Descriptor(gpuMem, bufferSize), m_strideSize(strideSize) {}
 
 		void Initialize();
@@ -34,7 +36,7 @@ namespace Graphic {
 
 	class IndexBuffer : public Descriptor {
 	public:
-		IndexBuffer(GPUMemory* gpuMem, const UINT bufferSize)
+		IndexBuffer(GPUCommittedBuffer* gpuMem, const UINT bufferSize)
 			: Descriptor(gpuMem, bufferSize) {}
 
 		void Initialize();
