@@ -47,5 +47,4 @@ namespace Graphic {
 		D3D12_INDEX_BUFFER_VIEW m_view;
 	};
 
-
 }

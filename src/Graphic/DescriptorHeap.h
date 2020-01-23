@@ -22,7 +22,10 @@ namespace Graphic {
 			m_HandleStart = m_heap->GetCPUDescriptorHandleForHeapStart();
 		}
 
-		CD3DX12_CPU_DESCRIPTOR_HANDLE GetHandle(UINT offset) { return m_HandleStart.Offset(offset, m_DescriptorSize); }
+		CD3DX12_CPU_DESCRIPTOR_HANDLE GetHandle(UINT offset) const { 
+			CD3DX12_CPU_DESCRIPTOR_HANDLE handle = m_HandleStart;
+			return handle.Offset(offset, m_DescriptorSize); 
+		}
 
 
 	private:

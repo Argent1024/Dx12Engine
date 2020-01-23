@@ -5,6 +5,7 @@
 #include "GPUBuffer.h"
 #include "Descriptor.h"
 #include "PipelineState.h"
+#include "SwapChain.h"
 
 namespace Graphic 
 {
@@ -55,11 +56,12 @@ namespace Graphic
 		IndexBuffer* m_indexBuffer;
 
 
-		ComPtr<IDXGISwapChain3> m_swapChain;
+		/*ComPtr<IDXGISwapChain3> m_swapChain;
 		ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
 		ComPtr<ID3D12Resource> m_renderTargets[FrameCount];
 		UINT m_rtvDescriptorSize;
-		UINT m_frameIndex;
+		UINT m_frameIndex;*/
+		SwapChain* m_swapChain;
 	
 		const UINT m_width;
 		const UINT m_height;
@@ -74,7 +76,5 @@ namespace Graphic
 		void GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter);
 		void CreateDevice();
 		void CreateSwapChain(const HWND t_appHwnd);
-		void CreateDescriptorHeap();
-		void CreateRTV();
 	};
 }

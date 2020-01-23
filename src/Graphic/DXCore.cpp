@@ -71,56 +71,8 @@ namespace Graphic {
 
 	// Create DX12 SwapChain
 	void DXCore::CreateSwapChain(const HWND t_appHwnd) {
-		// Describe and create the swap chain.
-		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-		swapChainDesc.BufferCount = FrameCount;
-		swapChainDesc.Width = m_width;
-		swapChainDesc.Height = m_height;
-		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-		swapChainDesc.SampleDesc.Count = 1;
-
-		ComPtr<IDXGISwapChain1> swapChain;
-		ThrowIfFailed(m_factory->CreateSwapChainForHwnd(
-			m_commandQueue->GetCommadnQueue(),   // Swap chain needs the queue so that it can force a flush on it.
-			t_appHwnd,					// The window handle in os
-			&swapChainDesc,
-			nullptr,
-			nullptr,
-			&swapChain
-		));
-
-		// This sample does not support fullscreen transitions.
-		ThrowIfFailed(m_factory->MakeWindowAssociation(t_appHwnd, DXGI_MWA_NO_ALT_ENTER));
-
-		ThrowIfFailed(swapChain.As(&m_swapChain));
-		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
-
-	}
-
-	void DXCore::CreateDescriptorHeap() {
-		// Describe and create a render target view (RTV) descriptor heap.
-		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-		rtvHeapDesc.NumDescriptors = FrameCount;
-		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		ThrowIfFailed(m_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_rtvHeap)));
-
-		m_rtvDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	}
-
-	void DXCore::CreateRTV() {
-		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvHeap->GetCPUDescriptorHandleForHeapStart());
-
-		// Create a RTV for each frame.
-		for (UINT n = 0; n < FrameCount; n++)
-		{
-			ThrowIfFailed(m_swapChain->GetBuffer(n, IID_PPV_ARGS(&m_renderTargets[n])));
-			m_device->CreateRenderTargetView(m_renderTargets[n].Get(), nullptr, rtvHandle);
-			rtvHandle.Offset(1, m_rtvDescriptorSize);
-		}
-		
+		m_swapChain = new SwapChain(t_appHwnd, m_width, m_height);
+		m_swapChain->Initialize(m_factory, m_device, m_commandQueue);
 	}
 
 	void DXCore::Init(const HWND t_appHwnd) {
@@ -169,11 +121,7 @@ namespace Graphic {
 		pso->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
 		pso->Initialize(m_device);
 
-		// TODO abstract this
 		CreateSwapChain(t_appHwnd);
-		CreateDescriptorHeap();
-		CreateRTV();
-
 
 		// Init asset below
 		// Define the geometry for a triangle.
@@ -239,11 +187,12 @@ namespace Graphic {
 		list->RSSetViewports(1, &m_viewport);
 		list->RSSetScissorRects(1, &m_scissorRect);
 
-
+		UINT frameIndex =m_swapChain->m_frameIndex;
 		// Indicate that the back buffer will be used as a render target.
-		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_renderTargets[m_frameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_swapChain->m_renderTargets[frameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
-		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvHeap->GetCPUDescriptorHandleForHeapStart(),m_frameIndex, m_rtvDescriptorSize);
+		//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvHeap->GetCPUDescriptorHandleForHeapStart(),m_frameIndex, m_rtvDescriptorSize);
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_swapChain->GetCPUHandle();
 		list->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 		// Record commands.
@@ -259,7 +208,7 @@ namespace Graphic {
 		//list->DrawInstanced(3, 1, 2, 0);
 
 		// Indicate that the back buffer will now be used to present.
-		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_renderTargets[m_frameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_swapChain->m_renderTargets[frameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
 		m_commandList->Close();
 	}
@@ -268,7 +217,6 @@ namespace Graphic {
 		RecordCommandList();
 		uint64_t fenceValue = m_commandQueue->Execute(m_commandList->GetCommandList());
 		m_commandQueue->WaitCPU(fenceValue);	
-		ThrowIfFailed(m_swapChain->Present(1, 0));
-		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+		m_swapChain->Present();
 	}
 }
