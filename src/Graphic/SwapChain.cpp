@@ -7,7 +7,7 @@ namespace Graphic {
 	
 	}
 
-	void SwapChain::Initialize(ComPtr<IDXGIFactory4> factory, ComPtr<ID3D12Device> device, CommandQueue* commandQueue) {
+	void SwapChain::Initialize(ComPtr<IDXGIFactory4> factory, ComPtr<ID3D12Device> device, ID3D12CommandQueue* commandQueue) {
 		{
 			// Create RTV descriptor heap
 			m_rtvHeap.SetNumDescriptors(FrameCount);
@@ -27,7 +27,7 @@ namespace Graphic {
 
 			ComPtr<IDXGISwapChain1> swapChain;
 			ThrowIfFailed(factory->CreateSwapChainForHwnd(
-				commandQueue->GetCommadnQueue(),   // Swap chain needs the queue so that it can force a flush on it.
+				commandQueue,   // Swap chain needs the queue so that it can force a flush on it.
 				m_appHwnd,						   // The window handle in os
 				&m_swapChainDesc,
 				nullptr,
@@ -40,12 +40,14 @@ namespace Graphic {
 			m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 		}
 
-
-		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle;
-		for (UINT n = 0; n < FrameCount; ++n) {
-			rtvHandle = m_rtvHeap.GetHandle(n);
-			ThrowIfFailed(m_swapChain->GetBuffer(n, IID_PPV_ARGS(&m_renderTargets[n])));
-			device->CreateRenderTargetView(m_renderTargets[n].Get(), nullptr, rtvHandle);
+		{
+			// Create RTV for each frame
+			CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle;
+			for (UINT n = 0; n < FrameCount; ++n) {
+				rtvHandle = m_rtvHeap.GetCPUHandle(n);
+				ThrowIfFailed(m_swapChain->GetBuffer(n, IID_PPV_ARGS(&m_renderTargets[n])));
+				device->CreateRenderTargetView(m_renderTargets[n].Get(), nullptr, rtvHandle);
+			}
 		}
 	}
 

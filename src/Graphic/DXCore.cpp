@@ -72,7 +72,7 @@ namespace Graphic {
 	// Create DX12 SwapChain
 	void DXCore::CreateSwapChain(const HWND t_appHwnd) {
 		m_swapChain = new SwapChain(t_appHwnd, m_width, m_height);
-		m_swapChain->Initialize(m_factory, m_device, m_commandQueue);
+		m_swapChain->Initialize(m_factory, m_device, m_commandQueue->GetCommadnQueue());
 	}
 
 	void DXCore::Init(const HWND t_appHwnd) {
@@ -156,7 +156,7 @@ namespace Graphic {
 		CommandList copyCL;
 		copyCL.Initialize(m_device);
 
-		m_GPUmem = new GPUDefaultBuffer(vertexBufferSize + indexBufferSize, copyCL.GetCommandList());
+		m_GPUmem = new GPU::DefaultBuffer(vertexBufferSize + indexBufferSize, copyCL.GetCommandList());
 		m_GPUmem->Initialize(m_device);
 		
 		copyCL.Reset();
@@ -192,7 +192,7 @@ namespace Graphic {
 		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_swapChain->m_renderTargets[frameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 		//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvHeap->GetCPUDescriptorHandleForHeapStart(),m_frameIndex, m_rtvDescriptorSize);
-		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_swapChain->GetCPUHandle();
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_swapChain->GetBackBufferCPUHandle();
 		list->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 		// Record commands.

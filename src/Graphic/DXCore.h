@@ -43,24 +43,15 @@ namespace Graphic
 		CD3DX12_RECT m_scissorRect;
 		ComPtr<ID3D12Device> m_device;
 		
-		// Temp
 		CommandQueue* m_commandQueue;
 		CommandList* m_commandList;
 		GraphicsPSO* pso;
 		ComPtr<ID3D12RootSignature> m_rootSignature;
 
-		/*ComPtr<ID3D12Resource> m_vertexBuffer;
-		D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;*/
-		GPUCommittedBuffer* m_GPUmem;
+		GPU::CommittedBuffer* m_GPUmem;
 		VertexBuffer* m_vertexBuffer;
 		IndexBuffer* m_indexBuffer;
 
-
-		/*ComPtr<IDXGISwapChain3> m_swapChain;
-		ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
-		ComPtr<ID3D12Resource> m_renderTargets[FrameCount];
-		UINT m_rtvDescriptorSize;
-		UINT m_frameIndex;*/
 		SwapChain* m_swapChain;
 	
 		const UINT m_width;

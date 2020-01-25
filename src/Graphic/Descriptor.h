@@ -5,46 +5,40 @@
 #include "DescriptorHeap.h"
 
 namespace Graphic {
-	class Descriptor {
-	public:
-		Descriptor(GPUMemory* GPUMem, const UINT Size);
-		void Initialize(void* data) { Initialize(); copyData(data); }
-		virtual void Initialize() = 0;
-		virtual void copyData(void* data) = 0;
-
-	protected:
-		const UINT m_bufferSize;
-		GPUMemory* const m_gpuMem;
-		UINT m_memOffset;
-	};
-
 	// TODO add template? More option in creating this stuff
-	class VertexBuffer : public Descriptor {
+	class VertexBuffer {
 	public:
-		VertexBuffer(GPUCommittedBuffer* gpuMem, const UINT bufferSize, const UINT strideSize) 
-			:Descriptor(gpuMem, bufferSize), m_strideSize(strideSize) {}
+		VertexBuffer(GPU::CommittedBuffer * gpubuffer, const UINT bufferSize, const UINT strideSize) 
+			:m_Buffer(gpubuffer), m_BufferSize(bufferSize), m_strideSize(strideSize) {}
 
 		void Initialize();
-		void copyData(void* data);
+		inline void copyData(void* data) { m_Buffer->copyData(data, m_BufferSize, m_Offset); }
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
 
 	private:
+		GPU::CommittedBuffer* m_Buffer;
+		UINT m_BufferSize;
+		UINT m_Offset;
 		const UINT m_strideSize;
 		D3D12_VERTEX_BUFFER_VIEW m_view;
 	};
 
 
-	class IndexBuffer : public Descriptor {
+	class IndexBuffer  {
 	public:
-		IndexBuffer(GPUCommittedBuffer* gpuMem, const UINT bufferSize)
-			: Descriptor(gpuMem, bufferSize) {}
+		IndexBuffer(GPU::CommittedBuffer* gpubuffer, const UINT bufferSize)
+			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
 
 		void Initialize();
-		void copyData(void* data);
+		inline void copyData(void* data) { m_Buffer->copyData(data, m_BufferSize, m_Offset); }
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
 		
 	private:
+		GPU::CommittedBuffer * m_Buffer;
+		UINT m_BufferSize;
+		UINT m_Offset;
 		D3D12_INDEX_BUFFER_VIEW m_view;
 	};
+
 
 }

@@ -183,6 +183,7 @@
     <ClInclude Include="src\WinApp.h" />
     <ClInclude Include="src\World\Object.h" />
     <ClInclude Include="src\World\World.h" />
+    <ClInclude Include="src\Graphic\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Graphic\CommandList.cpp" />
@@ -195,6 +196,7 @@
     <ClCompile Include="src\Graphic\PipelineState.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\WinApp.cpp" />
+    <ClCompile Include="src\Graphic\SwapChain.cpp" />
     <ClCompile Include="tEngine.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

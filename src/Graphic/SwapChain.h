@@ -3,7 +3,6 @@
 #include "DXHelper.h"
 #include "DescriptorHeap.h"
 #include "Descriptor.h"
-#include "CommandQueue.h"
 
 namespace Graphic {
 	class SwapChain {
@@ -13,12 +12,10 @@ namespace Graphic {
 
 		SwapChain(const HWND appHwnd, const UINT width, const UINT height);
 
-		void Initialize(ComPtr<IDXGIFactory4> factory, ComPtr<ID3D12Device> device, CommandQueue* commandQueue);
+		void Initialize(ComPtr<IDXGIFactory4> factory, ComPtr<ID3D12Device> device, ID3D12CommandQueue* commandQueue);
 		
-		// Return the handle of present rtv?
-		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const {
-			return m_rtvHeap.GetHandle(m_frameIndex);
-		}
+		// Return the handle of the back buffer
+		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetBackBufferCPUHandle() const { return m_rtvHeap.GetCPUHandle(m_frameIndex); }
 
 		inline void Present(UINT SyncInterval = 1, UINT Flags = 0);
 

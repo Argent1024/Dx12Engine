@@ -1,29 +1,17 @@
 #include "Descriptor.h"
 
 namespace Graphic {
-	Descriptor::Descriptor(GPUMemory* GPUMem, const UINT Size)
-		: m_gpuMem(GPUMem), m_bufferSize(Size) {}
-
 	void VertexBuffer::Initialize() {
-		m_memOffset = m_gpuMem->MemAlloc(m_bufferSize);
-		m_view.BufferLocation = m_gpuMem->GetGPUAddr() + m_memOffset;
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
 		m_view.StrideInBytes = m_strideSize;
-		m_view.SizeInBytes = m_bufferSize;
-	}
-
-	void VertexBuffer::copyData(void* data) {
-		m_gpuMem->copyData(data, m_bufferSize, m_memOffset);
+		m_view.SizeInBytes = m_BufferSize;
 	}
 
 	void IndexBuffer::Initialize() {
-		m_memOffset = m_gpuMem->MemAlloc(m_bufferSize);
-		m_view.BufferLocation = m_gpuMem->GetGPUAddr() + m_memOffset;
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
 		m_view.Format = DXGI_FORMAT_R32_UINT;
-		m_view.SizeInBytes = m_bufferSize;
+		m_view.SizeInBytes = m_BufferSize;
 	}
-
-	void IndexBuffer::copyData(void* data) {
-		m_gpuMem->copyData(data, m_bufferSize, m_memOffset);
-	}
-
 }

@@ -18,12 +18,7 @@ namespace Graphic {
 			m_HeapDesc.Properties = HeapProp;
 		}
 
-		UINT MemAlloc(const UINT size) {
-			assert(m_memAllocated + size <= m_Size);
-			UINT offset = m_memAllocated;
-			m_memAllocated += size;
-			return offset;
-		}
+		UINT MemAlloc(const UINT size, ComPtr<ID3D12Resource>& resource);
 
 		inline ID3D12Heap* GetHeap() const { return m_Heap.Get(); }
 
