@@ -11,11 +11,19 @@ namespace Graphic {
 
 		void Destory() {
 			m_heap = nullptr;
+			m_Alloced = 0;
 		}
 
 		inline void SetNumDescriptors(const UINT num) { m_HeapDesc.NumDescriptors = num; }
 		inline void SetType(const D3D12_DESCRIPTOR_HEAP_TYPE type) { m_HeapDesc.Type = type; }
 		inline void SetFlags(const D3D12_DESCRIPTOR_HEAP_FLAGS flag) { m_HeapDesc.Flags = flag; }
+
+		UINT MallocHeap() {
+			assert(m_Alloced + 1 < m_DescriptorSize);
+			UINT index = m_Alloced;
+			m_Alloced += 1;
+			return index;
+		}
 
 		void Initialize(ComPtr<ID3D12Device> device) {
 			Destory();
@@ -25,6 +33,7 @@ namespace Graphic {
 		}
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(UINT offset) const { 
+			assert(offset < m_DescriptorSize);
 			CD3DX12_CPU_DESCRIPTOR_HANDLE handle = m_HandleStart;
 			return handle.Offset(offset, m_DescriptorSize); 
 		}
@@ -33,6 +42,7 @@ namespace Graphic {
 		D3D12_DESCRIPTOR_HEAP_DESC m_HeapDesc;
 		ComPtr<ID3D12DescriptorHeap> m_heap;
 		UINT m_DescriptorSize;
+		UINT m_Alloced;
 		CD3DX12_CPU_DESCRIPTOR_HANDLE m_HandleStart;
 	};
 

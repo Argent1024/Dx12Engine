@@ -5,12 +5,12 @@ namespace Graphic {
 		m_Heap = nullptr;
 	}
 
-	UINT GPUHeap::MemAlloc(const UINT size, ComPtr<ID3D12Resource>& resource)  {
+	UINT GPUHeap::MemAlloc(const UINT size)  {
 		assert(m_memAllocated + size <= m_Size);
-		UINT offset = m_memAllocated;
+		//TODO assert align stuff
+		UINT HeapOffset = m_NumOfBuffers;
 		m_memAllocated += size;
-
-
-		return offset;
+		m_NumOfBuffers += 1;
+		return HeapOffset;
 	}
 }

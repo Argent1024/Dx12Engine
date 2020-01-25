@@ -7,21 +7,7 @@ namespace Graphic {
 		class CommittedBuffer : public GPUMemory {
 		public:
 			CommittedBuffer(const UINT size) : GPUMemory(size) {}
-
-			virtual void copyData(void* data, size_t size, size_t offset) = 0;
-
-			// Return offset of the memory, the user need to stored this
-			UINT MemAlloc(const UINT size) {
-				assert(m_MemAllocated + size <= m_MemSize);
-				UINT offset = m_MemAllocated;
-				m_MemAllocated += size;
-				return offset;
-			}
-
-		protected:
-			UINT m_MemAllocated;
 		};
-
 
 		class UploadBuffer : public CommittedBuffer {
 		public:
@@ -48,10 +34,35 @@ namespace Graphic {
 		private:
 			// TODO: Better way to do the copy...
 			ComPtr<ID3D12Resource> m_upload;
-
 			ComPtr<ID3D12Device> m_device;
 			ID3D12GraphicsCommandList* m_commandList;
+
 			static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_DEFAULT;
 		};
+
+	
+		// TODO Test this buffer
+		class PlacedBuffer : public GPUMemory {
+		public:
+			PlacedBuffer(GPUHeap* const GPUHeap, const UINT size, ID3D12GraphicsCommandList* copyCommandList)
+				:GPUMemory(size), m_Heap(GPUHeap), m_commandList(copyCommandList) {}
+
+			void Initialize(ComPtr<ID3D12Device> device) override;
+			void Destroy() override;
+			void copyData(void* data, size_t size, size_t offset) override;
+			inline UINT GetHeapOffset() const { return m_HeapOffset; }
+
+		private:
+			// TODO: Better way to do the copy...
+			ComPtr<ID3D12Resource> m_upload;
+			ComPtr<ID3D12Device> m_device;
+			ID3D12GraphicsCommandList* m_commandList;
+
+			GPUHeap* const m_Heap;
+			UINT m_HeapOffset;
+			//TODO 
+			D3D12_RESOURCE_DESC m_ResourceDesc;
+		};
+
 	}
 }
