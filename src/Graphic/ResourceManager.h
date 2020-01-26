@@ -6,7 +6,6 @@
 namespace Graphic {
 	// One ResourceManager for the engine
 	class ResourceManager {
-		
 
 
 	};

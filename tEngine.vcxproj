@@ -168,6 +168,7 @@
     <ClInclude Include="src\Graphic\GPUMemory.h" />
     <ClInclude Include="src\Graphic\GraphicCore.h" />
     <ClInclude Include="src\Graphic\PipelineState.h" />
+    <ClInclude Include="src\Graphic\ResourceManager.h" />
     <ClInclude Include="src\Graphic\RootSignature.h" />
     <ClInclude Include="src\Graphic\Material.h" />
     <ClInclude Include="src\Graphic\Primitive.h" />
