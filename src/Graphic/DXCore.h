@@ -16,6 +16,11 @@ namespace Graphic
         XMFLOAT4 color;
     };
 
+	 struct SceneConstantBuffer
+	{
+		XMFLOAT4 offset;
+	};
+
 	class DXCore {
 	public:
 		// functions below
@@ -47,6 +52,10 @@ namespace Graphic
 		CommandList* m_commandList;
 		GraphicsPSO* pso;
 		ComPtr<ID3D12RootSignature> m_rootSignature;
+
+		DescriptorHeap* cbvHeap;
+		ConstantBuffer* m_ConstantBuffer;
+		GPU::CommittedBuffer* m_cbGPUmem;
 
 		GPU::CommittedBuffer* m_GPUmem;
 		VertexBuffer* m_vertexBuffer;

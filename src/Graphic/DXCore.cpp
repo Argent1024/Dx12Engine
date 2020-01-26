@@ -88,16 +88,40 @@ namespace Graphic {
 		m_commandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
 		m_commandList->Initialize(m_device);
 		
-		// Create an empty root signature.
-		{
-			CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-			rootSignatureDesc.Init(0, nullptr, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+		   // Create a root signature consisting of a descriptor table with a single CBV.
+    {
+        D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
 
-			ComPtr<ID3DBlob> signature;
-			ComPtr<ID3DBlob> error;
-			ThrowIfFailed(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
-			ThrowIfFailed(m_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
-		}
+        // This is the highest version the sample supports. If CheckFeatureSupport succeeds, the HighestVersion returned will not be greater than this.
+        featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+
+        if (FAILED(m_device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
+        {
+            featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
+        }
+
+        CD3DX12_DESCRIPTOR_RANGE1 ranges[1];
+        CD3DX12_ROOT_PARAMETER1 rootParameters[1];
+
+        ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC);
+        rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_VERTEX);
+
+        // Allow input layout and deny uneccessary access to certain pipeline stages.
+        D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
+            D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+            D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+            D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+            D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+            D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+
+        CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
+        rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, 0, nullptr, rootSignatureFlags);
+
+        ComPtr<ID3DBlob> signature;
+        ComPtr<ID3DBlob> error;
+        ThrowIfFailed(D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, featureData.HighestVersion, &signature, &error));
+        ThrowIfFailed(m_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
+    }
 
 		UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 		
@@ -152,7 +176,22 @@ namespace Graphic {
 		m_indexBuffer->copyData(index_list);
 		*/
 
-		// Test default type buffer start
+		SceneConstantBuffer cbData;
+		cbData.offset = XMFLOAT4(1.0, 1.0, 1.0, 0.0);
+		const UINT cbSize = sizeof(cbData);
+
+		const UINT cbBufferSize = (sizeof(SceneConstantBuffer) + 255) & ~255;
+		cbvHeap = new DescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+		cbvHeap->Initialize(m_device);
+
+		m_cbGPUmem = new GPU::UploadBuffer(cbBufferSize);
+		m_cbGPUmem->Initialize(m_device);
+
+		m_ConstantBuffer = new ConstantBuffer(m_cbGPUmem, cbSize, cbvHeap);
+		m_ConstantBuffer->Initialize(m_device);
+		m_ConstantBuffer->copyData(&cbData);
+
+		// Use default type buffer start
 		CommandList copyCL;
 		copyCL.Initialize(m_device);
 
@@ -182,6 +221,12 @@ namespace Graphic {
 		// Record Start
 		m_commandList->Reset();
 		list->SetGraphicsRootSignature(m_rootSignature.Get());
+
+		ID3D12DescriptorHeap* ppHeaps[] = { cbvHeap->GetDescriptorHeap() };
+		list->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+
+		list->SetGraphicsRootDescriptorTable(0, cbvHeap->GetGPUHandle(0));
+
 		list->SetPipelineState(pso->GetPSO());
 
 		list->RSSetViewports(1, &m_viewport);

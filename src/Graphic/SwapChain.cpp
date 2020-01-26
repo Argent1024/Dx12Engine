@@ -2,7 +2,8 @@
 
 namespace Graphic {
 	SwapChain::SwapChain(const HWND appHwnd, const UINT width, const UINT height) 
-		: m_appHwnd(appHwnd), m_width(width), m_height(height)
+		: m_appHwnd(appHwnd), m_width(width), m_height(height), 
+		  m_rtvHeap(HeapType, FrameCount)
 	{
 	
 	}
@@ -10,8 +11,6 @@ namespace Graphic {
 	void SwapChain::Initialize(ComPtr<IDXGIFactory4> factory, ComPtr<ID3D12Device> device, ID3D12CommandQueue* commandQueue) {
 		{
 			// Create RTV descriptor heap
-			m_rtvHeap.SetNumDescriptors(FrameCount);
-			m_rtvHeap.SetType(HeapType);
 			m_rtvHeap.Initialize(device);
 		}
 
@@ -28,7 +27,7 @@ namespace Graphic {
 			ComPtr<IDXGISwapChain1> swapChain;
 			ThrowIfFailed(factory->CreateSwapChainForHwnd(
 				commandQueue,   // Swap chain needs the queue so that it can force a flush on it.
-				m_appHwnd,						   // The window handle in os
+				m_appHwnd,	    // The window handle in os
 				&m_swapChainDesc,
 				nullptr,
 				nullptr,
