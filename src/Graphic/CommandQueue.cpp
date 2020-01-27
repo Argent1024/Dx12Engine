@@ -23,7 +23,7 @@ namespace Graphic {
 		if (IsComplete(value)) {
 			return;
 		}
-		
+
 		// TODO multi threading here
 		m_fence->SetEventOnCompletion(value, m_fenceEvent);
 		WaitForSingleObject(m_fenceEvent, INFINITE);
@@ -47,14 +47,19 @@ namespace Graphic {
 	}
 
 	void CommandQueue::Stall(uint64_t value, CommandQueue* queue) {
-		Stall(value, queue->m_fence);
+		if (queue->IsComplete(value)) {
+			// return if that queue has already reach the fence value
+			return;
+		} else {
+			Stall(value, queue->m_fence);
+		}
 	}
 
 	void CommandQueue::Stall(CommandQueue* queue) {
 		Stall(queue->m_fenceValue, queue->m_fence);
 	}
 
-	// Wait GPU to finish all the work
+	// Tell GPU to wait until all the work finish (it seems useless...??)
 	void CommandQueue::Stall(uint64_t value) {
 		assert(m_fence.Get() != NULL);
 		assert(value >= 0);
@@ -69,17 +74,36 @@ namespace Graphic {
 		return m_fenceValue;
 	}
 
-	void CommandAllocator::Initialize(ComPtr<ID3D12Device> device) {
-		for (UINT i = 0; i < m_Size; ++i) {
+
+	CommandManager::CommandManager(UINT AllocatorNum,
+		D3D12_COMMAND_LIST_TYPE Type, D3D12_COMMAND_QUEUE_FLAGS Flags)
+		:  m_Queue(Type, Flags), m_Type(Type),
+		m_AllocatorIndex(0), m_AllocatorNum(AllocatorNum)
+	{
+	}
+
+	void CommandManager::Initialize(ComPtr<ID3D12Device> device) {
+		m_Device = device;
+		m_Queue.Initialize(m_Device);
+
+		// Create allocators
+		for (UINT i = 0; i < m_AllocatorNum; ++i)
+		{
 			ComPtr<ID3D12CommandAllocator> allocator;
 			ThrowIfFailed(device->CreateCommandAllocator(m_Type, IID_PPV_ARGS(&allocator)));
 			m_Allocators.push_back(allocator);
+			m_Fences.push_back(0);
 		}
-	}
 	
-	ID3D12CommandAllocator* CommandAllocator::GetAllocator(UINT index) {
-		assert(index < m_Size);
-		return m_Allocators[index].Get();
 	}
 
+	void CommandManager::Start() {
+		const uint64_t fence = m_Fences[m_AllocatorIndex];
+		m_Queue.WaitCPU(fence);
+		m_Allocators[m_AllocatorIndex]->Reset();
+	}
+
+	void CommandManager::End() {
+		m_AllocatorIndex = (m_AllocatorIndex + 1) % m_AllocatorNum;
+	}
 }

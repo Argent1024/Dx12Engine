@@ -9,11 +9,10 @@ namespace Graphic {
 	public:
 		CommandList(D3D12_COMMAND_LIST_TYPE type=D3D12_COMMAND_LIST_TYPE_DIRECT) : type(type) {}
 
-		void Initialize(ComPtr<ID3D12Device> device);
+		void Initialize(ID3D12CommandAllocator* allocator, ComPtr<ID3D12Device> device);
 		
-		inline void Reset() const {
-			ThrowIfFailed(m_commandAllocator->Reset());
-			ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), nullptr));
+		inline void Reset(ID3D12CommandAllocator* allocator) const {
+			ThrowIfFailed(m_commandList->Reset(allocator, nullptr));
 		}
 
 		inline void Close() const {
@@ -51,8 +50,6 @@ namespace Graphic {
 	private:
 		// TODO diff between these commandlist?
 		ComPtr<ID3D12GraphicsCommandList> m_commandList;
-		// TODO modify allocator
-		ComPtr<ID3D12CommandAllocator> m_commandAllocator;
 
 		ID3D12PipelineState* m_CurPipelineState;
 	};

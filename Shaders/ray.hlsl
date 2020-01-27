@@ -1,13 +1,15 @@
-cbuffer SceneConstantBuffer : register(b0)
+cbuffer cb0
 {
-    float4 offset;
+    float4 ScreenSize;
 };
+
 
 struct PSInput
 {
-    float4 position : SV_POSITION;
-    float4 color : COLOR;
+    float4 position : SV_POSITION; //[0, width] * [0, height]
+	float4 color : COLOR;
 };
+
 
 struct VSInput
 {
@@ -15,18 +17,18 @@ struct VSInput
 	float4 color : COLOR;
 };
 
+
 PSInput VSMain(VSInput v)
 {
     PSInput result;
 
-    result.position = v.position + offset;
-    result.color = v.color;
-
+    result.position = v.position ;
+	result.color = v.color;
+   // result.size = ScreenSize.xy;
     return result;
 }
 
 float4 PSMain(PSInput input) : SV_TARGET
 {
-	float2 coor = input.color.xy;
-    return coor.x;
+	return input.color;
 }

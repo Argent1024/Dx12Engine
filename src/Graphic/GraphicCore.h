@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include "DXCore.h"
+#include "CommandQueue.h"
+
 
 namespace Graphic 
 {
@@ -27,7 +29,6 @@ namespace Graphic
 		const UINT m_width;
 		const UINT m_height;
 		const LPCTSTR m_title;
-
 		DXCore* m_dxCore;
 	};
 }

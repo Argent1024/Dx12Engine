@@ -1,6 +1,9 @@
 #include "DXCore.h"
 
 namespace Graphic {
+
+	
+
 	// Enable the debug layer
 	// NOTE: Enabling the debug layer after device creation will invalidate the active device.
 	void DXCore::EnableDebug()
@@ -72,56 +75,54 @@ namespace Graphic {
 	// Create DX12 SwapChain
 	void DXCore::CreateSwapChain(const HWND t_appHwnd) {
 		m_swapChain = new SwapChain(t_appHwnd, m_width, m_height);
-		m_swapChain->Initialize(m_factory, m_device, m_commandQueue->GetCommadnQueue());
+		m_swapChain->Initialize(m_factory, m_device, GraphicsCommandManager.GetCommadnQueue());
 	}
 
 	void DXCore::Init(const HWND t_appHwnd) {
+
 		EnableDebug();
 		// Create factory
 		ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&m_factory)));
 		CreateDevice();
-		
-		// Create Command Queue
-		m_commandQueue = new CommandQueue();
-		m_commandQueue->Initialize(m_device);
+
+		// Init command manager
+		CopyCommandManager.Initialize(m_device);
+		GraphicsCommandManager.Initialize(m_device);
 
 		m_commandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
-		m_commandList->Initialize(m_device);
-		
-		   // Create a root signature consisting of a descriptor table with a single CBV.
-    {
-        D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
+		// Create a root signature consisting of a descriptor table with a single CBV.
+		{
+			D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
 
-        // This is the highest version the sample supports. If CheckFeatureSupport succeeds, the HighestVersion returned will not be greater than this.
-        featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+			// This is the highest version the sample supports. If CheckFeatureSupport succeeds, the HighestVersion returned will not be greater than this.
+			featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
 
-        if (FAILED(m_device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
-        {
-            featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
-        }
+			if (FAILED(m_device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
+			{
+				featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
+			}
 
-        CD3DX12_DESCRIPTOR_RANGE1 ranges[1];
-        CD3DX12_ROOT_PARAMETER1 rootParameters[1];
+			CD3DX12_DESCRIPTOR_RANGE1 ranges[1];
+			CD3DX12_ROOT_PARAMETER1 rootParameters[1];
 
-        ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC);
-        rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_VERTEX);
+			ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC);
+			rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_VERTEX);
 
-        // Allow input layout and deny uneccessary access to certain pipeline stages.
-        D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
-            D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-            D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-            D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-            D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-            D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+			// Allow input layout and deny uneccessary access to certain pipeline stages.
+			D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
+				D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+				D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+				D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+				D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS ;
+			
+			CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
+			rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, 0, nullptr, rootSignatureFlags);
 
-        CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-        rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, 0, nullptr, rootSignatureFlags);
-
-        ComPtr<ID3DBlob> signature;
-        ComPtr<ID3DBlob> error;
-        ThrowIfFailed(D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, featureData.HighestVersion, &signature, &error));
-        ThrowIfFailed(m_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
-    }
+			ComPtr<ID3DBlob> signature;
+			ComPtr<ID3DBlob> error;
+			ThrowIfFailed(D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, featureData.HighestVersion, &signature, &error));
+			ThrowIfFailed(m_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
+		}
 
 		UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 		
@@ -164,9 +165,9 @@ namespace Graphic {
 
 		const UINT vertexBufferSize = sizeof(triangleVertices);
 		const UINT indexBufferSize = sizeof(index_list);
-		/*
+		
 		// Use upload type buffer
-		m_GPUmem = new GPUUploadBuffer(vertexBufferSize + indexBufferSize);
+		m_GPUmem = new GPU::UploadBuffer(vertexBufferSize + indexBufferSize);
 		m_GPUmem->Initialize(m_device);
 		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
 		m_vertexBuffer->Initialize();
@@ -174,10 +175,10 @@ namespace Graphic {
 		m_indexBuffer = new IndexBuffer(m_GPUmem, indexBufferSize);
 		m_indexBuffer->Initialize();
 		m_indexBuffer->copyData(index_list);
-		*/
+		
 
 		SceneConstantBuffer cbData;
-		cbData.offset = XMFLOAT4(1.0, 1.0, 1.0, 0.0);
+		cbData.offset = XMFLOAT4((float)m_width, (float)m_height, 1.0, 1.0);
 		const UINT cbSize = sizeof(cbData);
 
 		const UINT cbBufferSize = (sizeof(SceneConstantBuffer) + 255) & ~255;
@@ -191,35 +192,36 @@ namespace Graphic {
 		m_ConstantBuffer->Initialize(m_device);
 		m_ConstantBuffer->copyData(&cbData);
 
-		// Use default type buffer start
+		/*// Use default type buffer start
 		CommandList copyCL;
-		copyCL.Initialize(m_device);
-
 		m_GPUmem = new GPU::DefaultBuffer(vertexBufferSize + indexBufferSize, copyCL.GetCommandList());
 		m_GPUmem->Initialize(m_device);
-		
-		copyCL.Reset();
+
+		CopyCommandManager.Start();
+		CopyCommandManager.InitCommandList(&copyCL);
 		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
 		m_vertexBuffer->Initialize();
 		m_vertexBuffer->copyData(triangleVertices);
 		copyCL.Close();
-		m_commandQueue->Execute(copyCL.GetCommandList());
-		m_commandQueue->WaitIdleCPU();
+		CopyCommandManager.ExecuteCommandList(&copyCL);
+		CopyCommandManager.End();
+	
 
-		copyCL.Reset();
+		CopyCommandManager.Start();
+		CopyCommandManager.InitCommandList(&copyCL);
 		m_indexBuffer = new IndexBuffer(m_GPUmem, indexBufferSize);
 		m_indexBuffer->Initialize();
 		m_indexBuffer->copyData(index_list);
 		copyCL.Close();
-		m_commandQueue->Execute(copyCL.GetCommandList());
-		m_commandQueue->WaitIdleCPU();
+		CopyCommandManager.ExecuteCommandList(&copyCL);
+		CopyCommandManager.End();
+		*/
 	}
 
 	void DXCore::RecordCommandList() 
 	{
 		ID3D12GraphicsCommandList* list = m_commandList->GetCommandList();
 		// Record Start
-		m_commandList->Reset();
 		list->SetGraphicsRootSignature(m_rootSignature.Get());
 
 		ID3D12DescriptorHeap* ppHeaps[] = { cbvHeap->GetDescriptorHeap() };
@@ -254,14 +256,17 @@ namespace Graphic {
 
 		// Indicate that the back buffer will now be used to present.
 		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_swapChain->m_renderTargets[frameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
-
 		m_commandList->Close();
 	}
 
 	void DXCore::Render() {
+		GraphicsCommandManager.Start();
+		GraphicsCommandManager.InitCommandList(m_commandList);
 		RecordCommandList();
-		uint64_t fenceValue = m_commandQueue->Execute(m_commandList->GetCommandList());
-		m_commandQueue->WaitCPU(fenceValue);	
+		GraphicsCommandManager.ExecuteCommandList(m_commandList);
+		GraphicsCommandManager.End();
+		/*uint64_t fenceValue = m_commandQueue->Execute(m_commandList->GetCommandList());
+		m_commandQueue->WaitCPU(fenceValue);*/
 		m_swapChain->Present();
 	}
 }

@@ -1,11 +1,18 @@
 #pragma once
 #include "DXHelper.h"
 #include "GPUHeap.h"
-
+#include <map>
 
 namespace Graphic {
-	// One ResourceManager for the engine
+	class DataManager {
+		
+
+	};
+
+
+	// One ResourceManager for the entire engine
 	class ResourceManager {
+	
 
 
 	};

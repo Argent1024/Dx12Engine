@@ -26,19 +26,30 @@ namespace Graphic {
 		void WaitIdleCPU();
 
 		// Wait On GPU (to synchronize different queue)
-		void Stall(uint64_t value, ComPtr<ID3D12Fence> fence);
 		void Stall(uint64_t value, CommandQueue* queue);
-		void Stall(CommandQueue* queue);
+		void Stall(CommandQueue* queue);  // USELESS?
 
 		// Wait GPU to finish all the work
 		void Stall(uint64_t value);	
 		
+		/*	
+		Return the fence value for this execute command finish
+		Example usage:
+
+			uint64_t fence = commandQueue->Execute(commandList);
+			commandQueue->WaitCPU(fence);
+			// the queue has finish working with the fence here
+
+		*/
 		uint64_t Execute(ID3D12CommandList* command);
 			
 		const  D3D12_COMMAND_LIST_TYPE type;
 		const  D3D12_COMMAND_QUEUE_FLAGS flags;
 
 	private:
+		// Wait On GPU for the fence
+		void Stall(uint64_t value, ComPtr<ID3D12Fence> fence);
+
 		ComPtr<ID3D12CommandQueue> m_commandQueue;
 
 		// Synchronization objects.
@@ -48,18 +59,59 @@ namespace Graphic {
 		ComPtr<ID3D12Fence> m_fence;
 	};
 
+	// User use this class to manage different type of Command Lists
+	// Take care of command list allocators 
+	// Help different command queue to wait each other
 
-	class CommandAllocator {
+	/* Example usage:
+		CommandManager Manager;
+		CommandList list;
+
+		for each frame
+		{
+			Manager.Start();
+			for each list {
+				Manager.InitCommandList(&list);
+				DoRecord(list);
+				Manager.ExecuteCommandList(&list);
+			}
+			Manager.End();
+		} */
+	class CommandManager {
 	public:
-		CommandAllocator(D3D12_COMMAND_LIST_TYPE Type, UINT Size)
-			: m_Size(Size), m_Type(Type) {}
+		CommandManager(UINT AllocatorNum, 
+			D3D12_COMMAND_LIST_TYPE Type=D3D12_COMMAND_LIST_TYPE_DIRECT, 
+			D3D12_COMMAND_QUEUE_FLAGS Flags=D3D12_COMMAND_QUEUE_FLAG_NONE);
 
 		void Initialize(ComPtr<ID3D12Device> device);
-		ID3D12CommandAllocator* GetAllocator(UINT index);
+
+		inline void InitCommandList(CommandList* commandList) { commandList->Initialize(m_Allocators[m_AllocatorIndex].Get(), m_Device); }
+		
+		void ExecuteCommandList(CommandList* commandList) 
+		{
+			uint64_t fence = m_Queue.Execute(commandList->GetCommandList());
+			m_Fences[m_AllocatorIndex] = std::max(m_Fences[m_AllocatorIndex], fence);
+		}
+
+		// Wait for the execution finsih before start, so that the allocator can be reset
+		void Start();
+		
+		//Switch the allocator after all command list have been sent to command queue
+		void End();
+
+		inline ID3D12CommandQueue* GetCommadnQueue() { return m_Queue.GetCommadnQueue(); }
+		inline void WaitIdleCPU() { m_Queue.WaitIdleCPU(); }
+		inline void WaitCPU(uint64_t value) { m_Queue.WaitCPU(value); }
+
+		const D3D12_COMMAND_LIST_TYPE m_Type;
 
 	private:
-		const UINT m_Size;
-		const D3D12_COMMAND_LIST_TYPE m_Type;
+		const UINT m_AllocatorNum;
+		UINT m_AllocatorIndex;
+
+		ComPtr<ID3D12Device> m_Device;
+		CommandQueue m_Queue;
 		std::vector<ComPtr<ID3D12CommandAllocator>> m_Allocators;
+		std::vector<uint64_t> m_Fences;
 	};
 }
