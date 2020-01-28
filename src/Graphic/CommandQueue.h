@@ -62,7 +62,6 @@ namespace Graphic {
 	// User use this class to manage different type of Command Lists
 	// Take care of command list allocators 
 	// Help different command queue to wait each other
-
 	/* Example usage:
 		CommandManager Manager;
 		CommandList list;
@@ -70,6 +69,7 @@ namespace Graphic {
 		for each frame
 		{
 			Manager.Start();
+			Manager.Stall(AnotherManager);
 			for each list {
 				Manager.InitCommandList(&list);
 				DoRecord(list);
@@ -77,6 +77,7 @@ namespace Graphic {
 			}
 			Manager.End();
 		} */
+
 	class CommandManager {
 	public:
 		CommandManager(UINT AllocatorNum, 
@@ -93,7 +94,7 @@ namespace Graphic {
 			m_Fences[m_AllocatorIndex] = std::max(m_Fences[m_AllocatorIndex], fence);
 		}
 
-		// Wait for the execution finsih before start, so that the allocator can be reset
+		// Wait for the execution finsih before start, so that the allocator can be reset.
 		void Start();
 		
 		//Switch the allocator after all command list have been sent to command queue

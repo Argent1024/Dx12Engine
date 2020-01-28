@@ -2,6 +2,7 @@
 
 #include "DXHelper.h"
 #include "PipelineState.h"
+#include "RootSignature.h"
 
 namespace Graphic {
 	
@@ -19,13 +20,35 @@ namespace Graphic {
 			ThrowIfFailed(m_commandList->Close());
 		}
 		
-		inline void SetPipelineState(const PipelineStateObject& newPSO) const {
+		// Avoid set PSO twice
+		inline void SetPipelineState(const PipelineStateObject& newPSO) {
 			ID3D12PipelineState* newPipelineState = newPSO.GetPSO();
 			if(newPipelineState !=m_CurPipelineState) {
 				m_commandList->SetPipelineState(newPipelineState);
+				m_CurPipelineState = newPipelineState;
 			}
 		}
-		
+
+		// Avoid set root signature twice
+		inline void SetGraphicsRootSignature(const RootSignature& newRS) {
+			ID3D12RootSignature* newRootSignature = newRS.GetRootSignature();
+			if (newRootSignature != m_CurRootSignature) {
+				assert("");
+				m_commandList->SetGraphicsRootSignature(newRootSignature);
+				m_CurRootSignature = newRootSignature;
+			}
+		}
+
+		// Avoid set root signature twice
+		inline void SetComputeRootSignature(const RootSignature& newRS) {
+			ID3D12RootSignature* newRootSignature = newRS.GetRootSignature();
+			if (newRootSignature != m_CurRootSignature) {
+				assert("");
+				m_commandList->SetComputeRootSignature(newRootSignature);
+				m_CurRootSignature = newRootSignature;
+			}
+		}
+
 		inline void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topo) const {
 			m_commandList->IASetPrimitiveTopology(topo);
 		}
@@ -52,6 +75,7 @@ namespace Graphic {
 		ComPtr<ID3D12GraphicsCommandList> m_commandList;
 
 		ID3D12PipelineState* m_CurPipelineState;
+		ID3D12RootSignature* m_CurRootSignature;
 	};
 
 		

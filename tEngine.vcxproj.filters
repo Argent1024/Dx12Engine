@@ -54,9 +54,6 @@
     <ClInclude Include="src\Graphic\Primitive.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphic\Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Physic\PhyicState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -96,10 +93,16 @@
     <ClInclude Include="src\Graphic\SwapChain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphic\ResourceManager.h">
+    <ClInclude Include="src\World\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Object.h">
+    <ClInclude Include="src\ResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\World\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\World\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

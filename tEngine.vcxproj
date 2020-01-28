@@ -78,7 +78,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)src\;$(ProjectDir)src\Math;$(IncludePath)</IncludePath>
-    <SourcePath>$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(ProjectDir)src\Utility;$(ProjectDir)src\;$(SourcePath)</SourcePath>
+    <SourcePath>$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(ProjectDir)src\Utility;$(ProjectDir)src\;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -168,9 +168,9 @@
     <ClInclude Include="src\Graphic\GPUMemory.h" />
     <ClInclude Include="src\Graphic\GraphicCore.h" />
     <ClInclude Include="src\Graphic\PipelineState.h" />
-    <ClInclude Include="src\Graphic\ResourceManager.h" />
+    <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Graphic\RootSignature.h" />
-    <ClInclude Include="src\Graphic\Material.h" />
+    <ClInclude Include="src\World\Material.h" />
     <ClInclude Include="src\Graphic\Primitive.h" />
     <ClInclude Include="src\Math\MathUtility.h" />
     <ClInclude Include="src\Math\Matrix3.h" />
@@ -182,6 +182,7 @@
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\Utility\Timer.h" />
     <ClInclude Include="src\WinApp.h" />
+    <ClInclude Include="src\World\Mesh.h" />
     <ClInclude Include="src\World\Object.h" />
     <ClInclude Include="src\World\World.h" />
     <ClInclude Include="src\Graphic\SwapChain.h" />
