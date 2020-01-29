@@ -48,6 +48,7 @@ namespace Game {
 		DataManager<Material> m_MaterialManager;
 
 		// GPU Stuff
+		// TODO GPU heap management
 		Graphic::DescriptorHeap m_DescriptorHeap;
 		DataManager<Graphic::GraphicsPSO> m_gPSO;
 		DataManager<Graphic::ComputePSO> m_cPSO;

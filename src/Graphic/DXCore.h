@@ -6,6 +6,7 @@
 #include "Descriptor.h"
 #include "PipelineState.h"
 #include "SwapChain.h"
+#include "Mesh.h"
 
 namespace Graphic 
 {
@@ -57,13 +58,13 @@ namespace Graphic
 		DescriptorHeap* cbvHeap;
 		ConstantBuffer* m_ConstantBuffer;
 		GPU::CommittedBuffer* m_cbGPUmem;
-
+		Game::Mesh* m_mesh;
 		GPU::CommittedBuffer* m_GPUmem;
 		VertexBuffer* m_vertexBuffer;
 		IndexBuffer* m_indexBuffer;
 
 		SwapChain* m_swapChain;
-	
+		
 		const UINT m_width;
 		const UINT m_height;
 

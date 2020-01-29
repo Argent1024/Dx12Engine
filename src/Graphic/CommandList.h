@@ -3,6 +3,7 @@
 #include "DXHelper.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
+#include "Descriptor.h"
 
 namespace Graphic {
 	
@@ -53,8 +54,12 @@ namespace Graphic {
 			m_commandList->IASetPrimitiveTopology(topo);
 		}
 		
-		inline void SetVertexBuffer(D3D12_VERTEX_BUFFER_VIEW* vertexBufferView) const {
-			m_commandList->IASetVertexBuffers(0, 1, vertexBufferView);
+		inline void SetIndexBuffer(const IndexBuffer& ib) const {
+			m_commandList->IASetIndexBuffer(ib.GetIndexView());
+		}
+
+		inline void SetVertexBuffer(const VertexBuffer& vb) const {
+			m_commandList->IASetVertexBuffers(0, 1, vb.GetBufferView());
 		}
 
 		inline void SetVertexBuffer(UINT startSlot, D3D12_VERTEX_BUFFER_VIEW* vertexBufferView) const {
