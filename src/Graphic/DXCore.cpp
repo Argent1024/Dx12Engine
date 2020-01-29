@@ -145,80 +145,57 @@ namespace Graphic {
 		pso->Initialize(m_device);
 
 		CreateSwapChain(t_appHwnd);
-
-		// Init asset below
-		// Define the geometry for a triangle.
-		Vertex triangleVertices[] =
 		{
-			{ { 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
-			{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-			{ { -1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-			{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f} }
-		};
+			// Init asset below
+			// Define the geometry for a triangle.
+			Vertex triangleVertices[] =
+			{
+				{ { 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
+				{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+				{ { -1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+				{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f} }
+			};
 
-		UINT index_list[] = {
-			0, 1, 2,
-			3, 2, 1
-		};
+			UINT index_list[] = {
+				0, 1, 2,
+				3, 2, 1
+			};
 
-		const UINT vertexBufferSize = sizeof(triangleVertices);
-		const UINT indexBufferSize = sizeof(index_list);
-		
-		// Use upload type buffer
-		m_GPUmem = new GPU::UploadBuffer(vertexBufferSize + indexBufferSize);
-		m_GPUmem->Initialize(m_device);
-		ptrVertexBuffer pVertex = std::make_shared<VertexBuffer>(m_GPUmem, vertexBufferSize, sizeof(Vertex));
-		//m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
-		pVertex->Initialize();
-		pVertex->copyData(triangleVertices);
+			const UINT vertexBufferSize = sizeof(triangleVertices);
+			const UINT indexBufferSize = sizeof(index_list);
 
-		ptrIndexBuffer pIndex = std::make_shared<IndexBuffer>(m_GPUmem, indexBufferSize);
-		//m_indexBuffer = new IndexBuffer(m_GPUmem, indexBufferSize);
-		pIndex->Initialize();
-		pIndex->copyData(index_list);
-		
+			// Use upload type buffer
+			m_GPUmem = new GPU::UploadBuffer(vertexBufferSize + indexBufferSize);
+			m_GPUmem->Initialize(m_device);
 
-		SceneConstantBuffer cbData;
-		cbData.offset = XMFLOAT4((float)m_width, (float)m_height, 1.0, 1.0);
-		const UINT cbSize = sizeof(cbData);
+			// Create Mesh
+			ptrVertexBuffer pVertex = std::make_shared<VertexBuffer>(m_GPUmem, vertexBufferSize, sizeof(Vertex));
+			pVertex->Initialize();
+			pVertex->copyData(triangleVertices);
 
-		const UINT cbBufferSize = (sizeof(SceneConstantBuffer) + 255) & ~255;
-		cbvHeap = new DescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
-		cbvHeap->Initialize(m_device);
+			ptrIndexBuffer pIndex = std::make_shared<IndexBuffer>(m_GPUmem, indexBufferSize);
+			pIndex->Initialize();
+			pIndex->copyData(index_list);
 
-		m_cbGPUmem = new GPU::UploadBuffer(cbBufferSize);
-		m_cbGPUmem->Initialize(m_device);
 
-		m_ConstantBuffer = new ConstantBuffer(m_cbGPUmem, cbSize, cbvHeap);
-		m_ConstantBuffer->Initialize(m_device);
-		m_ConstantBuffer->copyData(&cbData);
+			SceneConstantBuffer cbData;
+			cbData.offset = XMFLOAT4((float)m_width, (float)m_height, 1.0, 1.0);
+			const UINT cbSize = sizeof(cbData);
 
-		/*// Use default type buffer start
-		CommandList copyCL;
-		m_GPUmem = new GPU::DefaultBuffer(vertexBufferSize + indexBufferSize, copyCL.GetCommandList());
-		m_GPUmem->Initialize(m_device);
+			const UINT cbBufferSize = (sizeof(SceneConstantBuffer) + 255) & ~255;
+			cbvHeap = new DescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+			cbvHeap->Initialize(m_device);
 
-		CopyCommandManager.Start();
-		CopyCommandManager.InitCommandList(&copyCL);
-		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
-		m_vertexBuffer->Initialize();
-		m_vertexBuffer->copyData(triangleVertices);
-		copyCL.Close();
-		CopyCommandManager.ExecuteCommandList(&copyCL);
-		CopyCommandManager.End();
-	
+			m_cbGPUmem = new GPU::UploadBuffer(cbBufferSize);
+			m_cbGPUmem->Initialize(m_device);
 
-		CopyCommandManager.Start();
-		CopyCommandManager.InitCommandList(&copyCL);
-		m_indexBuffer = new IndexBuffer(m_GPUmem, indexBufferSize);
-		m_indexBuffer->Initialize();
-		m_indexBuffer->copyData(index_list);
-		copyCL.Close();
-		CopyCommandManager.ExecuteCommandList(&copyCL);
-		CopyCommandManager.End();
-		*/
-		// Create mesh
-		m_mesh = new Game::TriangleMesh(pVertex, pIndex);
+			m_ConstantBuffer = new ConstantBuffer(m_cbGPUmem, cbSize, cbvHeap);
+			m_ConstantBuffer->Initialize(m_device);
+			m_ConstantBuffer->copyData(&cbData);
+
+			// Create mesh
+			m_mesh = new Game::TriangleMesh(pVertex, pIndex);
+		}
 	}
 
 	void DXCore::RecordCommandList() 

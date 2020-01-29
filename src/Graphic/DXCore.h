@@ -60,9 +60,7 @@ namespace Graphic
 		GPU::CommittedBuffer* m_cbGPUmem;
 		Game::Mesh* m_mesh;
 		GPU::CommittedBuffer* m_GPUmem;
-		VertexBuffer* m_vertexBuffer;
-		IndexBuffer* m_indexBuffer;
-
+		
 		SwapChain* m_swapChain;
 		
 		const UINT m_width;
