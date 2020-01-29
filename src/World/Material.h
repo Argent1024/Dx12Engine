@@ -19,7 +19,7 @@ namespace Game {
 		{
 			commandList.SetPipelineState(*m_pso);
 			commandList.SetGraphicsRootSignature(*m_RootSignature);
-			_Use();
+			_Use(commandList);
 		}
 
 	protected:

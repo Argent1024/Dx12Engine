@@ -1,34 +1,33 @@
-cbuffer cb0
+cbuffer ScreenData : register(b0)
 {
     float4 ScreenSize;
 };
 
+struct VSInput
+{
+	float4 position: POSITION;
+	float color : COLOR;
+};
 
 struct PSInput
 {
-    float4 position : SV_POSITION; //[0, width] * [0, height]
-	float4 color : COLOR;
+    float4 position : SV_POSITION;
+    float4 color : COLOR;
 };
 
-
-struct VSInput
-{
-	float4 position : POSITION;
-	float4 color : COLOR;
-};
-
-
-PSInput VSMain(VSInput v)
+PSInput VSMain(VSInput input)
 {
     PSInput result;
 
-    result.position = v.position ;
-	result.color = v.color;
-   // result.size = ScreenSize.xy;
+    result.position = input.position;
+    result.color = input.color;
+
     return result;
 }
 
 float4 PSMain(PSInput input) : SV_TARGET
 {
-	return input.color;
+   float2 coor = (input.position / ScreenSize).xy;
+   return coor.x;
 }
+
