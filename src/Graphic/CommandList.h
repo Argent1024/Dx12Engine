@@ -61,14 +61,21 @@ namespace Graphic {
 		inline void SetVertexBuffer(const VertexBuffer& vb) const {
 			m_commandList->IASetVertexBuffers(0, 1, vb.GetBufferView());
 		}
+		
+		inline void DrawIndexedInstanced(
+			UINT IndexCountPerInstance, UINT InstanceCount,
+			UINT StartIndexLocation, INT BaseVertexLocation, UINT StartInstanceLocation) 
+		{
+			m_commandList->DrawIndexedInstanced(IndexCountPerInstance, InstanceCount, StartIndexLocation, BaseVertexLocation, StartInstanceLocation);
+		}
 
-		inline void SetVertexBuffer(UINT startSlot, D3D12_VERTEX_BUFFER_VIEW* vertexBufferView) const {
+		/*inline void SetVertexBuffer(UINT startSlot, D3D12_VERTEX_BUFFER_VIEW* vertexBufferView) const {
 			m_commandList->IASetVertexBuffers(startSlot, 1, vertexBufferView);
 		}
 
 		inline void SetVertexBuffers(UINT startSlot, UINT count, D3D12_VERTEX_BUFFER_VIEW* vertexBufferViews) const {
 			m_commandList->IASetVertexBuffers(startSlot, count, vertexBufferViews);
-		}
+		}*/
 
 		// TODO Write API
 		

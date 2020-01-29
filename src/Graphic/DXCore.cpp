@@ -167,12 +167,15 @@ namespace Graphic {
 		// Use upload type buffer
 		m_GPUmem = new GPU::UploadBuffer(vertexBufferSize + indexBufferSize);
 		m_GPUmem->Initialize(m_device);
-		m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
-		m_vertexBuffer->Initialize();
-		m_vertexBuffer->copyData(triangleVertices);
-		m_indexBuffer = new IndexBuffer(m_GPUmem, indexBufferSize);
-		m_indexBuffer->Initialize();
-		m_indexBuffer->copyData(index_list);
+		ptrVertexBuffer pVertex = std::make_shared<VertexBuffer>(m_GPUmem, vertexBufferSize, sizeof(Vertex));
+		//m_vertexBuffer = new VertexBuffer(m_GPUmem, vertexBufferSize, sizeof(Vertex));
+		pVertex->Initialize();
+		pVertex->copyData(triangleVertices);
+
+		ptrIndexBuffer pIndex = std::make_shared<IndexBuffer>(m_GPUmem, indexBufferSize);
+		//m_indexBuffer = new IndexBuffer(m_GPUmem, indexBufferSize);
+		pIndex->Initialize();
+		pIndex->copyData(index_list);
 		
 
 		SceneConstantBuffer cbData;
@@ -214,6 +217,8 @@ namespace Graphic {
 		CopyCommandManager.ExecuteCommandList(&copyCL);
 		CopyCommandManager.End();
 		*/
+		// Create mesh
+		m_mesh = new Game::TriangleMesh(pVertex, pIndex);
 	}
 
 	void DXCore::RecordCommandList() 
@@ -243,10 +248,14 @@ namespace Graphic {
 		// Record commands.
 		const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 		list->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-		list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		/*list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		list->IASetVertexBuffers(0, 1, m_vertexBuffer->GetBufferView());
 		list->IASetIndexBuffer(m_indexBuffer->GetIndexView());
-		list->DrawIndexedInstanced(6, 1, 0, 0, 0);
+
+		list->DrawIndexedInstanced(6, 1, 0, 0, 0);*/
+
+		m_mesh->SetMesh(*m_commandList);
+		m_mesh->Draw(*m_commandList);
 
 		// Draw without index buffer
 		//list->DrawInstanced(3, 1, 0, 0);

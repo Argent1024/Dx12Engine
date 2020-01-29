@@ -13,7 +13,7 @@ namespace Graphic {
 
 		virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
 		inline void copyData(void* data) { m_Buffer->copyData(data, m_BufferSize, m_Offset); }
-	
+		inline UINT GetSize() { return m_BufferSize; }
 	protected:
 		GPU::GPUMemory* m_Buffer;
 		UINT m_BufferSize;

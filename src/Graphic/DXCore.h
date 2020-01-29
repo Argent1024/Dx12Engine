@@ -6,7 +6,7 @@
 #include "Descriptor.h"
 #include "PipelineState.h"
 #include "SwapChain.h"
-#include "Mesh.h"
+#include "../World/Mesh.h"
 
 namespace Graphic 
 {
