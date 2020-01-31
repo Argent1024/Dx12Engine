@@ -214,9 +214,8 @@ namespace Graphic {
 		list->RSSetViewports(1, &m_viewport);
 		list->RSSetScissorRects(1, &m_scissorRect);
 
-		UINT frameIndex = m_swapChain->m_BackBufferIndex;
 		// Indicate that the back buffer will be used as a render target.
-		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_swapChain->m_renderTargets[frameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_swapChain->GetBackBufferResource(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 		// Set & clear swapchain
 		const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
@@ -231,7 +230,7 @@ namespace Graphic {
 		}
 
 		// Indicate that the back buffer will now be used to present.
-		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_swapChain->m_renderTargets[frameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_swapChain->GetBackBufferResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 		m_commandList->Close();
 	}
 

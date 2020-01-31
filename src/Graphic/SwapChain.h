@@ -16,12 +16,9 @@ namespace Graphic {
 		
 		// Return the handle of the back buffer
 		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetBackBufferCPUHandle() const { return m_rtvHeap.GetCPUHandle(m_BackBufferIndex); }
+		inline ID3D12Resource* GetBackBufferResource() const { return m_renderTargets[m_BackBufferIndex].Get(); }
 
 		inline void Present(UINT SyncInterval = 1, UINT Flags = 0);
-
-		//TODO Resource Barrier
-		ComPtr<ID3D12Resource> m_renderTargets[FrameCount];
-		UINT m_BackBufferIndex;
 
 	private:
 		const UINT m_width;
@@ -31,6 +28,9 @@ namespace Graphic {
 		ComPtr<IDXGISwapChain3> m_swapChain;
 		DXGI_SWAP_CHAIN_DESC1 m_swapChainDesc;
 		
+		ComPtr<ID3D12Resource> m_renderTargets[FrameCount];
+		UINT m_BackBufferIndex;
+
 		DescriptorHeap m_rtvHeap;
 	};
 
