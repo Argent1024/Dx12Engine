@@ -36,7 +36,8 @@ namespace Graphic {
 
 			ThrowIfFailed(factory->MakeWindowAssociation(m_appHwnd, DXGI_MWA_NO_ALT_ENTER));
 			ThrowIfFailed(swapChain.As(&m_swapChain));
-			m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+			m_BackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
+			
 		}
 
 		{

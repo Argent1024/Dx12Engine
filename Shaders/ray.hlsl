@@ -28,6 +28,6 @@ PSInput VSMain(VSInput input)
 float4 PSMain(PSInput input) : SV_TARGET
 {
    float2 coor = (input.position / ScreenSize).xy;
-   return coor.x;
+   return input.position / ScreenSize;
 }
 

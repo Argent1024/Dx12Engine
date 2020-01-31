@@ -70,7 +70,8 @@ namespace Graphic {
 		{
 			Manager.Start();
 			Manager.Stall(AnotherManager);
-			for each list {
+			clear rtv or do other start job before the frame
+			(multi thread) for each command list {
 				Manager.InitCommandList(&list);
 				DoRecord(list);
 				Manager.ExecuteCommandList(&list);

@@ -1,5 +1,7 @@
 #pragma once
+#include "CommandList.h"
 #include "Descriptor.h"
+
 
 #define ptrVertexBuffer std::shared_ptr<Graphic::VertexBuffer>
 #define ptrIndexBuffer std::shared_ptr<Graphic::IndexBuffer>
@@ -19,24 +21,31 @@ namespace Game {
 		TriangleMesh(ptrVertexBuffer v, ptrIndexBuffer i)
 			: Mesh(), m_VertexBuffer(v), m_IndexBuffer(i) {}
 
-		void SetMesh(Graphic::CommandList& commandList) override {
-			commandList.SetPrimitiveTopology(TopologyType);
-			commandList.SetVertexBuffer(*m_VertexBuffer);
-			commandList.SetIndexBuffer(*m_IndexBuffer);
-		}
-
+		void SetMesh(Graphic::CommandList& commandList) override;
 		// navie draw one instance
-		void Draw(Graphic::CommandList& commandList) override {
-			UINT IndexCountPerINstance = m_IndexBuffer->GetSize();
-			commandList.DrawIndexedInstanced(IndexCountPerINstance, 1, 0, 0, 0);
-		}
-
+		void Draw(Graphic::CommandList& commandList) override;
+		
 		static const D3D_PRIMITIVE_TOPOLOGY TopologyType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 	protected:
 		ptrVertexBuffer m_VertexBuffer;
 		ptrIndexBuffer m_IndexBuffer;
 
+	};
+
+
+	// Class that store point, used for particle system
+	class PointMesh : public Mesh {
+	public:
+		PointMesh(ptrVertexBuffer v) 
+			: m_VertexBuffer(v) {}
+
+		void SetMesh(Graphic::CommandList& commandList) override;
+		void Draw(Graphic::CommandList& commandList) override;
+
+		static const D3D_PRIMITIVE_TOPOLOGY TopologyType = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+	protected:
+		ptrVertexBuffer m_VertexBuffer;
 	};
 
 }

@@ -8,6 +8,7 @@ namespace Graphic {
 	public:
 		DescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE type, const UINT num=1, 
 			           const D3D12_DESCRIPTOR_HEAP_FLAGS flag = D3D12_DESCRIPTOR_HEAP_FLAG_NONE) 
+			:m_NumDescriptors(num)
 		{
 			 m_HeapDesc.NumDescriptors = num; 
 			 m_HeapDesc.Type = type;
@@ -40,13 +41,13 @@ namespace Graphic {
 		ID3D12DescriptorHeap* GetDescriptorHeap() { return m_heap.Get(); }
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(UINT offset) const { 
-			assert(offset < m_DescriptorSize);
+			assert(offset <  m_NumDescriptors);
 			CD3DX12_CPU_DESCRIPTOR_HANDLE handle = m_CPUHandleStart;
 			return handle.Offset(offset, m_DescriptorSize); 
 		}
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(UINT offset) const {
-			assert(offset < m_DescriptorSize);
+			assert(offset <  m_NumDescriptors);
 			CD3DX12_GPU_DESCRIPTOR_HANDLE handle = m_GPUHandleStart;
 			return handle.Offset(offset, m_DescriptorSize); 
 		}
@@ -55,6 +56,7 @@ namespace Graphic {
 	private:
 		D3D12_DESCRIPTOR_HEAP_DESC m_HeapDesc;
 		ComPtr<ID3D12DescriptorHeap> m_heap;
+		UINT m_NumDescriptors;
 		UINT m_DescriptorSize;
 		UINT m_Alloced;
 		CD3DX12_CPU_DESCRIPTOR_HANDLE m_CPUHandleStart;
