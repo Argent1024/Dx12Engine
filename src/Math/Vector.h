@@ -10,7 +10,7 @@ namespace Math
 		XMVECTOR m_vec;
 	public:
 		Vector3() {}
-
+		
 		INLINE Vector3(float x) { m_vec = XMVectorReplicate(x); }
 		INLINE Vector3(float x, float y, float z) { m_vec = XMVectorSet(x, y, z, 1.f); }
 		INLINE Vector3(const Vector3& v) { m_vec = v; }

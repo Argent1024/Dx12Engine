@@ -26,6 +26,14 @@ namespace Math {
 			m_mat.r[3] = XMVectorSetW(v, 1.f);
 		}
 
+		INLINE Matrix4(const Vector3& x, const Vector3& y, const Vector3& z, const Vector3& w) 
+		{
+			m_mat.r[0] = XMVectorSetW(x, 0.f);
+			m_mat.r[1] = XMVectorSetW(y, 0.f);
+			m_mat.r[2] = XMVectorSetW(z, 0.f);
+			m_mat.r[3] = XMVectorSetW(w, 1.f);
+		}
+
 		INLINE Matrix4(const Matrix4& mat) { m_mat = mat.m_mat; }
 		INLINE explicit Matrix4(IdentityTag) { m_mat = XMMatrixIdentity(); }
 		INLINE explicit Matrix4(ZeroTag) { m_mat.r[0] = m_mat.r[1] = m_mat.r[2] = m_mat.r[3] = XMVectorZero(); }

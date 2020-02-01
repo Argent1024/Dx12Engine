@@ -6,6 +6,7 @@
 #include "Descriptor.h"
 #include "PipelineState.h"
 #include "SwapChain.h"
+#include "../World/Camera.h"
 #include "../World/Mesh.h"
 
 namespace Graphic 
@@ -73,6 +74,9 @@ namespace Graphic
 		ComPtr<IDXGIFactory4> m_factory;
 
 		UINT dxgiFactoryFlags;
+
+		void CreateTriangle();
+		void CreateParticle();
 
 		void EnableDebug();
 		void GetHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter);

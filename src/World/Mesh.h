@@ -5,12 +5,13 @@
 
 #define ptrVertexBuffer std::shared_ptr<Graphic::VertexBuffer>
 #define ptrIndexBuffer std::shared_ptr<Graphic::IndexBuffer>
+#define ptrMesh std::shared_ptr<Game::Mesh>
 
 namespace Game {
-
+	
 	class Mesh {
 	public:
-		virtual void SetMesh(Graphic::CommandList& commandList) = 0;
+		virtual void UseMesh(Graphic::CommandList& commandList) = 0;
 		virtual void Draw(Graphic::CommandList& commandList) = 0;
 	};
 
@@ -18,10 +19,11 @@ namespace Game {
 	// TODO Doesn't consider some weird usage yet
 	class TriangleMesh : public Mesh {
 	public:
+		
 		TriangleMesh(ptrVertexBuffer v, ptrIndexBuffer i)
 			: Mesh(), m_VertexBuffer(v), m_IndexBuffer(i) {}
 
-		void SetMesh(Graphic::CommandList& commandList) override;
+		void UseMesh(Graphic::CommandList& commandList) override;
 		// navie draw one instance
 		void Draw(Graphic::CommandList& commandList) override;
 		
@@ -40,7 +42,7 @@ namespace Game {
 		PointMesh(ptrVertexBuffer v) 
 			: m_VertexBuffer(v) {}
 
-		void SetMesh(Graphic::CommandList& commandList) override;
+		void UseMesh(Graphic::CommandList& commandList) override;
 		void Draw(Graphic::CommandList& commandList) override;
 
 		static const D3D_PRIMITIVE_TOPOLOGY TopologyType = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;

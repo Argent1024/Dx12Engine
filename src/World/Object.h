@@ -6,6 +6,7 @@
 #define pMaterial std::shared_ptr<Game::Material>
 
 namespace Game {
+
 	class Object {
 	public:
 		virtual void RecordCommand(Graphic::CommandList& commandList) = 0;
@@ -15,5 +16,5 @@ namespace Game {
 		pMesh m_Mesh;
 	};
 
-
+	
 }

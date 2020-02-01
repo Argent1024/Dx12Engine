@@ -78,18 +78,7 @@ namespace Graphic {
 		m_swapChain->Initialize(m_factory, m_device, GraphicsCommandManager.GetCommadnQueue());
 	}
 
-	void DXCore::Init(const HWND t_appHwnd) {
-
-		EnableDebug();
-		// Create factory
-		ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&m_factory)));
-		CreateDevice();
-
-		// Init command manager
-		CopyCommandManager.Initialize(m_device);
-		GraphicsCommandManager.Initialize(m_device);
-
-		m_commandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
+	void DXCore::CreateTriangle() {
 		// Create a root signature consisting of a descriptor table with a single CBV.
 		{
 			D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
@@ -144,7 +133,6 @@ namespace Graphic {
 		pso->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
 		pso->Initialize(m_device);
 
-		CreateSwapChain(t_appHwnd);
 		{
 			// Init asset below
 			// Define the geometry for a triangle.
@@ -198,6 +186,25 @@ namespace Graphic {
 		}
 	}
 
+	void DXCore::CreateParticle() {
+		
+	}
+
+	void DXCore::Init(const HWND t_appHwnd) {
+
+		EnableDebug();
+		// Create factory
+		ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&m_factory)));
+		CreateDevice();
+		CreateSwapChain(t_appHwnd);
+		// Init command manager
+		CopyCommandManager.Initialize(m_device);
+		GraphicsCommandManager.Initialize(m_device);
+		m_commandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
+		
+		CreateTriangle();
+	}
+
 	void DXCore::RecordCommandList() 
 	{
 		ID3D12GraphicsCommandList* list = m_commandList->GetCommandList();
@@ -225,7 +232,7 @@ namespace Graphic {
 		// Record commands.
 		{
 			// Draw Mesh
-			m_mesh->SetMesh(*m_commandList);
+			m_mesh->UseMesh(*m_commandList);
 			m_mesh->Draw(*m_commandList);
 		}
 

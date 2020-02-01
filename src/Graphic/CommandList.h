@@ -65,6 +65,10 @@ namespace Graphic {
 		inline void SetSwapChain(const SwapChain& swapChain) { m_commandList->OMSetRenderTargets(1, &(swapChain.GetBackBufferCPUHandle()), FALSE, nullptr); ; }
 		inline void ClearSwapChain(const SwapChain& swapChain, const float color[4]) const { m_commandList->ClearRenderTargetView(swapChain.GetBackBufferCPUHandle(), color, 0, nullptr);}
 
+		// Camera
+		inline void SetViewPorts(const CD3DX12_VIEWPORT* viewPort) { m_commandList->RSSetViewports(1, viewPort); }
+		inline void SetScissorRects(const CD3DX12_RECT* scissorRect) { m_commandList->RSSetScissorRects(1, scissorRect); }
+
 		// TODO Write API
 		
 		ID3D12GraphicsCommandList* GetCommandList() const { return m_commandList.Get(); }	
