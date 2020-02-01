@@ -4,18 +4,20 @@
 #include "GPUHeap.h"
 #include "DescriptorHeap.h"
 
+#define ptrGPUMem std::shared_ptr<GPU::GPUMemory>
+
 namespace Graphic {
 	// Descriptors don't need to know about GPU Heap, GPU Buffer should handle all the memory stuff
 	class Descriptor {
 	public:
-		Descriptor(GPU::GPUMemory* gpubuffer, const UINT bufferSize)
+		Descriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
 			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
 
 		virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
 		inline void copyData(void* data) { m_Buffer->copyData(data, m_BufferSize, m_Offset); }
 		inline UINT GetSize() { return m_BufferSize; }
 	protected:
-		GPU::GPUMemory* m_Buffer;
+		ptrGPUMem m_Buffer;
 		UINT m_BufferSize;
 		UINT m_Offset;
 	};
@@ -23,7 +25,7 @@ namespace Graphic {
 	// TODO add template? More option in creating this stuff
 	class VertexBuffer : public Descriptor {
 	public:
-		VertexBuffer(GPU::CommittedBuffer * gpubuffer, const UINT bufferSize, const UINT strideSize) 
+		VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize) 
 			:Descriptor(gpubuffer, bufferSize), m_strideSize(strideSize) {}
 
 		void Initialize(ComPtr<ID3D12Device> device=nullptr) override;
@@ -38,7 +40,7 @@ namespace Graphic {
 
 	class IndexBuffer : public Descriptor  {
 	public:
-		IndexBuffer(GPU::CommittedBuffer* gpubuffer, const UINT bufferSize)
+		IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
 			: Descriptor(gpubuffer, bufferSize) {}
 
 		void Initialize(ComPtr<ID3D12Device> device=nullptr) override;
@@ -53,7 +55,7 @@ namespace Graphic {
 	// Texture
 	class ShaderResource : public Descriptor {
 	public:
-		ShaderResource(GPU::GPUMemory* gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap)
+		ShaderResource(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap)
 			: Descriptor(gpubuffer, bufferSize), m_descriptorHeap(descriptorHeap) {}
 
 		void Initialize(ComPtr<ID3D12Device> device) override;
@@ -67,7 +69,7 @@ namespace Graphic {
 
 	class ConstantBuffer : public Descriptor {
 	public:
-		ConstantBuffer(GPU::GPUMemory* gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap)
+		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap)
 			: Descriptor(gpubuffer, bufferSize), m_descriptorHeap(descriptorHeap) {}
 		
 		void Initialize(ComPtr<ID3D12Device> device) override;

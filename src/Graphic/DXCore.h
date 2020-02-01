@@ -57,9 +57,9 @@ namespace Graphic
 
 		DescriptorHeap* cbvHeap;
 		ConstantBuffer* m_ConstantBuffer;
-		GPU::CommittedBuffer* m_cbGPUmem;
+		ptrGPUMem m_cbGPUmem;
 		Game::Mesh* m_mesh;
-		GPU::CommittedBuffer* m_GPUmem;
+		ptrGPUMem m_GPUmem;
 		
 		SwapChain* m_swapChain;
 		

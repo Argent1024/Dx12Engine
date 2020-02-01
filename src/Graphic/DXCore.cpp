@@ -165,7 +165,7 @@ namespace Graphic {
 			const UINT indexBufferSize = sizeof(index_list);
 
 			// Use upload type buffer
-			m_GPUmem = new GPU::UploadBuffer(vertexBufferSize + indexBufferSize);
+			m_GPUmem = std::make_shared<GPU::UploadBuffer>(vertexBufferSize + indexBufferSize); //new GPU::UploadBuffer(vertexBufferSize + indexBufferSize);
 			m_GPUmem->Initialize(m_device);
 
 			// Create Mesh
@@ -186,7 +186,7 @@ namespace Graphic {
 			cbvHeap = new DescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 			cbvHeap->Initialize(m_device);
 
-			m_cbGPUmem = new GPU::UploadBuffer(cbBufferSize);
+			m_cbGPUmem = std::make_shared<GPU::UploadBuffer>(cbBufferSize);//new GPU::UploadBuffer(cbBufferSize);
 			m_cbGPUmem->Initialize(m_device);
 
 			m_ConstantBuffer = new ConstantBuffer(m_cbGPUmem, cbSize, cbvHeap);
