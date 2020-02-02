@@ -156,6 +156,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Math\MathCommon.h" />
+    <ClInclude Include="src\World\Camera.h" />
     <ClInclude Include="src\d3dx12.h" />
     <ClInclude Include="src\Graphic\CommandList.h" />
     <ClInclude Include="src\Graphic\CommandQueue.h" />
@@ -188,6 +190,7 @@
     <ClInclude Include="src\Graphic\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\World\Camera.cpp" />
     <ClCompile Include="src\Graphic\CommandList.cpp" />
     <ClCompile Include="src\Graphic\CommandQueue.cpp" />
     <ClCompile Include="src\Graphic\Descriptor.cpp" />
