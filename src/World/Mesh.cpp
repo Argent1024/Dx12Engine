@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
 namespace Game {
-	void TriangleMesh::SetMesh(Graphic::CommandList& commandList) {
+	void TriangleMesh::UseMesh(Graphic::CommandList& commandList) {
 		commandList.SetPrimitiveTopology(TopologyType);
 		commandList.SetVertexBuffer(*m_VertexBuffer);
 		commandList.SetIndexBuffer(*m_IndexBuffer);
@@ -12,7 +12,7 @@ namespace Game {
 		commandList.DrawIndexedInstanced(IndexCountPerINstance, 1, 0, 0, 0);
 	}
 
-	void PointMesh::SetMesh(Graphic::CommandList& commandList) {
+	void PointMesh::UseMesh(Graphic::CommandList& commandList) {
 		commandList.SetPrimitiveTopology(TopologyType);
 		commandList.SetVertexBuffer(*m_VertexBuffer);
 	}

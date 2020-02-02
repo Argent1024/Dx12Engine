@@ -20,6 +20,11 @@ namespace Graphic {
 
 		inline void Present(UINT SyncInterval = 1, UINT Flags = 0);
 
+		inline D3D12_RESOURCE_BARRIER Barrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) const 
+		{
+			return CD3DX12_RESOURCE_BARRIER::Transition(m_renderTargets[m_BackBufferIndex].Get(), before, after);
+		}
+
 	private:
 		const UINT m_width;
 		const UINT m_height;

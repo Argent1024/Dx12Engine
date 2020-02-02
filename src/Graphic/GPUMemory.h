@@ -34,11 +34,18 @@ namespace Graphic {
 				device->CreateShaderResourceView(m_Resource.Get(), srvDesc, srvHandle);
 			}
 
+			inline D3D12_RESOURCE_BARRIER Barrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) const
+			{
+				return CD3DX12_RESOURCE_BARRIER::Transition(m_Resource.Get(), before, after);
+			}
+
 		protected:
 			UINT m_MemAllocated;
 			const UINT m_MemSize;
 			D3D12_GPU_VIRTUAL_ADDRESS m_GPUAddr;
 			ComPtr<ID3D12Resource> m_Resource;
+
+
 		};
 
 	}

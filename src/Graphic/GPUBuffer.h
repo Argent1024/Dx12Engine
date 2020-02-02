@@ -40,6 +40,8 @@ namespace Graphic {
 			static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_DEFAULT;
 		};
 
+		
+
 	
 		// TODO Test this buffer
 		class PlacedBuffer : public GPUMemory {

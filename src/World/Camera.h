@@ -14,7 +14,7 @@ namespace Game {
 
 	public:
 		Camera(const Vector3& Position, const Vector3& ViewDir, const Vector3& WorldUp)
-			: { LookAt(Position, ViewDir, WorldUp); }
+		{ LookAt(Position, ViewDir, WorldUp); }
 
 		inline void LookAt(const Vector3& Position, const Vector3& ViewDir, const Vector3& WorldUp)
 		{

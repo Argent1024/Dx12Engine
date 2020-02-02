@@ -196,10 +196,11 @@ namespace Graphic {
 		// Create factory
 		ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&m_factory)));
 		CreateDevice();
-		CreateSwapChain(t_appHwnd);
 		// Init command manager
 		CopyCommandManager.Initialize(m_device);
 		GraphicsCommandManager.Initialize(m_device);
+		CreateSwapChain(t_appHwnd);
+
 		m_commandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
 		
 		CreateTriangle();
@@ -222,8 +223,7 @@ namespace Graphic {
 		list->RSSetScissorRects(1, &m_scissorRect);
 
 		// Indicate that the back buffer will be used as a render target.
-		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_swapChain->GetBackBufferResource(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
-
+		m_commandList->ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		// Set & clear swapchain
 		const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 		m_commandList->SetSwapChain(*m_swapChain);
@@ -237,7 +237,7 @@ namespace Graphic {
 		}
 
 		// Indicate that the back buffer will now be used to present.
-		list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_swapChain->GetBackBufferResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+		m_commandList->ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		m_commandList->Close();
 	}
 
