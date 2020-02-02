@@ -13,7 +13,8 @@ namespace Math {
 
 		INLINE const Matrix3& GetRotation() { return m_mat.Get3x3(); }
 		INLINE Vector3 GetTranslation() { return m_mat.GetW(); }
- 
+		
+		INLINE operator XMMATRIX() { return m_mat; }
 	private:
 		Matrix4 m_mat;
 	};

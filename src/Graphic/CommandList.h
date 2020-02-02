@@ -73,6 +73,13 @@ namespace Graphic {
 		// GPU memory 
 		inline void ResourceBarrier(const GPU::GPUMemory& gpumem, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) { m_commandList->ResourceBarrier(1, &(gpumem.Barrier(before, after))); }
 
+
+		// Set root signature
+		inline void SetGraphicsRootConstants(UINT ParaIndex, UINT Size32Bit, const void* data, UINT Offset32Bit=0) 
+		{
+			m_commandList->SetGraphicsRoot32BitConstants(ParaIndex, Size32Bit, data, Offset32Bit);
+		}
+	
 		// TODO Write API
 		
 		ID3D12GraphicsCommandList* GetCommandList() const { return m_commandList.Get(); }	

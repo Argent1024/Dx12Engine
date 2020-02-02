@@ -47,6 +47,8 @@ namespace Math {
 
 		INLINE Matrix4 operator* (const Matrix4& mat) const { return Matrix4(XMMatrixMultiply(m_mat, mat.m_mat)); }
 		INLINE Vector3 operator* (Vector3 vec) const { return Vector3(XMVector3Transform(vec, m_mat)); } 
+		
+		INLINE operator XMMATRIX() { return m_mat; }
 	protected:
 		XMMATRIX m_mat;
 	};
