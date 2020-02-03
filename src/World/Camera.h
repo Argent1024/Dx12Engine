@@ -12,6 +12,13 @@ namespace Game {
 	class Camera 
 	{
 	public:
+		Camera(UINT width, UINT height) :
+			 m_Viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)),
+			 m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
+		{
+		
+		}
+
 		virtual void UseCamera(Graphic::CommandList& commandList) 
 		{
 			commandList.SetViewPorts(&m_Viewport);
@@ -30,7 +37,8 @@ namespace Game {
 	{ 
 
 	public:
-		ProjectiveCamera(const Vector3& Position, const Vector3& ViewDir, const Vector3& WorldUp)
+		ProjectiveCamera(UINT width, UINT height, 
+			const Vector3& Position, const Vector3& ViewDir, const Vector3& WorldUp): Camera(width, height)
 		{ LookAt(Position, ViewDir, WorldUp); }
 
 		inline void LookAt(const Vector3& Position, const Vector3& ViewDir, const Vector3& WorldUp)

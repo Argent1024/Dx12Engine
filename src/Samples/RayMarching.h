@@ -30,7 +30,7 @@ namespace Samples {
 		RayMarching(UINT t_width, UINT t_height, 
 					const std::wstring shaderPath=L"D:\\work\\tEngine\\Shaders\\ray.hlsl",
 					LPCTSTR t_title=L"playground") 
-			: GraphicCore(t_width, t_height, t_title), m_shaderPath(m_shaderPath) {}
+			: GraphicCore(t_width, t_height, t_title), m_shaderPath(m_shaderPath), m_Camera(t_width, t_height) {}
 
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;

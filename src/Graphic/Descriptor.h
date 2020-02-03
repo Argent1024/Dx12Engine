@@ -32,7 +32,7 @@ namespace Graphic {
 		void Initialize(ComPtr<ID3D12Device> device=nullptr) override;
 
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
-
+		inline UINT GetStrideSize() const { return m_strideSize; }
 	private:
 		const UINT m_strideSize;
 		D3D12_VERTEX_BUFFER_VIEW m_view;

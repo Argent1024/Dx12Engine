@@ -164,7 +164,6 @@
     <ClInclude Include="src\Graphic\CommandQueue.h" />
     <ClInclude Include="src\Graphic\Descriptor.h" />
     <ClInclude Include="src\Graphic\DescriptorHeap.h" />
-    <ClInclude Include="src\Graphic\DXCore.h" />
     <ClInclude Include="src\Graphic\DXHelper.h" />
     <ClInclude Include="src\Graphic\GPUBuffer.h" />
     <ClInclude Include="src\Graphic\GPUHeap.h" />
@@ -196,7 +195,6 @@
     <ClCompile Include="src\Graphic\CommandList.cpp" />
     <ClCompile Include="src\Graphic\CommandQueue.cpp" />
     <ClCompile Include="src\Graphic\Descriptor.cpp" />
-    <ClCompile Include="src\Graphic\DXCore.cpp" />
     <ClCompile Include="src\Graphic\GPUHeap.cpp" />
     <ClCompile Include="src\Graphic\GPUBuffer.cpp" />
     <ClCompile Include="src\Graphic\GraphicCore.cpp" />

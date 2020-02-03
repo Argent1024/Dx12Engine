@@ -13,13 +13,13 @@ namespace Samples {
 
 		// Define Slot
 		CD3DX12_ROOT_PARAMETER1 rootParameters[1];
-		rootParameters[0].InitAsConstants(sizeof(ScreenConstantData) / 4, 0, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+		rootParameters[0].InitAsConstants(sizeof(ScreenConstantData) / 4, 0, 0, D3D12_SHADER_VISIBILITY_ALL);
 		D3D12_ROOT_SIGNATURE_FLAGS rsFlag = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 			
 		// Create RootSignature
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
 		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, 0, nullptr, rsFlag);
-			ComPtr<ID3DBlob> signature;
+		ComPtr<ID3DBlob> signature;
 		ComPtr<ID3DBlob> error;
 		ThrowIfFailed(D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, featureData.HighestVersion, &signature, &error));
 		ThrowIfFailed(device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
@@ -134,32 +134,21 @@ namespace Samples {
 			CommandList ThreadCommandList;
 			GraphicsCommandManager.InitCommandList(&ThreadCommandList);
 			
-			ID3D12GraphicsCommandList* list = ThreadCommandList.GetCommandList();
-			ThreadCommandList.SetGraphicsRootSignature(*m_rootSignature);
-			ThreadCommandList.SetPipelineState(*m_GraphicPSO);
-			
-	
-			//m_rayMarchScreen.RecordCommand(ThreadCommandList);
+			m_rayMarchScreen.RecordCommand(ThreadCommandList);
 			m_Camera.UseCamera(ThreadCommandList);
 			
 			// Set data to root constant
-			/*ScreenConstantData data;
+			ScreenConstantData data;
 			data.ScreenSize = XMFLOAT4((float)m_width, (float)m_height, 0.0, 0.0);
 			ThreadCommandList.SetGraphicsRootConstants(0, sizeof(ScreenConstantData) / 4, &data);
-			*/
+			
 			// Draw
 			ThreadCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			
 			ThreadCommandList.SetSwapChain(*m_swapChain);
 			ThreadCommandList.ClearSwapChain(*m_swapChain, clearColor);
-			//m_rayMarchScreen.Draw(ThreadCommandList);
-			//m_Mesh->UseMesh(ThreadCommandList);
-			//m_Mesh->Draw(ThreadCommandList);
-
-			list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			list->IASetVertexBuffers(0, 1, m_vertexBuffer->GetBufferView());
-			list->IASetIndexBuffer(m_indexBuffer->GetIndexView());
-			list->DrawInstanced(3, 1, 0, 0);
-			//list->DrawIndexedInstanced(6, 1, 0, 0, 0);
+			m_Mesh->UseMesh(ThreadCommandList);
+			m_rayMarchScreen.Draw(ThreadCommandList);
 
 			ThreadCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
