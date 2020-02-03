@@ -9,22 +9,19 @@
 namespace Game {
 	using namespace Math;
 
-	class Camera 
-	{
+	class Camera {
 	public:
-		Camera(UINT width, UINT height) :
+		Camera(const UINT width, const UINT height) :
 			 m_Viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)),
 			 m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
-		{
-		
-		}
+		{ }
 
 		virtual void UseCamera(Graphic::CommandList& commandList) 
 		{
 			commandList.SetViewPorts(&m_Viewport);
 			commandList.SetScissorRects(&m_ScissorRect);
 		}
-
+		
 		void SetViewPort(CD3DX12_VIEWPORT newViewPort) { m_Viewport = newViewPort; }
 		void SetScissorRect(CD3DX12_RECT newScissorRect) { m_ScissorRect = newScissorRect; } 
 
@@ -33,11 +30,10 @@ namespace Game {
 		CD3DX12_RECT m_ScissorRect;
 	};
 
-	class ProjectiveCamera : public Camera
-	{ 
 
+	class ProjectiveCamera : public Camera { 
 	public:
-		ProjectiveCamera(UINT width, UINT height, 
+		ProjectiveCamera(const UINT width, const UINT height, 
 			const Vector3& Position, const Vector3& ViewDir, const Vector3& WorldUp): Camera(width, height)
 		{ LookAt(Position, ViewDir, WorldUp); }
 

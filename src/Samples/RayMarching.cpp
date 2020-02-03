@@ -42,13 +42,8 @@ namespace Samples {
 			/*ScreenConstantData data;
 			data.ScreenSize = XMFLOAT4((float)m_width, (float)m_height, 0.0, 0.0);
 			// Emmmmmmm need a D3D12_Direct command list to set root signature
-			CommandList copyHelper;
-			CopyCommandManager.Start();
-			CopyCommandManager.InitCommandList(&copyHelper);
-			copyHelper.SetGraphicsRootSignature(*m_rootSignature);
-			copyHelper.SetGraphicsRootConstants(0, sizeof(ScreenConstantData) / 4, &data);
-			CopyCommandManager.ExecuteCommandList(&copyHelper);
-			CopyCommandManager.End();*/
+			// Change the way copyCommandManager work, put it inside the GPU mem allocator
+			*/
 		}
 
 		// TODO do more thing on pso
@@ -122,12 +117,12 @@ namespace Samples {
 		GraphicsCommandManager.Start();
 		CommandList mainCommandList;
 		const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
-		//GraphicsCommandManager.InitCommandList(&mainCommandList);
-		//mainCommandList.SetSwapChain(*m_swapChain);
-		//mainCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		//mainCommandList.ClearSwapChain(*m_swapChain, clearColor);
-		//mainCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		//GraphicsCommandManager.ExecuteCommandList(&mainCommandList);
+		GraphicsCommandManager.InitCommandList(&mainCommandList);
+		mainCommandList.SetSwapChain(*m_swapChain);
+		mainCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		mainCommandList.ClearSwapChain(*m_swapChain, clearColor);
+		mainCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		GraphicsCommandManager.ExecuteCommandList(&mainCommandList);
 
 		// Record commands for each object, only have one object here
 		{
@@ -142,12 +137,10 @@ namespace Samples {
 			data.ScreenSize = XMFLOAT4((float)m_width, (float)m_height, 0.0, 0.0);
 			ThreadCommandList.SetGraphicsRootConstants(0, sizeof(ScreenConstantData) / 4, &data);
 			
-			// Draw
+			// Barrier Draw
 			ThreadCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 			
 			ThreadCommandList.SetSwapChain(*m_swapChain);
-			ThreadCommandList.ClearSwapChain(*m_swapChain, clearColor);
-			m_Mesh->UseMesh(ThreadCommandList);
 			m_rayMarchScreen.Draw(ThreadCommandList);
 
 			ThreadCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
