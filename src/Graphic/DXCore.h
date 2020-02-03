@@ -50,6 +50,8 @@ namespace Graphic
 
 		CD3DX12_VIEWPORT m_viewport;
 		CD3DX12_RECT m_scissorRect;
+
+		Game::Camera* m_camera;
 		ComPtr<ID3D12Device> m_device;
 		
 		CommandList* m_commandList;

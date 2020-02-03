@@ -16,23 +16,40 @@ namespace Game {
 	//		 other View or parameter that are needed when rendering
 	class Material {
 	public:
+		Material() {}
+
 		Material(ptrPSO pso, ptrRootSigature rootSignature)
 			: m_pso(pso), m_RootSignature(rootSignature) {}
 
-		void SetMaterial(Graphic::CommandList& commandList) 
+		inline void SetGPUStuff(ptrPSO pso, ptrRootSigature rootSignature) 
+		{
+			m_pso = pso;
+			m_RootSignature = rootSignature;
+		}
+
+		void UseMaterial(Graphic::CommandList& commandList) const
 		{
 			commandList.SetPipelineState(*m_pso);
 			commandList.SetGraphicsRootSignature(*m_RootSignature);
-			_SetMaterial(commandList);
+			_UseMaterial(commandList);
 		}
 
 	protected:
 		// Do some copy maybe and set descriptor table here
-		virtual void _SetMaterial(Graphic::CommandList& commandList) = 0;
+		virtual void _UseMaterial(Graphic::CommandList& commandList) const = 0;
 
 		ptrPSO m_pso;
 		ptrRootSigature m_RootSignature;
 	};
 
+
+	class NoMaterial : public Material 
+	{	
+	public:
+		NoMaterial(ptrPSO pso, ptrRootSigature rootSignature)
+			: Material(pso, rootSignature) {}
+
+		void _UseMaterial(Graphic::CommandList& commandList) const override {}
+	};
 
 }

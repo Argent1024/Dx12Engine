@@ -16,6 +16,7 @@ namespace Graphic {
 		virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
 		inline void copyData(void* data) { m_Buffer->copyData(data, m_BufferSize, m_Offset); }
 		inline UINT GetSize() { return m_BufferSize; }
+		
 	protected:
 		ptrGPUMem m_Buffer;
 		UINT m_BufferSize;
@@ -78,4 +79,6 @@ namespace Graphic {
 		UINT m_HeapIndex;
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
 	};
+
+
 }

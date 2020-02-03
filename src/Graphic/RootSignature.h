@@ -33,8 +33,6 @@ namespace Graphic {
 				featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 			}
 
-
-			CD3DX12_DESCRIPTOR_RANGE1 ranges[1];
 			CD3DX12_ROOT_PARAMETER1 rootParameters[1];
 			{
 				// Create Root CBV at regisiter 0, space 0

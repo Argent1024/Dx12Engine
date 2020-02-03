@@ -19,11 +19,19 @@ namespace Game {
 	// TODO Doesn't consider some weird usage yet
 	class TriangleMesh : public Mesh {
 	public:
-		
+		TriangleMesh() {}
+
 		TriangleMesh(ptrVertexBuffer v, ptrIndexBuffer i)
 			: Mesh(), m_VertexBuffer(v), m_IndexBuffer(i) {}
 
+		inline void SetBuffer(ptrVertexBuffer v, ptrIndexBuffer i)
+		{
+			m_VertexBuffer = v;
+			m_IndexBuffer = i;
+		}
+
 		void UseMesh(Graphic::CommandList& commandList) override;
+
 		// navie draw one instance
 		void Draw(Graphic::CommandList& commandList) override;
 		

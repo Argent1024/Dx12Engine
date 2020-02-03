@@ -2,6 +2,7 @@
 
 namespace Game {
 	void TriangleMesh::UseMesh(Graphic::CommandList& commandList) {
+		assert(m_VertexBuffer != nullptr && m_IndexBuffer != nullptr);
 		commandList.SetPrimitiveTopology(TopologyType);
 		commandList.SetVertexBuffer(*m_VertexBuffer);
 		commandList.SetIndexBuffer(*m_IndexBuffer);

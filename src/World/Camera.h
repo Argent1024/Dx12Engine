@@ -9,7 +9,24 @@
 namespace Game {
 	using namespace Math;
 
-	class ProjectiveCamera
+	class Camera 
+	{
+	public:
+		virtual void UseCamera(Graphic::CommandList& commandList) 
+		{
+			commandList.SetViewPorts(&m_Viewport);
+			commandList.SetScissorRects(&m_ScissorRect);
+		}
+
+		void SetViewPort(CD3DX12_VIEWPORT newViewPort) { m_Viewport = newViewPort; }
+		void SetScissorRect(CD3DX12_RECT newScissorRect) { m_ScissorRect = newScissorRect; } 
+
+	protected:
+		CD3DX12_VIEWPORT m_Viewport;
+		CD3DX12_RECT m_ScissorRect;
+	};
+
+	class ProjectiveCamera : public Camera
 	{ 
 
 	public:
@@ -24,12 +41,9 @@ namespace Game {
 			m_ViewTransform = Transform(x, y ,z, -Position);
 		}
 
-		void UseCamera(Graphic::CommandList& commmandList);
+		void UseCamera(Graphic::CommandList& commmandList) override;
 
 	private:
-		CD3DX12_VIEWPORT m_Viewport;
-		CD3DX12_RECT m_ScissorRect;
-
 		Transform m_ViewTransform;
 	};
 }

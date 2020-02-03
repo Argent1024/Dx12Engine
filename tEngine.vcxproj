@@ -78,7 +78,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)src\World;$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(ProjectDir)src\;$(IncludePath)</IncludePath>
-    <SourcePath>$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(ProjectDir)src\Utility;$(ProjectDir)src\;$(SourcePath)</SourcePath>
+    <SourcePath>$(ProjectDir)src\Physic;$(ProjectDir)src\Samples;$(ProjectDir)src\World;$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(ProjectDir)src\Utility;$(ProjectDir)src\;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -157,6 +157,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Math\MathCommon.h" />
+    <ClInclude Include="src\Samples\RayMarching.h" />
     <ClInclude Include="src\World\Camera.h" />
     <ClInclude Include="src\d3dx12.h" />
     <ClInclude Include="src\Graphic\CommandList.h" />
@@ -185,11 +186,12 @@
     <ClInclude Include="src\Utility\Timer.h" />
     <ClInclude Include="src\WinApp.h" />
     <ClInclude Include="src\World\Mesh.h" />
-    <ClInclude Include="src\World\Object.h" />
+    <ClInclude Include="src\World\GObject.h" />
     <ClInclude Include="src\World\World.h" />
     <ClInclude Include="src\Graphic\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Samples\RayMarching.cpp" />
     <ClCompile Include="src\World\Camera.cpp" />
     <ClCompile Include="src\Graphic\CommandList.cpp" />
     <ClCompile Include="src\Graphic\CommandQueue.cpp" />

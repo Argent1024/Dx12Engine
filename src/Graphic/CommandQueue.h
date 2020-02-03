@@ -91,6 +91,7 @@ namespace Graphic {
 		
 		void ExecuteCommandList(CommandList* commandList) 
 		{
+			commandList->Close();
 			uint64_t fence = m_Queue.Execute(commandList->GetCommandList());
 			m_Fences[m_AllocatorIndex] = std::max(m_Fences[m_AllocatorIndex], fence);
 		}
