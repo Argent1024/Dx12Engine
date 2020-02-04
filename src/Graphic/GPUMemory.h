@@ -22,7 +22,7 @@ namespace Graphic {
 			// Call CreateCommitted and CreatePlaced when init
 			virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
 			virtual void Destroy() = 0;
-			virtual void copyData(void* data, size_t size, size_t offset) = 0;
+			
 			virtual D3D12_HEAP_TYPE GetHeapType() = 0;
 
 			inline UINT GetBufferSize() { return m_MemSize; }
