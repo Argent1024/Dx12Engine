@@ -4,8 +4,6 @@
 #include "GPUHeap.h"
 #include "DescriptorHeap.h"
 
-#define ptrGPUMem std::shared_ptr<GPU::GPUMemory>
-
 namespace Graphic {
 	// Descriptors don't need to know about GPU Heap, GPU Buffer should handle all the memory stuff
 	class Descriptor {

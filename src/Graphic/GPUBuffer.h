@@ -16,6 +16,7 @@ namespace Graphic {
 			void Initialize(ComPtr<ID3D12Device> device) override;
 			void Destroy() override;
 			void copyData(void* data, size_t size = 0, size_t offset = 0) override;
+			inline D3D12_HEAP_TYPE GetHeapType() override { return m_HeapType; }
 
 		private:
 			static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_UPLOAD;
@@ -30,6 +31,7 @@ namespace Graphic {
 			void Initialize(ComPtr<ID3D12Device> device) override;
 			void Destroy() override;
 			void copyData(void* data, size_t size, size_t offset)  override;
+			inline D3D12_HEAP_TYPE GetHeapType() override { return m_HeapType; }
 
 		private:
 			// TODO: Better way to do the copy...
@@ -41,8 +43,6 @@ namespace Graphic {
 		};
 
 		
-
-	
 		// TODO Test this buffer
 		class PlacedBuffer : public GPUMemory {
 		public:
@@ -53,8 +53,11 @@ namespace Graphic {
 			void Destroy() override;
 			void copyData(void* data, size_t size, size_t offset) override;
 			inline UINT GetHeapOffset() const { return m_HeapOffset; }
+			inline D3D12_HEAP_TYPE GetHeapType() override { return m_HeapType; }
 
 		private:
+			static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_DEFAULT;
+
 			// TODO: Better way to do the copy...
 			ComPtr<ID3D12Resource> m_upload;
 			ComPtr<ID3D12Device> m_device;

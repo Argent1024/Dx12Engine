@@ -59,6 +59,7 @@ namespace Graphic {
 		ComPtr<ID3D12Fence> m_fence;
 	};
 
+
 	// User use this class to manage different type of Command Lists
 	// Take care of command list allocators 
 	// Help different command queue to wait each other
@@ -117,4 +118,5 @@ namespace Graphic {
 		std::vector<ComPtr<ID3D12CommandAllocator>> m_Allocators;
 		std::vector<uint64_t> m_Fences;
 	};
+
 }

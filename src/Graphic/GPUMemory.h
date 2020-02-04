@@ -1,11 +1,24 @@
 #pragma once
 
 #include "DXHelper.h"
+#include "CommandQueue.h"
+#include "MemoryManager.h"
 
+
+#define ptrGPUMem std::shared_ptr<GPU::GPUMemory>
 
 namespace Graphic {
+
+	class CommandManager;
+	class CommandList;
+
 	namespace GPU {
+		class MemoryAllocator;
+
 		class GPUMemory {
+		friend class CommandManager;
+		friend class CommandList;
+		friend class MemoryAllocator;
 		public:
 			GPUMemory(UINT Size)
 				: m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL), m_MemSize(Size) {}
@@ -14,6 +27,9 @@ namespace Graphic {
 			virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
 			virtual void Destroy() = 0;
 			virtual void copyData(void* data, size_t size, size_t offset) = 0;
+			virtual D3D12_HEAP_TYPE GetHeapType() = 0;
+
+			inline UINT GetBufferSize() { return m_MemSize; }
 
 			// Return offset of the memory, the user need to stored this
 			UINT MemAlloc(const UINT size) {
@@ -22,8 +38,6 @@ namespace Graphic {
 				m_MemAllocated += size;
 				return offset;
 			}
-
-			// TODO barrier stuff
 
 			inline D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddr() const {
 				assert(m_GPUAddr != D3D12_GPU_VIRTUAL_ADDRESS_NULL);
@@ -40,6 +54,10 @@ namespace Graphic {
 			}
 
 		protected:
+			inline ID3D12Resource* GetResource() const {
+				return m_Resource.Get();
+			}
+
 			UINT m_MemAllocated;
 			const UINT m_MemSize;
 			D3D12_GPU_VIRTUAL_ADDRESS m_GPUAddr;
