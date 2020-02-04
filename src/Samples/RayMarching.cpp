@@ -30,7 +30,9 @@ namespace Samples {
 		this->CreateDevice();
 		
 		// Initialize Command Manager
-		CopyCommandManager.Initialize(m_device);
+		//CopyCommandManager.Initialize(m_device);
+		EngineGPUMemory.Initialize(m_device);
+		CopyHelper.Initialize(m_device);
 		GraphicsCommandManager.Initialize(m_device);
 		
 		CreatSwapChain(m_appHwnd);
@@ -92,8 +94,9 @@ namespace Samples {
 			const UINT vertexBufferSize = sizeof(triangleVertices);
 			const UINT indexBufferSize = sizeof(index_list);
 			// Use upload type buffer
-			m_GPUmem = std::make_shared<GPU::UploadBuffer>(vertexBufferSize + indexBufferSize); 
-			m_GPUmem->Initialize(m_device);
+			//m_GPUmem = std::make_shared<GPU::UploadBuffer>(vertexBufferSize + indexBufferSize); 
+			//m_GPUmem->Initialize(m_device);
+			m_GPUmem = EngineGPUMemory.CreateCommittedBuffer(vertexBufferSize + indexBufferSize);
 
 			m_vertexBuffer = std::make_shared<VertexBuffer>(m_GPUmem, vertexBufferSize, sizeof(Vertex));
 			m_vertexBuffer->Initialize();
@@ -102,6 +105,9 @@ namespace Samples {
 			m_indexBuffer = std::make_shared<IndexBuffer>(m_GPUmem, indexBufferSize);
 			m_indexBuffer->Initialize();
 			m_indexBuffer->copyData((void*)index_list);
+			
+
+
 			m_Mesh =std::make_shared<TriangleMesh>(m_vertexBuffer, m_indexBuffer);
 		}
 

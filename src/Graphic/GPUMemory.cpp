@@ -1,12 +1,13 @@
-#include "MemoryManager.h"
+#include "GPUMemory.h"
+#include "GPUBuffer.h"
+#include "CommandQueue.h"
+
 namespace Graphic {
-	
-	GPU::MemoryAllocator EngineGPUMemoryAllocator;
 
 	namespace GPU {
 		void MemoryAllocator::Initialize(ComPtr<ID3D12Device> device)
 		{
-			m_CopyHelper.Initialize(device);
+			m_device = device;
 		}
 
 		ptrGPUMem MemoryAllocator::CreateCommittedBuffer(const UINT bufferSize, const D3D12_HEAP_TYPE heapType)
@@ -16,16 +17,17 @@ namespace Graphic {
 			{
 			case D3D12_HEAP_TYPE_DEFAULT:
 				ptr = std::make_shared<GPU::DefaultBuffer>(bufferSize);
-				ptr->Initialize(m_device);
 
 			case D3D12_HEAP_TYPE_UPLOAD:
 				ptr = std::make_shared<GPU::UploadBuffer>(bufferSize);
-				ptr->Initialize(m_device);
 
 			//TODO Placed heap
 			default:
-				assert(FALSE && "Wrong heap type");
+				break;
+				//assert(FALSE && "Wrong heap type");
 			}
+
+			ptr->Initialize(m_device);
 			return ptr;
 		}
 
@@ -42,7 +44,8 @@ namespace Graphic {
 
 				//TODO Placed heap
 				default:
-					assert(FALSE && "Wrong heap type");
+					break;
+					//assert(FALSE && "Wrong heap type");
 			}
 		}
 
@@ -64,12 +67,12 @@ namespace Graphic {
 			assert(destOffset + size <= destSize);
 
 			CommandList copycl;
-			m_CopyHelper.Start();
-			m_CopyHelper.InitCommandList(&copycl);
+			CopyHelper.Start();
+			CopyHelper.InitCommandList(&copycl);
 			copycl.CopyBufferRegion(dest, destOffset, src, 0, size);
-			m_CopyHelper.ExecuteCommandList(&copycl);
-			m_CopyHelper.End();
-			m_CopyHelper.Start();
+			CopyHelper.ExecuteCommandList(&copycl);
+			CopyHelper.End();
+			CopyHelper.Start();
 		}
 	}
 }

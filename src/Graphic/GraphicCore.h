@@ -1,15 +1,15 @@
 #pragma once
 #include <iostream>
 #include "CommandQueue.h"
-
+#include "MemoryManager.h"
 
 namespace Graphic 
 {
+
 	class GraphicCore {
 	public:
 		GraphicCore(UINT t_width, UINT t_height, LPCTSTR t_title):
 			m_width(t_width), m_height(t_height), m_title(t_title),
-			CopyCommandManager(1),
 			GraphicsCommandManager(2) { }
 
 		UINT GetWidth() const { return m_width; }
@@ -30,7 +30,6 @@ namespace Graphic
 
 
 		// TODO maybe dont put here?
-		CommandManager CopyCommandManager;
 		CommandManager GraphicsCommandManager;
 
 		const UINT m_width;

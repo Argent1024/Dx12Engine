@@ -4,6 +4,7 @@
 #include "CommandList.h"
 
 namespace Graphic {
+	extern CommandManager CopyHelper;
 
 	//TODO Consider multi threading
 	class CommandQueue {

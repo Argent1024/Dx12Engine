@@ -1,7 +1,6 @@
 #pragma once
-#include "GPUMemory.h"
+
 #include "GPUBuffer.h"
-#include "GPUHeap.h"
 #include "DescriptorHeap.h"
 
 namespace Graphic {
@@ -12,7 +11,10 @@ namespace Graphic {
 			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
 
 		virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
-		inline void copyData(void* data) { m_Buffer->copyData(data, m_BufferSize, m_Offset); }
+
+		inline void copyData(void* data) { 
+			EngineGPUMemory.UploadData(*m_Buffer, data, m_BufferSize, m_Offset);
+		}
 		inline UINT GetSize() { return m_BufferSize; }
 		
 	protected:
@@ -31,6 +33,7 @@ namespace Graphic {
 
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
 		inline UINT GetStrideSize() const { return m_strideSize; }
+
 	private:
 		const UINT m_strideSize;
 		D3D12_VERTEX_BUFFER_VIEW m_view;

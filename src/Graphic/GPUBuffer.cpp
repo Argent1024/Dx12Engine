@@ -52,13 +52,12 @@ namespace Graphic {
 		void DefaultBuffer::Destroy() {
 			m_device = nullptr;
 			m_Resource = nullptr;
-			m_upload = nullptr;
 			m_GPUAddr = D3D12_GPU_VIRTUAL_ADDRESS_NULL;
 			m_MemAllocated = 0;
 		}
 
 		void DefaultBuffer::copyData(void* data, size_t size, size_t offset) {
-			assert(offset + size <= m_MemSize);
+			/*assert(offset + size <= m_MemSize);
 			ThrowIfFailed(
 				m_device->CreateCommittedResource(
 					&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
@@ -80,6 +79,7 @@ namespace Graphic {
 			m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Resource.Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_COPY_DEST));
 			m_commandList->CopyBufferRegion(m_Resource.Get(), offset, m_upload.Get(), 0, size);
 			m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Resource.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ));
+			*/		
 		}
 
 

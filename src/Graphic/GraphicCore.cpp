@@ -1,6 +1,9 @@
 #include "GraphicCore.h"
 
 namespace Graphic {
+	GPU::MemoryAllocator EngineGPUMemory;
+	CommandManager CopyHelper(1);
+
 	void GraphicCore::EnableDebug()
 	{
 		ComPtr<ID3D12Debug> debugController;

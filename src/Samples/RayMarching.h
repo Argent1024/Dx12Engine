@@ -1,4 +1,5 @@
 #pragma once
+
 #include "GraphicCore.h"
 #include "../World/Camera.h"
 #include "../World/GObject.h"

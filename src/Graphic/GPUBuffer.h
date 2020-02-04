@@ -25,8 +25,8 @@ namespace Graphic {
 
 		class DefaultBuffer : public CommittedBuffer {
 		public:
-			DefaultBuffer(const UINT bufferSize, ID3D12GraphicsCommandList* copyCommandList) :
-				CommittedBuffer(bufferSize), m_commandList(copyCommandList) {}
+			DefaultBuffer(const UINT bufferSize) :
+				CommittedBuffer(bufferSize) {}
 
 			void Initialize(ComPtr<ID3D12Device> device) override;
 			void Destroy() override;
@@ -35,9 +35,7 @@ namespace Graphic {
 
 		private:
 			// TODO: Better way to do the copy...
-			ComPtr<ID3D12Resource> m_upload;
 			ComPtr<ID3D12Device> m_device;
-			ID3D12GraphicsCommandList* m_commandList;
 
 			static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_DEFAULT;
 		};

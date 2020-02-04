@@ -19,7 +19,7 @@ namespace Samples {
 
 	private:
 		Camera m_Camera;
-		static const std::wstring shaderPath=L"D:\\work\\tEngine\\Shaders\\particle.hlsl";
+		const std::wstring shaderPath=L"D:\\work\\tEngine\\Shaders\\particle.hlsl";
 	};
 }
 

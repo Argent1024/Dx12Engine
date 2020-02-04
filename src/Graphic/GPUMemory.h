@@ -1,25 +1,21 @@
 #pragma once
 
 #include "DXHelper.h"
-#include "CommandQueue.h"
-#include "MemoryManager.h"
-
-
 #define ptrGPUMem std::shared_ptr<GPU::GPUMemory>
 
 namespace Graphic {
-
 	class CommandManager;
 	class CommandList;
 
 	namespace GPU {
-		class MemoryAllocator;
 
 		class GPUMemory {
-		friend class CommandManager;
-		friend class CommandList;
-		friend class MemoryAllocator;
+
 		public:
+		friend CommandManager;
+		friend CommandList;
+		friend class MemoryAllocator;
+
 			GPUMemory(UINT Size)
 				: m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL), m_MemSize(Size) {}
 
@@ -62,9 +58,29 @@ namespace Graphic {
 			const UINT m_MemSize;
 			D3D12_GPU_VIRTUAL_ADDRESS m_GPUAddr;
 			ComPtr<ID3D12Resource> m_Resource;
-
-
 		};
 
+
+		class MemoryAllocator {
+		public:
+			MemoryAllocator() {}
+
+			void Initialize(ComPtr<ID3D12Device> device);
+
+			// TODO manage cpu memory by myself
+			ptrGPUMem CreateCommittedBuffer(const UINT bufferSize, const D3D12_HEAP_TYPE m_HeapType=D3D12_HEAP_TYPE_DEFAULT);
+			
+			void UploadData(GPUMemory& dest, void* data, UINT size, UINT offset=0);
+
+		private:
+			void _UploadData(GPUMemory& buffer, void* data, UINT size, UINT offset=0);
+
+			void _CopyBuffer(GPUMemory& dest, GPUMemory& src);
+
+			ptrGPUMem m_Upload;
+			ComPtr<ID3D12Device> m_device;
+		};
 	}
+
+	extern GPU::MemoryAllocator EngineGPUMemory;
 }
