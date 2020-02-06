@@ -21,13 +21,14 @@ namespace Graphic {
 		
 
 			GPUMemory(UINT Size)
-				: m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL), m_MemSize(Size) {}
+				: m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL), 
+				  m_MemSize(Size), m_ResourceDesc(CD3DX12_RESOURCE_DESC::Buffer(Size)) {}
 
 			// Call CreateCommitted and CreatePlaced when init
-			virtual void Initialize(ComPtr<ID3D12Device> device, D3D12_RESOURCE_DESC* desc=nullptr) = 0;
+			virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
 			virtual void Destroy() = 0;
 			
-			virtual D3D12_HEAP_TYPE GetHeapType() = 0;
+			virtual inline D3D12_HEAP_TYPE GetHeapType() = 0;
 
 			inline UINT GetBufferSize() { return m_MemSize; }
 
@@ -48,15 +49,16 @@ namespace Graphic {
 			{
 				return CD3DX12_RESOURCE_BARRIER::Transition(m_Resource.Get(), before, after);
 			}
-
+			
 		protected:
-			inline ID3D12Resource* GetResource() const {
-				return m_Resource.Get();
-			}
+			inline ID3D12Resource* GetResource() const { return m_Resource.Get(); }
 
 			UINT m_MemAllocated;
-			const UINT m_MemSize;
+			const UINT m_MemSize;		// Total Memory Size
 			D3D12_GPU_VIRTUAL_ADDRESS m_GPUAddr;
+
+
+			D3D12_RESOURCE_DESC m_ResourceDesc;
 			ComPtr<ID3D12Resource> m_Resource;
 		};
 

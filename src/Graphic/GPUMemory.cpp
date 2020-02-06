@@ -13,35 +13,24 @@ namespace Graphic {
 		ptrGPUMem MemoryAllocator::CreateCommittedBuffer(const UINT bufferSize, const D3D12_HEAP_TYPE heapType)
 		{
 			ptrGPUMem ptr;
-			switch (heapType)
-			{
-			case D3D12_HEAP_TYPE_DEFAULT:
-				ptr = std::make_shared<GPU::DefaultBuffer>(bufferSize);
-
-			case D3D12_HEAP_TYPE_UPLOAD:
-				ptr = std::make_shared<GPU::UploadBuffer>(bufferSize);
-
-			//TODO Placed heap
-			default:
-				break;
-				//assert(FALSE && "Wrong heap type");
-			}
-
+		
+			ptr = std::make_shared<GPU::CommittedBuffer>(bufferSize, heapType);
 			ptr->Initialize(m_device);
+			
 			return ptr;
 		}
 
-		void MemoryAllocator::UploadData(GPUMemory& dest, void* data, UINT bufferSize, UINT offset) {
+		void MemoryAllocator::UploadData(GPUMemory& dest, void* data, UINT dataSize, UINT offset) {
 			switch (dest.GetHeapType()) 
 			{
 				case D3D12_HEAP_TYPE_DEFAULT:
-					m_Upload = CreateCommittedBuffer(bufferSize, D3D12_HEAP_TYPE_UPLOAD);
-					_UploadData(*m_Upload, data, bufferSize, offset);
+					m_Upload = CreateCommittedBuffer(dataSize, D3D12_HEAP_TYPE_UPLOAD);
+					_UploadData(*m_Upload, data, dataSize, 0);
 					_CopyBuffer(dest, *m_Upload);
-
+					break;
 				case D3D12_HEAP_TYPE_UPLOAD:
-					_UploadData(dest, data, bufferSize, offset);
-
+					_UploadData(dest, data, dataSize, offset);
+					break;
 				//TODO Placed heap
 				default:
 					break;
@@ -84,13 +73,12 @@ namespace Graphic {
 		void MemoryAllocator::_CopyBuffer(GPUMemory& dest, GPUMemory& src)  {
 			UINT size = src.GetBufferSize();
 			UINT destSize = dest.GetBufferSize();
-			UINT destOffset = dest.m_MemAllocated;
-			assert(destOffset + size <= destSize);
+			UINT destOffset = dest.m_MemAllocated ;
 
 			CommandList copycl;
 			CopyHelper.Start();
 			CopyHelper.InitCommandList(&copycl);
-			copycl.CopyBufferRegion(dest, destOffset, src, 0, size);
+			copycl.CopyBufferRegion(dest, destOffset - size, src, 0, size);
 			CopyHelper.ExecuteCommandList(&copycl);
 			CopyHelper.End();
 			CopyHelper.Start();

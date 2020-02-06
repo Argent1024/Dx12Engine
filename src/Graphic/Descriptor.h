@@ -4,6 +4,7 @@
 #include "DescriptorHeap.h"
 
 namespace Graphic {
+
 	// Most Descriptor here shouldn't be used directly, use Mesh & Material class instead
 	// Descriptors don't need to know about GPU Heap, GPU Buffer should handle all the memory stuff
 	class Descriptor {
@@ -13,7 +14,8 @@ namespace Graphic {
 
 		virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
 
-		inline void copyData(void* data) { EngineGPUMemory.UploadData(*m_Buffer, data, m_BufferSize, m_Offset);}
+		inline void copyData(void* data) { EngineGPUMemory.UploadData(*m_Buffer, data, m_BufferSize, m_Offset); }
+
 		inline UINT GetSize() { return m_BufferSize; }
 		
 	protected:
@@ -70,7 +72,7 @@ namespace Graphic {
 			: Descriptor(gpubuffer, bufferSize) {}
 
 		void Initialize(ComPtr<ID3D12Device> device=nullptr) override;
-	
+		
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
 		
 	private:

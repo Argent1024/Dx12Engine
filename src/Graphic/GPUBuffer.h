@@ -6,38 +6,19 @@ namespace Graphic {
 	namespace GPU {
 		class CommittedBuffer : public GPUMemory {
 		public:
-			CommittedBuffer(const UINT size) : GPUMemory(size) {}
-		};
+			CommittedBuffer(const UINT size, D3D12_HEAP_TYPE type) 
+				: GPUMemory(size), m_HeapType(type) {}
 
-		class UploadBuffer : public CommittedBuffer {
-		public:
-			UploadBuffer(const UINT bufferSize) : CommittedBuffer(bufferSize) {}
+			void Initialize(ComPtr<ID3D12Device> device) override;
 
-			void Initialize(ComPtr<ID3D12Device> device, D3D12_RESOURCE_DESC* desc=nullptr) override;
 			void Destroy() override;
-			
-			inline D3D12_HEAP_TYPE GetHeapType() override { return m_HeapType; }
+
+			inline D3D12_HEAP_TYPE GetHeapType() override { return m_HeapType;}
 
 		private:
-			static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_UPLOAD;
+			// Committed buffer need a heap type to distinguish default or upload
+			D3D12_HEAP_TYPE m_HeapType;
 		};
-
-
-		class DefaultBuffer : public CommittedBuffer {
-		public:
-			DefaultBuffer(const UINT bufferSize) :
-				CommittedBuffer(bufferSize) {}
-
-			void Initialize(ComPtr<ID3D12Device> device, D3D12_RESOURCE_DESC* desc=nullptr) override;
-			void Destroy() override;
-			
-			inline D3D12_HEAP_TYPE GetHeapType() override { return m_HeapType; }
-
-		private:
-			ComPtr<ID3D12Device> m_device;
-			static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_DEFAULT;
-		};
-
 		
 		// TODO Test this buffer
 		class PlacedBuffer : public GPUMemory {
@@ -45,11 +26,10 @@ namespace Graphic {
 			PlacedBuffer(GPUHeap* const GPUHeap, const UINT size)
 				:GPUMemory(size), m_Heap(GPUHeap) {}
 
-			void Initialize(ComPtr<ID3D12Device> device, D3D12_RESOURCE_DESC* desc=nullptr) override;
+			void Initialize(ComPtr<ID3D12Device> device) override;
 			void Destroy() override;
 			
 			inline UINT GetHeapOffset() const { return m_HeapOffset; }
-			inline D3D12_HEAP_TYPE GetHeapType() override { return m_HeapType; }
 
 		private:
 			static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_DEFAULT;

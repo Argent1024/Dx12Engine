@@ -100,7 +100,7 @@ namespace Samples {
 
 			m_vertexBuffer = std::make_shared<VertexBuffer>(m_GPUmem, vertexBufferSize, sizeof(Vertex));
 			m_vertexBuffer->Initialize();
-			m_vertexBuffer->copyData((void*)triangleVertices);
+			m_vertexBuffer->copyData(triangleVertices);
 
 			m_indexBuffer = std::make_shared<IndexBuffer>(m_GPUmem, indexBufferSize);
 			m_indexBuffer->Initialize();
