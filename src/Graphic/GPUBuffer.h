@@ -13,7 +13,7 @@ namespace Graphic {
 		public:
 			UploadBuffer(const UINT bufferSize) : CommittedBuffer(bufferSize) {}
 
-			void Initialize(ComPtr<ID3D12Device> device) override;
+			void Initialize(ComPtr<ID3D12Device> device, D3D12_RESOURCE_DESC* desc=nullptr) override;
 			void Destroy() override;
 			
 			inline D3D12_HEAP_TYPE GetHeapType() override { return m_HeapType; }
@@ -28,7 +28,7 @@ namespace Graphic {
 			DefaultBuffer(const UINT bufferSize) :
 				CommittedBuffer(bufferSize) {}
 
-			void Initialize(ComPtr<ID3D12Device> device) override;
+			void Initialize(ComPtr<ID3D12Device> device, D3D12_RESOURCE_DESC* desc=nullptr) override;
 			void Destroy() override;
 			
 			inline D3D12_HEAP_TYPE GetHeapType() override { return m_HeapType; }
@@ -45,7 +45,7 @@ namespace Graphic {
 			PlacedBuffer(GPUHeap* const GPUHeap, const UINT size)
 				:GPUMemory(size), m_Heap(GPUHeap) {}
 
-			void Initialize(ComPtr<ID3D12Device> device) override;
+			void Initialize(ComPtr<ID3D12Device> device, D3D12_RESOURCE_DESC* desc=nullptr) override;
 			void Destroy() override;
 			
 			inline UINT GetHeapOffset() const { return m_HeapOffset; }
@@ -58,8 +58,7 @@ namespace Graphic {
 			
 			GPUHeap* const m_Heap;
 			UINT m_HeapOffset;
-			//TODO 
-			D3D12_RESOURCE_DESC m_ResourceDesc;
+		
 		};
 
 	}

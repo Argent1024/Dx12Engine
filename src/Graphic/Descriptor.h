@@ -4,6 +4,7 @@
 #include "DescriptorHeap.h"
 
 namespace Graphic {
+	// Most Descriptor here shouldn't be used directly, use Mesh & Material class instead
 	// Descriptors don't need to know about GPU Heap, GPU Buffer should handle all the memory stuff
 	class Descriptor {
 	public:
@@ -43,6 +44,8 @@ namespace Graphic {
 		UINT m_HeapIndex;
 	};
 
+
+
 	class VertexBuffer : public Descriptor {
 	public:
 		VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize) 
@@ -60,6 +63,7 @@ namespace Graphic {
 	};
 
 
+
 	class IndexBuffer : public Descriptor  {
 	public:
 		IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
@@ -74,6 +78,7 @@ namespace Graphic {
 	};
 
 
+
 	class ConstantBuffer : public HeapDescriptor {
 	public:
 		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap)
@@ -83,6 +88,7 @@ namespace Graphic {
 	private:
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
 	};
+
 
 
 	class ShaderResource : public HeapDescriptor {
@@ -101,6 +107,7 @@ namespace Graphic {
 	private:
 		D3D12_SHADER_RESOURCE_VIEW_DESC m_srvDesc;
 	};
+
 
 
 	class UnorderedAccess : public HeapDescriptor {

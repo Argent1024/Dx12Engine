@@ -31,22 +31,43 @@ namespace Graphic {
 			return ptr;
 		}
 
-		void MemoryAllocator::UploadData(GPUMemory& dest, void* data, UINT size, UINT offset) {
+		void MemoryAllocator::UploadData(GPUMemory& dest, void* data, UINT bufferSize, UINT offset) {
 			switch (dest.GetHeapType()) 
 			{
 				case D3D12_HEAP_TYPE_DEFAULT:
-					m_Upload = CreateCommittedBuffer(size, D3D12_HEAP_TYPE_UPLOAD);
-					_UploadData(*m_Upload, data, size, offset);
+					m_Upload = CreateCommittedBuffer(bufferSize, D3D12_HEAP_TYPE_UPLOAD);
+					_UploadData(*m_Upload, data, bufferSize, offset);
 					_CopyBuffer(dest, *m_Upload);
 
 				case D3D12_HEAP_TYPE_UPLOAD:
-					_UploadData(dest, data, size, offset);
+					_UploadData(dest, data, bufferSize, offset);
 
 				//TODO Placed heap
 				default:
 					break;
 					//assert(FALSE && "Wrong heap type");
 			}
+		}
+
+		void MemoryAllocator::UploadTexure(GPUMemory& dest, const D3D12_SUBRESOURCE_DATA* textureData, UINT bufferSize) {
+			// TODO different types later
+			assert(dest.GetHeapType == D3D12_HEAP_TYPE_DEFAULT);
+			const UINT64 uploadBufferSize = GetRequiredIntermediateSize(dest.GetResource(), 0, 1);
+			ComPtr<ID3D12Resource> textureUploadHeap;
+			ThrowIfFailed(m_device->CreateCommittedResource(
+							&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+							D3D12_HEAP_FLAG_NONE,
+							&CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
+							D3D12_RESOURCE_STATE_GENERIC_READ,
+							nullptr,
+							IID_PPV_ARGS(&textureUploadHeap)));
+			CommandList copycl;
+			CopyHelper.Start();
+			CopyHelper.InitCommandList(&copycl);
+			UpdateSubresources(copycl.GetCommandList(), dest.GetResource(), textureUploadHeap.Get(), 0, 0, 1, textureData);
+			CopyHelper.ExecuteCommandList(&copycl);
+			CopyHelper.End();
+			CopyHelper.Start();
 		}
 
 		void MemoryAllocator::_UploadData(GPUMemory& buffer, void* data, UINT size, UINT offset) {
@@ -74,5 +95,6 @@ namespace Graphic {
 			CopyHelper.End();
 			CopyHelper.Start();
 		}
+
 	}
 }

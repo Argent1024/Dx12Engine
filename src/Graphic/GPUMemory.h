@@ -13,18 +13,18 @@ namespace Graphic {
 		class GPUMemory {
 
 		public:
-		friend CommandManager;
-		friend CommandList;
-		friend ShaderResource;
-		friend UnorderedAccess;
-		friend class MemoryAllocator;
+			friend CommandManager;
+			friend CommandList;
+			friend ShaderResource;
+			friend UnorderedAccess;
+			friend class MemoryAllocator;
 		
 
 			GPUMemory(UINT Size)
 				: m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL), m_MemSize(Size) {}
 
 			// Call CreateCommitted and CreatePlaced when init
-			virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
+			virtual void Initialize(ComPtr<ID3D12Device> device, D3D12_RESOURCE_DESC* desc) = 0;
 			virtual void Destroy() = 0;
 			
 			virtual D3D12_HEAP_TYPE GetHeapType() = 0;
@@ -70,13 +70,16 @@ namespace Graphic {
 			// TODO manage cpu memory by myself
 			ptrGPUMem CreateCommittedBuffer(const UINT bufferSize, const D3D12_HEAP_TYPE m_HeapType=D3D12_HEAP_TYPE_DEFAULT);
 			
-			void UploadData(GPUMemory& dest, void* data, UINT size, UINT offset=0);
+			void UploadData(GPUMemory& dest, void* data, UINT bufferize, UINT offset=0);
+
+			void UploadTexure(GPUMemory& dest, const D3D12_SUBRESOURCE_DATA* textureData, UINT bufferSize);
 
 		private:
 			void _UploadData(GPUMemory& buffer, void* data, UINT size, UINT offset=0);
 
 			void _CopyBuffer(GPUMemory& dest, GPUMemory& src);
 
+			// Only use one thread...?
 			ptrGPUMem m_Upload;
 			ComPtr<ID3D12Device> m_device;
 		};
