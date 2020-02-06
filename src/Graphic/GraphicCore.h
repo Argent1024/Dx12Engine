@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include "CommandQueue.h"
-#include "MemoryManager.h"
 
 namespace Graphic 
 {

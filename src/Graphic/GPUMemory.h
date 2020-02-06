@@ -6,7 +6,8 @@
 namespace Graphic {
 	class CommandManager;
 	class CommandList;
-
+	class ShaderResource;
+	class UnorderedAccess;
 	namespace GPU {
 
 		class GPUMemory {
@@ -14,7 +15,10 @@ namespace Graphic {
 		public:
 		friend CommandManager;
 		friend CommandList;
+		friend ShaderResource;
+		friend UnorderedAccess;
 		friend class MemoryAllocator;
+		
 
 			GPUMemory(UINT Size)
 				: m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL), m_MemSize(Size) {}
@@ -38,10 +42,6 @@ namespace Graphic {
 			inline D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddr() const {
 				assert(m_GPUAddr != D3D12_GPU_VIRTUAL_ADDRESS_NULL);
 				return m_GPUAddr;
-			}
-
-			inline void CreateSRV(ComPtr<ID3D12Device> device, D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc, D3D12_CPU_DESCRIPTOR_HANDLE srvHandle) {
-				device->CreateShaderResourceView(m_Resource.Get(), srvDesc, srvHandle);
 			}
 
 			inline D3D12_RESOURCE_BARRIER Barrier(D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) const

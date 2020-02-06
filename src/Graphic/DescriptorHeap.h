@@ -51,7 +51,8 @@ namespace Graphic {
 			CD3DX12_GPU_DESCRIPTOR_HANDLE handle = m_GPUHandleStart;
 			return handle.Offset(offset, m_DescriptorSize); 
 		}
-		
+
+		inline D3D12_DESCRIPTOR_HEAP_TYPE GetDescriptorHeapType() const { return m_HeapDesc.Type; }
 
 	private:
 		D3D12_DESCRIPTOR_HEAP_DESC m_HeapDesc;
