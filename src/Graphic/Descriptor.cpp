@@ -45,6 +45,6 @@ namespace Graphic {
 	void UnorderedAccess::CreateDescriptor(ComPtr<ID3D12Device> device)
 	{
 		m_HeapIndex = m_descriptorHeap->MallocHeap();
-		device->CreateUnorderedAccessView(m_Buffer->GetResource(), &m_uavDesc, m_descriptorHeap->GetCPUHandle(m_HeapIndex));
+		//device->CreateUnorderedAccessView(m_Buffer->GetResource(), &m_uavDesc, m_descriptorHeap->GetCPUHandle(m_HeapIndex));
 	}
 }

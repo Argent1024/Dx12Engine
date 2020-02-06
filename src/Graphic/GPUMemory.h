@@ -24,7 +24,7 @@ namespace Graphic {
 				: m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL), m_MemSize(Size) {}
 
 			// Call CreateCommitted and CreatePlaced when init
-			virtual void Initialize(ComPtr<ID3D12Device> device, D3D12_RESOURCE_DESC* desc) = 0;
+			virtual void Initialize(ComPtr<ID3D12Device> device, D3D12_RESOURCE_DESC* desc=nullptr) = 0;
 			virtual void Destroy() = 0;
 			
 			virtual D3D12_HEAP_TYPE GetHeapType() = 0;
@@ -72,7 +72,7 @@ namespace Graphic {
 			
 			void UploadData(GPUMemory& dest, void* data, UINT bufferize, UINT offset=0);
 
-			void UploadTexure(GPUMemory& dest, const D3D12_SUBRESOURCE_DATA* textureData, UINT bufferSize);
+			void UploadTexure(GPUMemory& dest, D3D12_SUBRESOURCE_DATA* textureData);
 
 		private:
 			void _UploadData(GPUMemory& buffer, void* data, UINT size, UINT offset=0);

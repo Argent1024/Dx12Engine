@@ -2,9 +2,8 @@
 
 namespace Graphic {
 
-	Texture::Texture(UINT width, UINT height, D3D12_RESOURCE_DIMENSION dim=D3D12_RESOURCE_DIMENSION_TEXTURE2D)
+	Texture::Texture(UINT width, UINT height, D3D12_RESOURCE_DIMENSION dim)
 	{
-		m_textureDesc.MipLevels = 1;
 		m_textureDesc.MipLevels = 1;
 		m_textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		m_textureDesc.Width = width;
@@ -21,14 +20,24 @@ namespace Graphic {
 	{
 		// Whether this work...? Should rewrite GPU Memory?
 		const D3D12_RESOURCE_ALLOCATION_INFO  allocateInfo = device->GetResourceAllocationInfo(0, 1, &m_textureDesc);
-		const UINT bufferSize = allocateInfo.SizeInBytes;
+		const UINT64 bufferSize = allocateInfo.SizeInBytes;
 		ptrGPUMem gpuMem = EngineGPUMemory.CreateCommittedBuffer(bufferSize);
+		
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srvDesc.Format = m_textureDesc.Format;
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D; //TODO emmmm
+        srvDesc.Texture2D.MipLevels = 1;
+
 		m_srv = new ShaderResource(gpuMem, bufferSize, descriptorHeap);
+		m_srv->SetSRVDesc(srvDesc);
+		m_srv->Initialize(device);
 	}
 
-	void Texture::UploadTexture(const TextureData& textureData) 
+
+	void Texture::UploadTexture(TextureData& textureData) 
 	{
-		
+		m_srv->CopyTexture(&textureData.GetTextureData());
 	}
 
 }

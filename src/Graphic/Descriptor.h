@@ -102,8 +102,14 @@ namespace Graphic {
 		inline void SetSRVDesc(const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) { m_srvDesc = desc; }
 
 		void CreateDescriptor(ComPtr<ID3D12Device> device) override;
+
 		void Initialize(ComPtr<ID3D12Device> device) override;
-	
+
+		void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData) 
+		{
+			EngineGPUMemory.UploadTexure(*m_Buffer, textureData);
+		}
+
 	private:
 		D3D12_SHADER_RESOURCE_VIEW_DESC m_srvDesc;
 	};
@@ -121,6 +127,7 @@ namespace Graphic {
 		inline void SetUAVDesc(const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc) { m_uavDesc = desc; }
 
 		void CreateDescriptor(ComPtr<ID3D12Device> device) override;
+
 		void Initialize(ComPtr<ID3D12Device> device) override;
 
 	private:

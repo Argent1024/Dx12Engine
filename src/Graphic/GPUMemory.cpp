@@ -49,9 +49,9 @@ namespace Graphic {
 			}
 		}
 
-		void MemoryAllocator::UploadTexure(GPUMemory& dest, const D3D12_SUBRESOURCE_DATA* textureData, UINT bufferSize) {
+		void MemoryAllocator::UploadTexure(GPUMemory& dest, D3D12_SUBRESOURCE_DATA* textureData) {
 			// TODO different types later
-			assert(dest.GetHeapType == D3D12_HEAP_TYPE_DEFAULT);
+			assert(dest.GetHeapType() == D3D12_HEAP_TYPE_DEFAULT);
 			const UINT64 uploadBufferSize = GetRequiredIntermediateSize(dest.GetResource(), 0, 1);
 			ComPtr<ID3D12Resource> textureUploadHeap;
 			ThrowIfFailed(m_device->CreateCommittedResource(

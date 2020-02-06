@@ -4,7 +4,14 @@
 
 namespace Graphic {
 
-	struct TextureData {
+	class TextureData {
+	public:
+		inline D3D12_SUBRESOURCE_DATA GetTextureData() const { return m_textureData; }
+
+		void LoadTexture() {}
+
+	private:
+		D3D12_SUBRESOURCE_DATA m_textureData;
 		std::vector<UINT8> data;
 		const UINT TextureWidth;
 		const UINT TextureHeighet;
@@ -18,7 +25,7 @@ namespace Graphic {
 
 		void CreateSRV(ComPtr<ID3D12Device> device, DescriptorHeap* descriptorHeap);
 
-		void UploadTexture(const TextureData& textureData);
+		void UploadTexture(TextureData& textureData);
 
 	private:
 		ShaderResource* m_srv;
