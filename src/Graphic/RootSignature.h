@@ -4,6 +4,15 @@
 
 
 namespace Graphic {
+	// TODO better way to creat root signature layout
+	class RootSignatureBinder {
+	public:
+		RootSignatureBinder() {}
+
+	private:
+		CD3DX12_ROOT_PARAMETER1 m_rootParameters;
+		
+	};
 
 	class RootSignature {
 	public:
@@ -19,7 +28,7 @@ namespace Graphic {
 	
 
 	// Simple root signature
-	// Store View Mat
+	// Store View Mat and one Texture
 	class NaiveRootSignature : public RootSignature
 	{
 	public:

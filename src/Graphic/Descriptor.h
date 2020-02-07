@@ -34,12 +34,15 @@ namespace Graphic {
 			assert(descriptorHeap != nullptr);
 		}
 
-		void SetDescriptorHeap(DescriptorHeap*  descriptorHeap) { m_descriptorHeap = descriptorHeap; }
+		inline void SetDescriptorHeap(DescriptorHeap*  descriptorHeap) { m_descriptorHeap = descriptorHeap; }
 
 		// Create Descriptor on the descriptor heap
 		virtual void CreateDescriptor(ComPtr<ID3D12Device> device) = 0;
 
-		UINT GetHeapIndex() const { return m_HeapIndex; }
+		inline UINT GetHeapIndex() const { return m_HeapIndex; }
+
+		// Help method for command list to do copy
+		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetDescriptorCPUHandle() const { return m_descriptorHeap->GetCPUHandle(m_HeapIndex); }
 
 	protected:
 		DescriptorHeap*  m_descriptorHeap;

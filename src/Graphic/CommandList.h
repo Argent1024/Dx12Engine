@@ -77,6 +77,10 @@ namespace Graphic {
 			m_commandList->CopyBufferRegion(dest.GetResource(), destOffset, src.GetResource(), srcOffset, sizeBytes); 
 		}
 
+		// Descriptor stuff
+		// Copy descriptor to destHeap's Index position
+		inline void CopyDescriptor(const HeapDescriptor& descriptor, DescriptorHeap* destHeap, UINT destIndex) {}
+
 		// Set root signature
 		inline void SetGraphicsRootConstants(UINT ParaIndex, UINT Size32Bit, const void* data, UINT Offset32Bit=0) { m_commandList->SetGraphicsRoot32BitConstants(ParaIndex, Size32Bit, data, Offset32Bit); }
 	
