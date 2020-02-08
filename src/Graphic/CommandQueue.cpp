@@ -1,8 +1,10 @@
 #include "CommandQueue.h"
 
 namespace Graphic {
+	CommandManager CopyHelper(1);
 
-	void CommandQueue::Initialize(ComPtr<ID3D12Device> device) {
+	void CommandQueue::Initialize() {
+		ID3D12Device* device = Engine::GetDevice();
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Flags = flags;
 		queueDesc.Type = type;
@@ -82,9 +84,9 @@ namespace Graphic {
 	{
 	}
 
-	void CommandManager::Initialize(ComPtr<ID3D12Device> device) {
-		m_Device = device;
-		m_Queue.Initialize(m_Device);
+	void CommandManager::Initialize() {
+		ID3D12Device* device = Engine::GetDevice();
+		m_Queue.Initialize();
 
 		// Create allocators
 		for (UINT i = 0; i < m_AllocatorNum; ++i)

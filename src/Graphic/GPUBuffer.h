@@ -9,7 +9,7 @@ namespace Graphic {
 			CommittedBuffer(const UINT size, D3D12_HEAP_TYPE type) 
 				: GPUMemory(size), m_HeapType(type) {}
 
-			void Initialize(ComPtr<ID3D12Device> device) override;
+			void Initialize() override;
 
 			void Destroy() override;
 
@@ -26,15 +26,13 @@ namespace Graphic {
 			PlacedBuffer(GPUHeap* const GPUHeap, const UINT size)
 				:GPUMemory(size), m_Heap(GPUHeap) {}
 
-			void Initialize(ComPtr<ID3D12Device> device) override;
+			void Initialize() override;
 			void Destroy() override;
 			
 			inline UINT GetHeapOffset() const { return m_HeapOffset; }
 
 		private:
 			static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_DEFAULT;
-
-			ComPtr<ID3D12Device> m_device;
 			
 			GPUHeap* const m_Heap;
 			UINT m_HeapOffset;

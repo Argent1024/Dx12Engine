@@ -1,18 +1,18 @@
 #pragma once
 
-#include "DXHelper.h"
+#include "GraphicCore.h"
 
 namespace Graphic {
 
 	class DescriptorHeap {
 	public:
-		DescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE type, const UINT num=1, 
-			           const D3D12_DESCRIPTOR_HEAP_FLAGS flag = D3D12_DESCRIPTOR_HEAP_FLAG_NONE) 
+		DescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE type, const UINT num, 
+			           const D3D12_DESCRIPTOR_HEAP_FLAGS flag) 
 			:m_NumDescriptors(num)
 		{
-			 m_HeapDesc.NumDescriptors = num; 
-			 m_HeapDesc.Type = type;
-			 m_HeapDesc.Flags = flag;
+			m_HeapDesc.NumDescriptors = num; 
+			m_HeapDesc.Type = type;
+			m_HeapDesc.Flags = flag;
 		}
 
 		~DescriptorHeap() { Destory(); }
@@ -22,6 +22,9 @@ namespace Graphic {
 			m_Alloced = 0;
 		}
 
+		inline void Reset() { m_Alloced = 0; }
+
+		// TODO Multithreading lock here
 		// Ask num descriptors and return the first offset
 		UINT MallocHeap(UINT num=1) {
 			assert(m_Alloced + num < m_DescriptorSize);
@@ -30,8 +33,9 @@ namespace Graphic {
 			return index;
 		}
 
-		void Initialize(ComPtr<ID3D12Device> device) {
+		void Initialize() {
 			Destory();
+			ID3D12Device* device = Engine::GetDevice();
 			ThrowIfFailed(device->CreateDescriptorHeap(&m_HeapDesc, IID_PPV_ARGS(&m_heap)));
 			m_DescriptorSize = device->GetDescriptorHandleIncrementSize(m_HeapDesc.Type);
 			m_CPUHandleStart = m_heap->GetCPUDescriptorHandleForHeapStart();
@@ -65,3 +69,16 @@ namespace Graphic {
 	};
 
 }
+
+
+// The engine use two kind of descriptor heaps, large descriptor heaps to store all stuff
+// and small descriptor heaps to create descriptor table and to use by shaders. 
+// Call reset on small descriptor heap every frame
+// When record commands, the command list should do copy between these two heaps.
+namespace Engine {
+
+	// Return the descriptor heap for creating views
+	inline Graphic::DescriptorHeap* GetInitHeap() { return &InitHeap; }
+	inline Graphic::DescriptorHeap* GetInUseHeap() { return &InUseHeap;}
+
+};

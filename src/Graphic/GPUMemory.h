@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DXHelper.h"
+#include "GraphicCore.h"
 #define ptrGPUMem std::shared_ptr<GPU::GPUMemory>
 
 namespace Graphic {
@@ -25,7 +25,7 @@ namespace Graphic {
 				  m_MemSize(Size), m_ResourceDesc(CD3DX12_RESOURCE_DESC::Buffer(Size)) {}
 
 			// Call CreateCommitted and CreatePlaced when init
-			virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
+			virtual void Initialize() = 0;
 			virtual void Destroy() = 0;
 			
 			virtual inline D3D12_HEAP_TYPE GetHeapType() = 0;
@@ -67,8 +67,6 @@ namespace Graphic {
 		public:
 			MemoryAllocator() {}
 
-			void Initialize(ComPtr<ID3D12Device> device);
-
 			// TODO manage cpu memory by myself
 			ptrGPUMem CreateCommittedBuffer(const UINT bufferSize, const D3D12_HEAP_TYPE m_HeapType=D3D12_HEAP_TYPE_DEFAULT);
 			
@@ -83,9 +81,13 @@ namespace Graphic {
 
 			// Only use one thread...?
 			ptrGPUMem m_Upload;
-			ComPtr<ID3D12Device> m_device;
 		};
 	}
+}
 
-	extern GPU::MemoryAllocator EngineGPUMemory;
+namespace Engine 
+{
+	// TODO rewrite this without using class?
+	extern Graphic::GPU::MemoryAllocator MemoryAllocator;
+	
 }

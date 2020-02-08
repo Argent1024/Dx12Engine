@@ -3,15 +3,17 @@
 namespace Graphic {
 	SwapChain::SwapChain(const HWND appHwnd, const UINT width, const UINT height) 
 		: m_appHwnd(appHwnd), m_width(width), m_height(height), 
-		  m_rtvHeap(HeapType, FrameCount)
+		  m_rtvHeap(HeapType, FrameCount, D3D12_DESCRIPTOR_HEAP_FLAG_NONE)
 	{
 	
 	}
 
-	void SwapChain::Initialize(ComPtr<IDXGIFactory4> factory, ComPtr<ID3D12Device> device, ID3D12CommandQueue* commandQueue) {
+	void SwapChain::Initialize(ID3D12CommandQueue* commandQueue) {
+		IDXGIFactory4* factory = Engine::GetFactory();
+		ID3D12Device* device = Engine::GetDevice();
 		{
 			// Create RTV descriptor heap
-			m_rtvHeap.Initialize(device);
+			m_rtvHeap.Initialize();
 		}
 
 		{

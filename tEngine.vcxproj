@@ -157,7 +157,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Graphic\Texture.h" />
-    <ClInclude Include="src\Samples\ParticlesTest.h" />
     <ClInclude Include="src\Math\MathCommon.h" />
     <ClInclude Include="src\Samples\RayMarching.h" />
     <ClInclude Include="src\World\Camera.h" />
@@ -193,7 +192,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Graphic\Texture.cpp" />
-    <ClCompile Include="src\Samples\ParticlesTest.cpp" />
     <ClCompile Include="src\Graphic\GPUMemory.cpp" />
     <ClCompile Include="src\Samples\RayMarching.cpp" />
     <ClCompile Include="src\World\Camera.cpp" />

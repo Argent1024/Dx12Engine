@@ -44,7 +44,6 @@ namespace Samples {
 		ptrMesh m_Mesh;
 		ptrMaterial m_Material;
 		GObject m_textureObject;
-		Camera m_Camera;
 
 		Camera m_Camera;
 

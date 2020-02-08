@@ -12,9 +12,9 @@ namespace Graphic {
 		Descriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
 			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
 
-		virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
+		virtual void Initialize() = 0;
 
-		inline void copyData(void* data) { EngineGPUMemory.UploadData(*m_Buffer, data, m_BufferSize, m_Offset); }
+		inline void copyData(void* data) { Engine::MemoryAllocator.UploadData(*m_Buffer, data, m_BufferSize, m_Offset); }
 
 		inline UINT GetSize() { return m_BufferSize; }
 		
@@ -28,24 +28,27 @@ namespace Graphic {
 	// Base class for those view who use descriptor heap to bind 
 	class HeapDescriptor : public Descriptor {
 	public:
-		HeapDescriptor(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap) 
-			: Descriptor(gpubuffer, bufferSize), m_descriptorHeap(descriptorHeap) 
-		{
-			assert(descriptorHeap != nullptr);
-		}
-
-		inline void SetDescriptorHeap(DescriptorHeap*  descriptorHeap) { m_descriptorHeap = descriptorHeap; }
-
-		// Create Descriptor on the descriptor heap
-		virtual void CreateDescriptor(ComPtr<ID3D12Device> device) = 0;
+		HeapDescriptor(ptrGPUMem gpubuffer, const UINT bufferSize) 
+			: Descriptor(gpubuffer, bufferSize) {}
 
 		inline UINT GetHeapIndex() const { return m_HeapIndex; }
 
+		// Copy this descriptor to the in use descriptor heap for rendering
+		inline void CopyDescriptor(UINT index) const {
+			DescriptorHeap* descriptorHeap = Engine::GetInUseHeap();
+			ID3D12Device* device = Engine::GetDevice();
+			CD3DX12_CPU_DESCRIPTOR_HANDLE destCPU = descriptorHeap->GetCPUHandle(index);
+			device->CopyDescriptorsSimple(1, destCPU, GetDescriptorCPUHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//TODO type
+		}
+
 		// Help method for command list to do copy
-		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetDescriptorCPUHandle() const { return m_descriptorHeap->GetCPUHandle(m_HeapIndex); }
+		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetDescriptorCPUHandle() const 
+		{ 
+			DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
+			return descriptorHeap->GetCPUHandle(m_HeapIndex); 
+		}
 
 	protected:
-		DescriptorHeap*  m_descriptorHeap;
 		UINT m_HeapIndex;
 	};
 
@@ -56,7 +59,7 @@ namespace Graphic {
 		VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize) 
 			:Descriptor(gpubuffer, bufferSize), m_strideSize(strideSize) {}
 
-		void Initialize(ComPtr<ID3D12Device> device=nullptr) override;
+		void Initialize() override;
 
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
 
@@ -74,7 +77,7 @@ namespace Graphic {
 		IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
 			: Descriptor(gpubuffer, bufferSize) {}
 
-		void Initialize(ComPtr<ID3D12Device> device=nullptr) override;
+		void Initialize() override;
 		
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
 		
@@ -87,9 +90,9 @@ namespace Graphic {
 	class ConstantBuffer : public HeapDescriptor {
 	public:
 		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap)
-			: HeapDescriptor(gpubuffer, bufferSize, descriptorHeap) {}
+			: HeapDescriptor(gpubuffer, bufferSize) {}
 		
-		void Initialize(ComPtr<ID3D12Device> device) override;
+		void Initialize() override;
 	private:
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
 	};
@@ -98,21 +101,18 @@ namespace Graphic {
 
 	class ShaderResource : public HeapDescriptor {
 	public:
-		ShaderResource(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap)
-			: HeapDescriptor(gpubuffer, bufferSize, descriptorHeap) 
-		{
-			assert(descriptorHeap->GetDescriptorHeapType() == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		}
+		ShaderResource(ptrGPUMem gpubuffer, const UINT bufferSize)
+			: HeapDescriptor(gpubuffer, bufferSize) 
+		{}
 
 		inline void SetSRVDesc(const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) { m_srvDesc = desc; }
 
-		void CreateDescriptor(ComPtr<ID3D12Device> device) override;
-
-		void Initialize(ComPtr<ID3D12Device> device) override;
+		// Create SRV on the init descriptor heap
+		void Initialize() override;
 
 		void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData) 
 		{
-			EngineGPUMemory.UploadTexure(*m_Buffer, textureData);
+			Engine::MemoryAllocator.UploadTexure(*m_Buffer, textureData);
 		}
 
 	private:
@@ -123,17 +123,14 @@ namespace Graphic {
 
 	class UnorderedAccess : public HeapDescriptor {
 	public:
-		UnorderedAccess(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap)
-			: HeapDescriptor(gpubuffer, bufferSize, descriptorHeap) 
-		{
-			assert(descriptorHeap->GetDescriptorHeapType() == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		}
+		UnorderedAccess(ptrGPUMem gpubuffer, const UINT bufferSize)
+			: HeapDescriptor(gpubuffer, bufferSize) 
+		{}
 
 		inline void SetUAVDesc(const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc) { m_uavDesc = desc; }
 
-		void CreateDescriptor(ComPtr<ID3D12Device> device) override;
-
-		void Initialize(ComPtr<ID3D12Device> device) override;
+		// Create UAV on the init descriptor heap
+		void Initialize() override;
 
 	private:
 		D3D12_UNORDERED_ACCESS_VIEW_DESC m_uavDesc;

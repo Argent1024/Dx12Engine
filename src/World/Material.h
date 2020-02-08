@@ -4,6 +4,7 @@
 #include "CommandList.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
+#include "Texture.h"
 
 #define ptrPSO std::shared_ptr<Graphic::GraphicsPSO>
 #define ptrRootSigature std::shared_ptr<Graphic::RootSignature>
@@ -35,7 +36,8 @@ namespace Game {
 		}
 
 	protected:
-		// Do some copy maybe and set descriptor table here
+		// Allocate place from descriptor heap (Create a new descriptor table)
+		// Copy descriptors required when rendering and call set descriptor table
 		virtual void _UseMaterial(Graphic::CommandList& commandList) const = 0;
 
 		ptrPSO m_pso;
@@ -50,6 +52,14 @@ namespace Game {
 			: Material(pso, rootSignature) {}
 
 		void _UseMaterial(Graphic::CommandList& commandList) const override {}
+	};
+
+	class TextureMaterial : public Material 
+	{
+	public:
+
+	private:
+		ptrTexture m_texture;
 	};
 
 }

@@ -1,75 +1,85 @@
 #include "GraphicCore.h"
+#include "GPUMemory.h"
+#include "DescriptorHeap.h"
+#include "CommandQueue.h"
 
-namespace Graphic {
-	GPU::MemoryAllocator EngineGPUMemory;
-	CommandManager CopyHelper(1);
-
-	void GraphicCore::EnableDebug()
+// Helper function for acquiring the first available hardware adapter that supports Direct3D 12.
+// If no such adapter can be found, *ppAdapter will be set to nullptr.
+void Engine::CreateHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter)
+{
+	ComPtr<IDXGIAdapter1> adapter;
+	*ppAdapter = nullptr;
+	for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != pFactory->EnumAdapters1(adapterIndex, &adapter); ++adapterIndex)
 	{
-		ComPtr<ID3D12Debug> debugController;
-		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+		DXGI_ADAPTER_DESC1 desc;
+		adapter->GetDesc1(&desc);
+
+		if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 		{
-			debugController->EnableDebugLayer();
-			// Enable additional debug layers.
-			dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+			// Don't select the Basic Render Driver adapter.
+			// If you want a software adapter, pass in "/warp" on the command line.
+			continue;
 		}
-			
-	}
-
-	// Helper function for acquiring the first available hardware adapter that supports Direct3D 12.
-	// If no such adapter can be found, *ppAdapter will be set to nullptr.
-	void GraphicCore::CreateHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter)
-	{
-		ComPtr<IDXGIAdapter1> adapter;
-		*ppAdapter = nullptr;
-		for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != pFactory->EnumAdapters1(adapterIndex, &adapter); ++adapterIndex)
+			// Check to see if the adapter supports Direct3D 12, but don't create the
+		// actual device yet.
+		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
 		{
-			DXGI_ADAPTER_DESC1 desc;
-			adapter->GetDesc1(&desc);
-
-			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
-			{
-				// Don't select the Basic Render Driver adapter.
-				// If you want a software adapter, pass in "/warp" on the command line.
-				continue;
-			}
-				// Check to see if the adapter supports Direct3D 12, but don't create the
-			// actual device yet.
-			if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
-			{
-				break;
-			}
+			break;
 		}
-
-		*ppAdapter = adapter.Detach();
 	}
-		
-	// Create DX12 Device
-	void GraphicCore::CreateDevice() 
-	{
-		ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&m_factory)));
-		ThrowIfFailed(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&m_factory)));
+
+	*ppAdapter = adapter.Detach();
+}
+
+void Engine::CreateDevice() {
+	bool useWarpDevice = FALSE;
+
+	ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&dxFactory)));
+	ThrowIfFailed(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&dxFactory)));
 			
-		if (m_useWarpDevice) {
-			ComPtr<IDXGIAdapter> warpAdapter;
-			ThrowIfFailed(m_factory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter)));
+	if (useWarpDevice) {
+		ComPtr<IDXGIAdapter> warpAdapter;
+		ThrowIfFailed(dxFactory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter)));
 
-			ThrowIfFailed(D3D12CreateDevice(
-				warpAdapter.Get(),
-				D3D_FEATURE_LEVEL_11_0,
-				IID_PPV_ARGS(&m_device)
-			));
-		} else {
-			ComPtr<IDXGIAdapter1> hardwareAdapter;
-			CreateHardwareAdapter(m_factory.Get(), &hardwareAdapter);
+		ThrowIfFailed(D3D12CreateDevice(
+			warpAdapter.Get(),
+			D3D_FEATURE_LEVEL_11_0,
+			IID_PPV_ARGS(&dxDevice)
+		));
+	} else {
+		ComPtr<IDXGIAdapter1> hardwareAdapter;
+		CreateHardwareAdapter(dxFactory.Get(), &hardwareAdapter);
 
-			ThrowIfFailed(D3D12CreateDevice(
-				hardwareAdapter.Get(),
-				D3D_FEATURE_LEVEL_11_0,
-				IID_PPV_ARGS(&m_device)
-			));
-		}
+		ThrowIfFailed(D3D12CreateDevice(
+			hardwareAdapter.Get(),
+			D3D_FEATURE_LEVEL_11_0,
+			IID_PPV_ARGS(&dxDevice)
+		));
 	}
+}
 
+void Engine::EnableDebug()
+{
+	ComPtr<ID3D12Debug> debugController;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+	{
+		debugController->EnableDebugLayer();
+		// Enable additional debug layers.
+		dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+	}		
+}	
+
+
+Graphic::GPU::MemoryAllocator Engine::MemoryAllocator;
+Graphic::CommandManager CopyHelper(1);
+Graphic::CommandManager GraphicsCommandManager(2);
+
+namespace Engine {
+	ComPtr<ID3D12Device> dxDevice;
+	ComPtr<IDXGIFactory4> dxFactory;
+	UINT dxgiFactoryFlags;
+	UINT NumDescriptors = 10;
+	Graphic::DescriptorHeap InitHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, NumDescriptors,  D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+	Graphic::DescriptorHeap InUseHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, NumDescriptors, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 
 }

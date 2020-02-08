@@ -1,10 +1,11 @@
 #pragma once
 
-#include "DXHelper.h"
+#include "GraphicCore.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
 #include "Descriptor.h"
 #include "SwapChain.h"
+
 
 namespace Graphic {
 	
@@ -12,7 +13,7 @@ namespace Graphic {
 	public:
 		CommandList(D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT) : type(type) {}
 
-		void Initialize(ID3D12CommandAllocator* allocator, ComPtr<ID3D12Device> device);
+		void Initialize(ID3D12CommandAllocator* allocator);
 
 		inline void Reset(ID3D12CommandAllocator* allocator) const {
 			ThrowIfFailed(m_commandList->Reset(allocator, nullptr));
@@ -78,8 +79,6 @@ namespace Graphic {
 		}
 
 		// Descriptor stuff
-		// Copy descriptor to destHeap's Index position
-		inline void CopyDescriptor(const HeapDescriptor& descriptor, DescriptorHeap* destHeap, UINT destIndex) {}
 
 		// Set root signature
 		inline void SetGraphicsRootConstants(UINT ParaIndex, UINT Size32Bit, const void* data, UINT Offset32Bit=0) { m_commandList->SetGraphicsRoot32BitConstants(ParaIndex, Size32Bit, data, Offset32Bit); }

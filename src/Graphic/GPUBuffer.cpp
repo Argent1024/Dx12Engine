@@ -1,8 +1,9 @@
 #include "GPUBuffer.h"
 namespace Graphic {
 	namespace GPU {
-		void CommittedBuffer::Initialize(ComPtr<ID3D12Device> device) {
+		void CommittedBuffer::Initialize() {
 			Destroy();
+			ID3D12Device* device = Engine::GetDevice();
 			D3D12_RESOURCE_STATES bufferState;
 
 			switch (m_HeapType)
@@ -40,12 +41,12 @@ namespace Graphic {
 		}
 
 
-		void PlacedBuffer::Initialize(ComPtr<ID3D12Device> device) {
+		void PlacedBuffer::Initialize() {
 			Destroy();
+			ID3D12Device* device = Engine::GetDevice();
 			m_HeapOffset = m_Heap->MemAlloc(m_MemSize);
-			m_device = device;
 			ThrowIfFailed(
-				m_device->CreatePlacedResource(
+				device->CreatePlacedResource(
 					m_Heap->GetHeap(),
 					m_HeapOffset,
 					&m_ResourceDesc,
@@ -59,7 +60,6 @@ namespace Graphic {
 
 
 		void PlacedBuffer::Destroy() {
-			m_device = nullptr;
 			m_Resource = nullptr;
 			m_GPUAddr = D3D12_GPU_VIRTUAL_ADDRESS_NULL;
 			m_MemAllocated = 0;

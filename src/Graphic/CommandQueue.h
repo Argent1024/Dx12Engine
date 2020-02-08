@@ -3,8 +3,10 @@
 #include "DXHelper.h"
 #include "CommandList.h"
 
+extern Graphic::CommandManager CopyHelper;
+extern Graphic::CommandManager GraphicsCommandManager;
+
 namespace Graphic {
-	extern CommandManager CopyHelper;
 
 	//TODO Consider multi threading
 	class CommandQueue {
@@ -14,7 +16,7 @@ namespace Graphic {
 			type(type), flags(flags), m_fenceCompletedValue(1), m_fenceValue(1)
 		{}
 
-		void Initialize(ComPtr<ID3D12Device> device);
+		void Initialize();
 
 		ID3D12CommandQueue* GetCommadnQueue() const { return m_commandQueue.Get(); }
 
@@ -87,9 +89,9 @@ namespace Graphic {
 			D3D12_COMMAND_LIST_TYPE Type=D3D12_COMMAND_LIST_TYPE_DIRECT, 
 			D3D12_COMMAND_QUEUE_FLAGS Flags=D3D12_COMMAND_QUEUE_FLAG_NONE);
 
-		void Initialize(ComPtr<ID3D12Device> device);
+		void Initialize();
 
-		inline void InitCommandList(CommandList* commandList) { commandList->Initialize(m_Allocators[m_AllocatorIndex].Get(), m_Device); }
+		inline void InitCommandList(CommandList* commandList) { commandList->Initialize(m_Allocators[m_AllocatorIndex].Get()); }
 		
 		void ExecuteCommandList(CommandList* commandList) 
 		{
@@ -114,7 +116,6 @@ namespace Graphic {
 		const UINT m_AllocatorNum;
 		UINT m_AllocatorIndex;
 
-		ComPtr<ID3D12Device> m_Device;
 		CommandQueue m_Queue;
 		std::vector<ComPtr<ID3D12CommandAllocator>> m_Allocators;
 		std::vector<uint64_t> m_Fences;

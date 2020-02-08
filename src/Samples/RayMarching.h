@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicCore.h"
+#include "CommandQueue.h"
 #include "../World/Camera.h"
 #include "../World/GObject.h"
 
@@ -56,7 +57,7 @@ namespace Samples {
 
 		void CreatSwapChain(const HWND t_appHwnd) {
 			m_swapChain = new SwapChain(t_appHwnd, m_width, m_height);
-			m_swapChain->Initialize(m_factory, m_device, GraphicsCommandManager.GetCommadnQueue());
+			m_swapChain->Initialize(GraphicsCommandManager.GetCommadnQueue());
 		}
 	};
 }

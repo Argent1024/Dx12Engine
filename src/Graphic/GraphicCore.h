@@ -1,15 +1,17 @@
 #pragma once
-#include <iostream>
-#include "CommandQueue.h"
+
+#include "DXHelper.h"
+
+
 
 namespace Graphic 
 {
+	class DescriptorHeap;
 
 	class GraphicCore {
 	public:
 		GraphicCore(UINT t_width, UINT t_height, LPCTSTR t_title):
-			m_width(t_width), m_height(t_height), m_title(t_title),
-			GraphicsCommandManager(2) { }
+			m_width(t_width), m_height(t_height), m_title(t_title) { }
 
 		UINT GetWidth() const { return m_width; }
 		UINT GetHeight() const {return m_height; }
@@ -19,17 +21,6 @@ namespace Graphic
 		virtual void Render() = 0;
 
 	protected:
-		void EnableDebug();
-		void CreateHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter);
-		void CreateDevice();
-
-		ComPtr<ID3D12Device> m_device;
-		ComPtr<IDXGIFactory4> m_factory;
-		UINT dxgiFactoryFlags;
-
-
-		// TODO maybe dont put here?
-		CommandManager GraphicsCommandManager;
 
 		const UINT m_width;
 		const UINT m_height;
@@ -38,4 +29,23 @@ namespace Graphic
 		static const UINT FrameCount = 2;
 		static const bool m_useWarpDevice = FALSE;
 	};
+}
+
+
+namespace Engine 
+{
+	
+	extern ComPtr<ID3D12Device> dxDevice;
+	extern ComPtr<IDXGIFactory4> dxFactory;
+	extern UINT dxgiFactoryFlags;
+	extern UINT NumDescriptors;
+	extern Graphic::DescriptorHeap InitHeap;
+	extern Graphic::DescriptorHeap InUseHeap;
+	
+
+	inline ID3D12Device* GetDevice() { return dxDevice.Get(); }
+	inline IDXGIFactory4* GetFactory() { return dxFactory.Get(); }
+	void EnableDebug();
+	void CreateHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter);
+	void CreateDevice();
 }

@@ -21,6 +21,7 @@
 // referenced by the GPU.
 using Microsoft::WRL::ComPtr;
 
+
 inline std::string HrToString(HRESULT hr)
 {
 	char s_str[64] = {};

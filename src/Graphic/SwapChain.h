@@ -12,7 +12,7 @@ namespace Graphic {
 
 		SwapChain(const HWND appHwnd, const UINT width, const UINT height);
 
-		void Initialize(ComPtr<IDXGIFactory4> factory, ComPtr<ID3D12Device> device, ID3D12CommandQueue* commandQueue);
+		void Initialize(ID3D12CommandQueue* commandQueue);
 		
 		// Return the handle of the back buffer
 		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetBackBufferCPUHandle() const { return m_rtvHeap.GetCPUHandle(m_BackBufferIndex); }

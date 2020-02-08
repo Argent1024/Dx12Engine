@@ -5,17 +5,12 @@
 namespace Graphic {
 
 	namespace GPU {
-		void MemoryAllocator::Initialize(ComPtr<ID3D12Device> device)
-		{
-			m_device = device;
-		}
-
 		ptrGPUMem MemoryAllocator::CreateCommittedBuffer(const UINT bufferSize, const D3D12_HEAP_TYPE heapType)
 		{
 			ptrGPUMem ptr;
-		
+			
 			ptr = std::make_shared<GPU::CommittedBuffer>(bufferSize, heapType);
-			ptr->Initialize(m_device);
+			ptr->Initialize();
 			
 			return ptr;
 		}
@@ -41,9 +36,10 @@ namespace Graphic {
 		void MemoryAllocator::UploadTexure(GPUMemory& dest, D3D12_SUBRESOURCE_DATA* textureData) {
 			// TODO different types later
 			assert(dest.GetHeapType() == D3D12_HEAP_TYPE_DEFAULT);
+			ID3D12Device* device = Engine::GetDevice();
 			const UINT64 uploadBufferSize = GetRequiredIntermediateSize(dest.GetResource(), 0, 1);
 			ComPtr<ID3D12Resource> textureUploadHeap;
-			ThrowIfFailed(m_device->CreateCommittedResource(
+			ThrowIfFailed(device->CreateCommittedResource(
 							&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 							D3D12_HEAP_FLAG_NONE,
 							&CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
