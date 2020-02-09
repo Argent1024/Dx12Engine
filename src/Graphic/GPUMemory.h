@@ -37,7 +37,7 @@ namespace Graphic {
 
 			// Return offset of the memory, the user need to stored this
 			UINT MemAlloc(const UINT size) {
-				if (m_MemSize == 0) { return 0; } // Only store one stuff, don't care memory size
+				if (m_MemSize == 0) { return 0; } // Only store one stuff, don't care memory size TODO modify this...
 				assert(m_MemAllocated + size <= m_MemSize);
 				UINT offset = m_MemAllocated;
 				m_MemAllocated += size;

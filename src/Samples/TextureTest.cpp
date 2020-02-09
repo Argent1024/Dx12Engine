@@ -89,6 +89,8 @@ namespace Samples {
 	{	
 		
 		GraphicsCommandManager.Start();
+		DescriptorHeap* UseHeap = Engine::GetInUseHeap();
+		UseHeap->Reset();
 		CommandList mainCommandList;
 		const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 		GraphicsCommandManager.InitCommandList(&mainCommandList);
@@ -121,6 +123,7 @@ namespace Samples {
 		// Wait Finish
 		GraphicsCommandManager.End();
 		m_swapChain->Present();
+
 	}
 
 }
