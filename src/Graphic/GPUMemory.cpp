@@ -15,6 +15,17 @@ namespace Graphic {
 			return ptr;
 		}
 
+		ptrGPUMem MemoryAllocator::CreateCommittedBuffer(const D3D12_RESOURCE_DESC& desc, const D3D12_HEAP_TYPE heapType) 
+		{
+			ptrGPUMem ptr;
+			
+			ptr = std::make_shared<GPU::CommittedBuffer>(desc, heapType);
+			ptr->Initialize();
+			
+			return ptr;
+		}
+
+
 		void MemoryAllocator::UploadData(GPUMemory& dest, void* data, UINT dataSize, UINT offset) {
 			switch (dest.GetHeapType()) 
 			{

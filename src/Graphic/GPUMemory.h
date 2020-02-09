@@ -19,7 +19,10 @@ namespace Graphic {
 			friend UnorderedAccess;
 			friend class MemoryAllocator;
 		
-
+			GPUMemory(const D3D12_RESOURCE_DESC& desc)
+				:m_ResourceDesc(desc), m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL), m_MemSize(0)
+			{}
+		
 			GPUMemory(UINT Size)
 				: m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL), 
 				  m_MemSize(Size), m_ResourceDesc(CD3DX12_RESOURCE_DESC::Buffer(Size)) {}
@@ -34,6 +37,7 @@ namespace Graphic {
 
 			// Return offset of the memory, the user need to stored this
 			UINT MemAlloc(const UINT size) {
+				if (m_MemSize == 0) { return 0; } // Only store one stuff, don't care memory size
 				assert(m_MemAllocated + size <= m_MemSize);
 				UINT offset = m_MemAllocated;
 				m_MemAllocated += size;
@@ -54,7 +58,7 @@ namespace Graphic {
 			inline ID3D12Resource* GetResource() const { return m_Resource.Get(); }
 
 			UINT m_MemAllocated;
-			const UINT m_MemSize;		// Total Memory Size
+			UINT m_MemSize;		// Total Memory Size
 			D3D12_GPU_VIRTUAL_ADDRESS m_GPUAddr;
 
 
@@ -69,7 +73,7 @@ namespace Graphic {
 
 			// TODO manage cpu memory by myself
 			ptrGPUMem CreateCommittedBuffer(const UINT bufferSize, const D3D12_HEAP_TYPE m_HeapType=D3D12_HEAP_TYPE_DEFAULT);
-			
+			ptrGPUMem CreateCommittedBuffer(const D3D12_RESOURCE_DESC& desc, const D3D12_HEAP_TYPE heapType=D3D12_HEAP_TYPE_DEFAULT);
 			void UploadData(GPUMemory& dest, void* data, UINT bufferize, UINT offset=0);
 
 			void UploadTexure(GPUMemory& dest, D3D12_SUBRESOURCE_DATA* textureData);

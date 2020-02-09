@@ -101,7 +101,7 @@ namespace Graphic {
 
 	class ShaderResource : public HeapDescriptor {
 	public:
-		ShaderResource(ptrGPUMem gpubuffer, const UINT bufferSize)
+		ShaderResource(ptrGPUMem gpubuffer, const UINT bufferSize=0) //TODO fix this emmmmmm
 			: HeapDescriptor(gpubuffer, bufferSize) 
 		{}
 

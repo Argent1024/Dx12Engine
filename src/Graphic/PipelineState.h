@@ -6,13 +6,13 @@
 */
 #pragma once
 
-#include "DXHelper.h"
+#include "GraphicCore.h"
 
 namespace Graphic {
 
 	class PipelineStateObject {
 	public:
-		virtual void Initialize(ComPtr<ID3D12Device> device) = 0;
+		virtual void Initialize() = 0;
 
 		void SetRootSigature(ID3D12RootSignature* rootSignature) { m_rootSignature = rootSignature; } 
 		ID3D12PipelineState* GetPSO() const { return m_pipelineState.Get(); }
@@ -46,9 +46,10 @@ namespace Graphic {
 			m_psoDesc.SampleDesc.Count = 1;
 		}
 
-		virtual void Initialize(ComPtr<ID3D12Device> device) override {
+		virtual void Initialize() override {
 			// Make Sure we did set a root signature
 			assert(m_rootSignature != nullptr);
+			ID3D12Device* device = Engine::GetDevice();
 			m_psoDesc.pRootSignature = m_rootSignature;
 			SetDefault();
 			ThrowIfFailed(device->CreateGraphicsPipelineState(&m_psoDesc, IID_PPV_ARGS(&m_pipelineState)));
@@ -61,7 +62,7 @@ namespace Graphic {
 
 	class ComputePSO : public PipelineStateObject {
 	public:
-		void Initialize(ComPtr<ID3D12Device> device) override {}
+		void Initialize() override {}
 
 	};
 }

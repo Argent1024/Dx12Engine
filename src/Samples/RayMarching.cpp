@@ -1,8 +1,9 @@
 #include "RayMarching.h"
 
 namespace Samples {
-	void RayMarchingRootSignature::Initialize(ComPtr<ID3D12Device> device) 
+	void RayMarchingRootSignature::Initialize() 
 	{
+		ID3D12Device* device = Engine::GetDevice();
 		D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
 		// This is the highest version the sample supports. If CheckFeatureSupport succeeds, the HighestVersion returned will not be greater than this.
 		featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
@@ -28,7 +29,7 @@ namespace Samples {
 	void RayMarching::Init(const HWND m_appHwnd) {
 		Engine::EnableDebug();
 		Engine::CreateDevice();
-		ID3D12Device* device = Engine::GetDevice();
+	
 		// Initialize Command Manager
 		//CopyCommandManager.Initialize(m_device);
 		CopyHelper.Initialize();
@@ -39,7 +40,7 @@ namespace Samples {
 		// Initialize Root Signature and pass constant into it
 		{
 			m_rootSignature = std::make_shared<RayMarchingRootSignature>();
-			m_rootSignature->Initialize(device);
+			m_rootSignature->Initialize();
 			/*ScreenConstantData data;
 			data.ScreenSize = XMFLOAT4((float)m_width, (float)m_height, 0.0, 0.0);
 			// Emmmmmmm need a D3D12_Direct command list to set root signature
@@ -70,7 +71,7 @@ namespace Samples {
 			m_GraphicPSO->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
 			m_GraphicPSO->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 			m_GraphicPSO->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
-			m_GraphicPSO->Initialize(device);
+			m_GraphicPSO->Initialize();
 		}
 
 		CreateGameObject();

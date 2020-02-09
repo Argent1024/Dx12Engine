@@ -8,6 +8,9 @@ namespace Graphic {
 		public:
 			CommittedBuffer(const UINT size, D3D12_HEAP_TYPE type) 
 				: GPUMemory(size), m_HeapType(type) {}
+			
+			CommittedBuffer(const D3D12_RESOURCE_DESC& desc, D3D12_HEAP_TYPE type)
+				: GPUMemory(desc), m_HeapType(type) {}
 
 			void Initialize() override;
 

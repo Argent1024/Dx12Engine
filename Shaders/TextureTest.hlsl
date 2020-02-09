@@ -1,7 +1,7 @@
-struct PSInput
+struct DS_OUTPUT
 {
-    float4 position : SV_POSITION;
-    float2 uv : TEXCOORD;
+	float4 vPosition  : SV_POSITION;
+	float2 uv : TEXCOORD;
 };
 
 Texture2D g_texture : register(t0);

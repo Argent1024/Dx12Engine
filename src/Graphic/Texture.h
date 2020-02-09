@@ -14,15 +14,9 @@ namespace Graphic {
 
 		void LoadTexture();
 
-		inline UINT GetWidth() const { return m_Width; }
-		inline UINT GetHeight() const { return m_Heighet; }
-
 	private:
 		D3D12_SUBRESOURCE_DATA m_textureData;
-		std::vector<UINT8> m_data;
-		const UINT m_Width;
-		const UINT m_Heighet;
-		const UINT m_PixelSize;
+		std::vector<UINT8> m_data;	// Does UINT8 ok?
 	};
 
 	// Texture
@@ -30,15 +24,15 @@ namespace Graphic {
 	public:
 		Texture(UINT width, UINT height, D3D12_RESOURCE_DIMENSION dim=D3D12_RESOURCE_DIMENSION_TEXTURE2D);
 
-		void CreateSRV(ComPtr<ID3D12Device> device);
+		void CreateSRV();
 
 		void UploadTexture(const TextureData& textureData);
 
 		// Simple method to create the SRV, load texture from file and upload it to the SRV
-		void CreateTexture(ComPtr<ID3D12Device> device);
+		void CreateTexture();
 
 		// Copy texture to in use descriptor heap
-		inline void CopyTexture(ComPtr<ID3D12Device> device, UINT index) const {
+		inline void BindTexture(UINT index) const {
 			m_srv->CopyDescriptor(index);
 		}
 

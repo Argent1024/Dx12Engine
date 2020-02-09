@@ -2,54 +2,32 @@
 
 namespace Samples {
 
-	void TextureTestRS::Initialize(ComPtr<ID3D12Device> device) 
-	{
-		D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
-		// This is the highest version the sample supports. If CheckFeatureSupport succeeds, the HighestVersion returned will not be greater than this.
-		featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
-		if (FAILED(device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
-		{
-			featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
-		}
-
-		// Define SRV
-		CD3DX12_DESCRIPTOR_RANGE1 range[1];
-		CD3DX12_ROOT_PARAMETER1 rootParameters[1];
-		range[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-		rootParameters[0].InitAsDescriptorTable(1, &range[0]);
-
-		D3D12_ROOT_SIGNATURE_FLAGS rsFlag = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-		// Create RootSignature
-		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, 0, nullptr, rsFlag);
-		ComPtr<ID3DBlob> signature;
-		ComPtr<ID3DBlob> error;
-		ThrowIfFailed(D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, featureData.HighestVersion, &signature, &error));
-		ThrowIfFailed(device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
-	}
-
 	void TextureTestSample::Init(const HWND m_appHwnd) 
 	{
-		this->EnableDebug();
-		this->CreateDevice();
+		Engine::EnableDebug();
+		Engine::CreateDevice();
 		
 		// Initialize Command Manager
 		//CopyCommandManager.Initialize(m_device);
-		EngineGPUMemory.Initialize(m_device);
-		CopyHelper.Initialize(m_device);
-		GraphicsCommandManager.Initialize(m_device);
+		CopyHelper.Initialize();
+		GraphicsCommandManager.Initialize();
+
+		DescriptorHeap* initHeap = Engine::GetInitHeap();
+		initHeap->Initialize();
+		DescriptorHeap* useHeap = Engine::GetInUseHeap();
+		useHeap->Initialize();
 
 		CreatSwapChain(m_appHwnd);
 		{
-			m_rootSignature = std::make_shared<TextureTestRS>();
-			m_rootSignature->Initialize(m_device);
+			m_rootSignature = std::make_shared<RootSignature>();
+			m_rootSignature->Initialize();
 		}
 
 		{
 			UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 			ComPtr<ID3DBlob> VS;
 			ComPtr<ID3DBlob> PS;
-			const std::wstring path = L"D:\\work\\tEngine\\Shaders\\ray.hlsl";
+			const std::wstring path = L"D:\\work\\tEngine\\Shaders\\shaders.hlsl";
 			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &VS, nullptr));
 			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &PS, nullptr));
 
@@ -57,7 +35,7 @@ namespace Samples {
 			D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 			{
 					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 			};
 
 			m_GraphicPSO = std::make_shared<GraphicsPSO>();
@@ -66,7 +44,7 @@ namespace Samples {
 			m_GraphicPSO->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
 			m_GraphicPSO->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 			m_GraphicPSO->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
-			m_GraphicPSO->Initialize(m_device);
+			m_GraphicPSO->Initialize();
 		}
 		
 		// Create Assert
@@ -84,7 +62,7 @@ namespace Samples {
 			const UINT vertexBufferSize = sizeof(triangleVertices);
 			const UINT indexBufferSize = sizeof(index_list);
 			
-			m_GPUmem = EngineGPUMemory.CreateCommittedBuffer(vertexBufferSize + indexBufferSize);
+			m_GPUmem = Engine::MemoryAllocator.CreateCommittedBuffer(vertexBufferSize + indexBufferSize);
 
 			m_vertexBuffer = std::make_shared<VertexBuffer>(m_GPUmem, vertexBufferSize, sizeof(Vertex));
 			m_vertexBuffer->Initialize();
@@ -97,11 +75,52 @@ namespace Samples {
 			m_Mesh =std::make_shared<TriangleMesh>(m_vertexBuffer, m_indexBuffer);
 		}
 
-		m_Material = std::make_shared<NoMaterial>(m_GraphicPSO, m_rootSignature);
+		// Create Texture
+		m_texture = std::make_shared<Texture>(256, 256);
+		m_texture->CreateSRV();
+
+		m_Material = std::make_shared<TextureMaterial>(m_GraphicPSO, m_rootSignature, m_texture);
 
 		m_textureObject.SetMesh(m_Mesh);
 		m_textureObject.SetMaterial(m_Material);
+	}
 
+	void TextureTestSample::Render() 
+	{	
+		
+		GraphicsCommandManager.Start();
+		CommandList mainCommandList;
+		const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+		GraphicsCommandManager.InitCommandList(&mainCommandList);
+		mainCommandList.SetSwapChain(*m_swapChain);
+		mainCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		mainCommandList.ClearSwapChain(*m_swapChain, clearColor);
+		mainCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		GraphicsCommandManager.ExecuteCommandList(&mainCommandList);
+
+		// Record commands for each object, only have one object here
+		{
+			CommandList ThreadCommandList;
+			GraphicsCommandManager.InitCommandList(&ThreadCommandList);
+			
+			m_textureObject.RecordCommand(ThreadCommandList);
+			m_Camera.UseCamera(ThreadCommandList);
+			
+
+			// Barrier Draw
+			ThreadCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			
+			ThreadCommandList.SetSwapChain(*m_swapChain);
+			m_textureObject.Draw(ThreadCommandList);
+
+			ThreadCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+
+			GraphicsCommandManager.ExecuteCommandList(&ThreadCommandList);
+		}
+		
+		// Wait Finish
+		GraphicsCommandManager.End();
+		m_swapChain->Present();
 	}
 
 }

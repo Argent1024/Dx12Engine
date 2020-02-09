@@ -79,6 +79,16 @@ namespace Graphic {
 		}
 
 		// Descriptor stuff
+		inline void SetDescriptorHeap(DescriptorHeap& descriptorHeap) 
+		{
+			ID3D12DescriptorHeap* heap = descriptorHeap.GetDescriptorHeap();
+			m_commandList->SetDescriptorHeaps(1, &heap);
+		}
+
+		inline void SetGraphicsRootDescriptorTable(UINT rootSlot, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
+		{
+			m_commandList->SetGraphicsRootDescriptorTable(rootSlot, handle);
+		}
 
 		// Set root signature
 		inline void SetGraphicsRootConstants(UINT ParaIndex, UINT Size32Bit, const void* data, UINT Offset32Bit=0) { m_commandList->SetGraphicsRoot32BitConstants(ParaIndex, Size32Bit, data, Offset32Bit); }

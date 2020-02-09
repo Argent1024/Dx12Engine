@@ -57,6 +57,9 @@ namespace Game {
 	class TextureMaterial : public Material 
 	{
 	public:
+		TextureMaterial(ptrPSO pso, ptrRootSigature rootSignature, ptrTexture texture);
+
+		void _UseMaterial(Graphic::CommandList& commandList) const override;
 
 	private:
 		ptrTexture m_texture;

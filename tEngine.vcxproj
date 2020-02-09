@@ -159,6 +159,7 @@
     <ClInclude Include="src\Graphic\Texture.h" />
     <ClInclude Include="src\Math\MathCommon.h" />
     <ClInclude Include="src\Samples\RayMarching.h" />
+    <ClInclude Include="src\Samples\TextureTest.h" />
     <ClInclude Include="src\World\Camera.h" />
     <ClInclude Include="src\d3dx12.h" />
     <ClInclude Include="src\Graphic\CommandList.h" />
@@ -191,9 +192,11 @@
     <ClInclude Include="src\Graphic\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Graphic\RootSignature.cpp" />
     <ClCompile Include="src\Graphic\Texture.cpp" />
     <ClCompile Include="src\Graphic\GPUMemory.cpp" />
     <ClCompile Include="src\Samples\RayMarching.cpp" />
+    <ClCompile Include="src\Samples\TextureTest.cpp" />
     <ClCompile Include="src\World\Camera.cpp" />
     <ClCompile Include="src\Graphic\CommandList.cpp" />
     <ClCompile Include="src\Graphic\CommandQueue.cpp" />
@@ -205,6 +208,7 @@
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\WinApp.cpp" />
     <ClCompile Include="src\Graphic\SwapChain.cpp" />
+    <ClCompile Include="src\World\Material.cpp" />
     <ClCompile Include="src\World\Mesh.cpp" />
     <ClCompile Include="tEngine.cpp" />
   </ItemGroup>

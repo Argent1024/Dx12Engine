@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicCore.h"
+#include "CommandQueue.h"
 #include "../World/Camera.h"
 #include "../World/GObject.h"
 
@@ -15,10 +16,6 @@ namespace Samples {
         XMFLOAT2 texcoor;
     };
 
-	class TextureTestRS : public RootSignature {
-	public:
-		void Initialize(ComPtr<ID3D12Device> device) override;
-	};
 
 	class TextureTestSample : public GraphicCore {
 	public:
@@ -42,6 +39,7 @@ namespace Samples {
 
 		ptrGPUMem m_GPUmem;
 		ptrMesh m_Mesh;
+		ptrTexture m_texture;
 		ptrMaterial m_Material;
 		GObject m_textureObject;
 
@@ -49,7 +47,7 @@ namespace Samples {
 
 		void CreatSwapChain(const HWND t_appHwnd) {
 			m_swapChain = new SwapChain(t_appHwnd, m_width, m_height);
-			m_swapChain->Initialize(m_factory, m_device, GraphicsCommandManager.GetCommadnQueue());
+			m_swapChain->Initialize(GraphicsCommandManager.GetCommadnQueue());
 		}
 	};
 

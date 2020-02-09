@@ -24,7 +24,7 @@ namespace Samples {
 
 	class RayMarchingRootSignature : public RootSignature {
 	public:
-		void Initialize(ComPtr<ID3D12Device> device) override;
+		void Initialize() override;
 	};
 
 	class RayMarching : public GraphicCore {

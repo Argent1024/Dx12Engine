@@ -114,6 +114,9 @@
     <ClInclude Include="src\Graphic\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Samples\TextureTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tEngine.cpp">
@@ -162,6 +165,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphic\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphic\RootSignature.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Samples\TextureTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\World\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
