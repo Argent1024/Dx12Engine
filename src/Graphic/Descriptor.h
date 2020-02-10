@@ -34,18 +34,16 @@ namespace Graphic {
 		inline UINT GetHeapIndex() const { return m_HeapIndex; }
 
 		// Copy this descriptor to the in use descriptor heap for rendering
-		inline void CopyDescriptor(UINT index) const {
-			DescriptorHeap* descriptorHeap = Engine::GetInUseHeap();
-			ID3D12Device* device = Engine::GetDevice();
-			CD3DX12_CPU_DESCRIPTOR_HANDLE destCPU = descriptorHeap->GetCPUHandle(index);
-			device->CopyDescriptorsSimple(1, destCPU, GetDescriptorCPUHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//TODO type
-		}
+		inline void BindDescriptor(UINT index) const {
+			DescriptorHeap* InitHeap = Engine::GetInUseHeap();
+			CD3DX12_CPU_DESCRIPTOR_HANDLE destCPUHandle = InitHeap->GetCPUHandle(m_HeapIndex);
 
-		// Help method for command list to do copy
-		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetDescriptorCPUHandle() const 
-		{ 
-			DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
-			return descriptorHeap->GetCPUHandle(m_HeapIndex); 
+			DescriptorHeap* InUseHeap = Engine::GetInitHeap();
+			CD3DX12_CPU_DESCRIPTOR_HANDLE srcCPUHandle = InUseHeap->GetCPUHandle(index);
+
+			ID3D12Device* device = Engine::GetDevice();
+			// Free threaded as long as different threads don't write to a same place
+			device->CopyDescriptorsSimple(1, destCPUHandle, srcCPUHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//TODO type
 		}
 
 	protected:

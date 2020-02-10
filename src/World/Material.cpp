@@ -10,6 +10,8 @@ namespace Game {
 	void TextureMaterial::_UseMaterial(Graphic::CommandList& commandList) const 
 	{
 		// TODO need to remove code here to other place
+		
+		// Malloc a continous blocks from descriptor heap to bind resource
 		UINT numTexture = 1;
 		Graphic::DescriptorHeap* descriptorHeap = Engine::GetInUseHeap();
 		UINT heapIndex = descriptorHeap->MallocHeap(numTexture);

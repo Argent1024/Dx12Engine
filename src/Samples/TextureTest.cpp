@@ -77,7 +77,7 @@ namespace Samples {
 
 		// Create Texture
 		m_texture = std::make_shared<Texture>(256, 256);
-		m_texture->CreateSRV();
+		m_texture->CreateTexture();
 
 		m_Material = std::make_shared<TextureMaterial>(m_GraphicPSO, m_rootSignature, m_texture);
 

@@ -75,6 +75,7 @@ Graphic::CommandManager CopyHelper(1);
 Graphic::CommandManager GraphicsCommandManager(2);
 
 namespace Engine {
+
 	ComPtr<ID3D12Device> dxDevice;
 	ComPtr<IDXGIFactory4> dxFactory;
 	UINT dxgiFactoryFlags;

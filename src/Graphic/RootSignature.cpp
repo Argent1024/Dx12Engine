@@ -17,7 +17,7 @@ namespace Graphic {
 		CD3DX12_ROOT_PARAMETER1 rootParameters[2];
 		
 		// Define the Descriptor table
-		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0); // t0
+		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0-t1
 
 		// A Root CBV at regisiter 0, space 0
 		rootParameters[0].InitAsConstants(sizeof(DirectX::XMMATRIX) / 4,  0, 0, D3D12_SHADER_VISIBILITY_VERTEX);

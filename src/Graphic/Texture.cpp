@@ -3,17 +3,45 @@
 namespace Graphic {
 
 	TextureData::TextureData(const UINT width, const UINT height, const UINT pixelSize) 
-		: m_data(width * height* pixelSize, 0)
-	{	
+		: m_data(width * height* pixelSize)
+	{
 		// Set infomation to m_textureData
 		m_textureData.pData = &m_data[0];
 		m_textureData.RowPitch = width * pixelSize;
 		m_textureData.SlicePitch = m_textureData.RowPitch * height;
+
+		const UINT textureSize = m_textureData.SlicePitch;
+		const UINT rowPitch = m_textureData.RowPitch;
+		const UINT cellPitch = rowPitch >> 3;        // The width of a cell in the checkboard texture.
+		const UINT cellHeight = width >> 3;    // The height of a cell in the checkerboard texture.
+		// Load Chess Board
+		for (UINT n = 0; n < textureSize; n += pixelSize)
+		{
+			UINT x = n % rowPitch;
+			UINT y = n / rowPitch;
+			UINT i = x / cellPitch;
+			UINT j = y / cellHeight;
+
+			if (i % 2 == j % 2)
+			{
+				m_data[n] = 0x00;        // R
+				m_data[n + 1] = 0x00;    // G
+				m_data[n + 2] = 0x00;    // B
+				m_data[n + 3] = 0xff;    // A
+			}
+			else
+			{
+				m_data[n] = 0xff;        // R
+				m_data[n + 1] = 0xff;    // G
+				m_data[n + 2] = 0xff;    // B
+				m_data[n + 3] = 0xff;    // A
+			}
+			
+		}
 	}
 
 	void TextureData::LoadTexture() { 
 		// Do load texture to m_data
-			
 
 	}
 
