@@ -28,9 +28,9 @@ namespace Graphic {
 		void CreateTexture();
 
 		// Copy texture to in use descriptor heap
-		inline void BindTexture(UINT index) const {
-			m_srv->BindDescriptor(index);
-		}
+		inline void BindTexture(UINT index) const { m_srv->BindDescriptor(index); }
+
+		inline ShaderResource* GetShaderResourceView() { return m_srv; }
 
 	private:
 		void CreateSRV();

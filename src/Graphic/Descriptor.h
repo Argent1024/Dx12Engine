@@ -3,6 +3,7 @@
 #include "GPUBuffer.h"
 #include "DescriptorHeap.h"
 
+
 namespace Graphic {
 
 	// Most Descriptor here shouldn't be used directly, use Mesh & Material class instead

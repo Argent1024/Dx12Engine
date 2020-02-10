@@ -5,6 +5,7 @@
 #include "RootSignature.h"
 #include "Descriptor.h"
 #include "SwapChain.h"
+#include "DepthBuffer.h"
 
 
 namespace Graphic {
@@ -63,9 +64,13 @@ namespace Graphic {
 		inline void DrawIndexedInstanced(UINT IndexCountPerInstance, UINT InstanceCount, UINT StartIndexLocation, INT BaseVertexLocation, UINT StartInstanceLocation) const {m_commandList->DrawIndexedInstanced(IndexCountPerInstance, InstanceCount, StartIndexLocation, BaseVertexLocation, StartInstanceLocation);}
 
 		// Swap Chain
-		inline void SetSwapChain(const SwapChain& swapChain) { m_commandList->OMSetRenderTargets(1, &(swapChain.GetBackBufferCPUHandle()), FALSE, nullptr); ; }
+		inline void SetSwapChain(const SwapChain& swapChain) { m_commandList->OMSetRenderTargets(1, &(swapChain.GetBackBufferCPUHandle()), FALSE, nullptr); }
+		// swap chain with depth buffer
+		inline void SetSwapChain(const SwapChain& swapChain, const DepthBuffer& depthBuffer) { m_commandList->OMSetRenderTargets(1, &(swapChain.GetBackBufferCPUHandle()), FALSE, &(depthBuffer.GetDepthBufferCPUHandle())); }
 		inline void ClearSwapChain(const SwapChain& swapChain, const float color[4]) const { m_commandList->ClearRenderTargetView(swapChain.GetBackBufferCPUHandle(), color, 0, nullptr);}
 		inline void ResourceBarrier(const SwapChain& swapChain, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) { m_commandList->ResourceBarrier(1, &(swapChain.Barrier(before, after))); }
+		
+		inline void ClearDepthChain(DepthBuffer& depthBuffer, const float color[4]) { m_commandList->ClearDepthStencilView(depthBuffer.GetDepthBufferCPUHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr); }
 
 		// ProjectiveCamera
 		inline void SetViewPorts(const CD3DX12_VIEWPORT* viewPort) { m_commandList->RSSetViewports(1, viewPort); }

@@ -28,17 +28,24 @@ namespace Game {
 			m_RootSignature = rootSignature;
 		}
 
-		void UseMaterial(Graphic::CommandList& commandList) const
+		inline void UseMaterial(Graphic::CommandList& commandList)
 		{
+			LoadMaterial();
 			commandList.SetPipelineState(*m_pso);
 			commandList.SetGraphicsRootSignature(*m_RootSignature);
 			_UseMaterial(commandList);
 		}
 
 	protected:
-		// Allocate place from descriptor heap (Create a new descriptor table)
-		// Copy descriptors required when rendering and call set descriptor table
+		
+		// Bind descriptor table when rendering
 		virtual void _UseMaterial(Graphic::CommandList& commandList) const = 0;
+
+		// Test if the descriptor table still one the heap (TODO)
+		// if not
+		//	 Allocate place from descriptor heap (Create a new descriptor table)
+		//	 Copy descriptors required when rendering
+		virtual void LoadMaterial() = 0;
 
 		ptrPSO m_pso;
 		ptrRootSigature m_RootSignature;
@@ -52,7 +59,9 @@ namespace Game {
 			: Material(pso, rootSignature) {}
 
 		void _UseMaterial(Graphic::CommandList& commandList) const override {}
+		void LoadMaterial() override {}
 	};
+
 
 	class TextureMaterial : public Material 
 	{
@@ -60,9 +69,14 @@ namespace Game {
 		TextureMaterial(ptrPSO pso, ptrRootSigature rootSignature, ptrTexture texture);
 
 		void _UseMaterial(Graphic::CommandList& commandList) const override;
+		void LoadMaterial() override;
 
 	private:
+		// Bing texture to a descriptor table, save the index for table start
+		UINT m_HeapIndex;
+
 		ptrTexture m_texture;
+
 	};
 
 }
