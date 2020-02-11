@@ -10,13 +10,6 @@ namespace Samples {
 	using namespace Graphic;
 	using namespace Game;
 
-	struct Vertex
-    {
-        XMFLOAT3 position;
-        XMFLOAT2 texcoor;
-    };
-
-
 	class TextureTestSample : public GraphicCore {
 	public:
 		TextureTestSample(UINT t_width, UINT t_height, LPCTSTR t_title=L"playground")

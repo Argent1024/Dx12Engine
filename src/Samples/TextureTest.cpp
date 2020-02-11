@@ -47,8 +47,13 @@ namespace Samples {
 		
 		// Create Assert
 		
-			// Define the geometry for a triangle.
-		std::vector<Vertex> triangleVertices =
+		struct TextureVertex
+		{
+			XMFLOAT3 position;
+			XMFLOAT2 texcoor;
+		};
+		// Define the geometry for a triangle.
+		std::vector<TextureVertex> triangleVertices =
 		{
 			{ { 0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f } },
 			{ { 0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f } },
@@ -57,16 +62,6 @@ namespace Samples {
 		};
 		std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
 		
-
-		Vertex test[] =
-		{
-			{ { 0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f } },
-			{ { 0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f } },
-			{ { -0.5f, 0.5f, 0.0f }, { 0.0f, 1.0f } },
-			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f } }
-		};
-		const UINT v_s = sizeof(test[0]);
-		const UINT t = sizeof(Vertex);
 		m_Mesh =std::make_shared<TriangleMesh>(triangleVertices, index_list);
 		
 		// Create Texture

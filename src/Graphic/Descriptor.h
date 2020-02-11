@@ -129,11 +129,9 @@ namespace Graphic {
 
 	class UnorderedAccess : public HeapDescriptor {
 	public:
-		UnorderedAccess(ptrGPUMem gpubuffer, const UINT bufferSize)
-			: HeapDescriptor(gpubuffer, bufferSize) 
-		{}
-
-		inline void SetUAVDesc(const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc) { m_uavDesc = desc; }
+		UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc)
+			: m_uavDesc(desc), HeapDescriptor(gpubuffer, 0) 
+		{ this->Initialize(); }
 
 	private:
 		// Create UAV on the init descriptor heap

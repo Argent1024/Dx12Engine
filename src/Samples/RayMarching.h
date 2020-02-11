@@ -10,12 +10,6 @@ namespace Samples {
 	using namespace Graphic;
 	using namespace Game;
 
-	struct Vertex
-    {
-        XMFLOAT3 position;
-        XMFLOAT4 color;
-    };
-
 	// helper struct for passing root signature constants
 	struct ScreenConstantData 
 	{

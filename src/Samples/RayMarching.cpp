@@ -81,8 +81,15 @@ namespace Samples {
 	{
 		// Create Mesh
 		{
+			struct RayMarchVertex
+			{
+				XMFLOAT3 position;
+				XMFLOAT4 color;
+			};
+
+
 			// Define the geometry for a triangle.
-			std::vector<Vertex> triangleVertices =
+			std::vector<RayMarchVertex> triangleVertices =
 			{
 				{ { 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
 				{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
@@ -90,14 +97,7 @@ namespace Samples {
 				{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f} }
 			};
 			std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
-			Vertex test[] = {
-				{ { 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
-				{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-				{ { -1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-				{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f} }
-			};
-			auto t = sizeof(test);
-			auto v_s = sizeof(Vertex);
+			
 			m_Mesh = std::make_shared<TriangleMesh>(triangleVertices, index_list);
 		}
 
