@@ -7,6 +7,7 @@
 #define ptrIndexBuffer std::shared_ptr<Graphic::IndexBuffer>
 #define ptrMesh std::shared_ptr<Game::Mesh>
 
+
 namespace Game {
 	
 	class Mesh {
@@ -16,18 +17,22 @@ namespace Game {
 	};
 
 	// Class for triangle mesh.
-	// TODO Doesn't consider some weird usage yet
 	class TriangleMesh : public Mesh {
 	public:
-		TriangleMesh() {}
-
-		TriangleMesh(ptrVertexBuffer v, ptrIndexBuffer i)
-			: Mesh(), m_VertexBuffer(v), m_IndexBuffer(i) {}
-
-		inline void SetBuffer(ptrVertexBuffer v, ptrIndexBuffer i)
+		// Create the mesh with data, create vertex buffer & index buffer
+		template<class Vertex>
+		TriangleMesh(const std::vector<Vertex>& vertex, const std::vector<UINT>& index)
 		{
-			m_VertexBuffer = v;
-			m_IndexBuffer = i;
+			const UINT vertexBufferSize = vertex.size() * sizeof(Vertex);
+			const UINT indexBufferSize = index.size() * sizeof(UINT);
+
+			// Allocate memory from gpu to store vertex buffer and index buffer
+			ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(vertexBufferSize + indexBufferSize);
+			m_VertexBuffer = std::make_shared<Graphic::VertexBuffer>(gpumem, vertexBufferSize, sizeof(Vertex));
+			m_VertexBuffer->copyData(&vertex[0]);
+		
+			m_IndexBuffer = std::make_shared<Graphic::IndexBuffer>(gpumem, indexBufferSize);
+			m_IndexBuffer->copyData(&index[0]);
 		}
 
 		void UseMesh(Graphic::CommandList& commandList) override;
@@ -47,12 +52,18 @@ namespace Game {
 	// Class that store point, used for particle system
 	class PointMesh : public Mesh {
 	public:
-		PointMesh(ptrVertexBuffer v) 
-			: m_VertexBuffer(v) {}
+		template <class Vertex>
+		PointMesh(const std::vector<Vertex>& vertex) 
+		{
+			const UINT vertexBufferSize = vertex.size() * sizeof(Vertex);
+			ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(vertexBufferSize);
+			m_VertexBuffer = std::make_shared<Graphic::VertexBuffer>(gpumem, vertexBufferSize, sizeof(Vertex));
+			m_VertexBuffer->copyData(&vertex[0]);
+		}
 
 		void UseMesh(Graphic::CommandList& commandList) override;
 		void Draw(Graphic::CommandList& commandList) override;
-
+		
 		static const D3D_PRIMITIVE_TOPOLOGY TopologyType = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
 	protected:
 		ptrVertexBuffer m_VertexBuffer;

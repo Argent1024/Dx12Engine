@@ -71,9 +71,7 @@ namespace Graphic {
 
 		ptrGPUMem gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
 
-		m_srv = new ShaderResource(gpuMem);
-		m_srv->SetSRVDesc(srvDesc);
-		m_srv->Initialize();
+		m_srv = new ShaderResource(gpuMem, srvDesc);
 	}
 
 

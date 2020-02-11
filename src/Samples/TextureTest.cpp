@@ -7,8 +7,6 @@ namespace Samples {
 		Engine::EnableDebug();
 		Engine::CreateDevice();
 		
-		// Initialize Command Manager
-		//CopyCommandManager.Initialize(m_device);
 		CopyHelper.Initialize();
 		GraphicsCommandManager.Initialize();
 
@@ -48,32 +46,19 @@ namespace Samples {
 		}
 		
 		// Create Assert
-		{
+		
 			// Define the geometry for a triangle.
-			Vertex triangleVertices[] =
-			{
-				{ { 0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f } },
-				{ { 0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f } },
-				{ { -0.5f, 0.5f, 0.0f }, { 0.0f, 1.0f } },
-				{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f } }
-			};
-			UINT index_list[] = { 0, 1, 2, 3, 2, 1 };
-
-			const UINT vertexBufferSize = sizeof(triangleVertices);
-			const UINT indexBufferSize = sizeof(index_list);
-			
-			m_GPUmem = Engine::MemoryAllocator.CreateCommittedBuffer(vertexBufferSize + indexBufferSize);
-
-			m_vertexBuffer = std::make_shared<VertexBuffer>(m_GPUmem, vertexBufferSize, sizeof(Vertex));
-			m_vertexBuffer->Initialize();
-			m_vertexBuffer->copyData(triangleVertices);
-
-			m_indexBuffer = std::make_shared<IndexBuffer>(m_GPUmem, indexBufferSize);
-			m_indexBuffer->Initialize();
-			m_indexBuffer->copyData((void*)index_list);
-			
-			m_Mesh =std::make_shared<TriangleMesh>(m_vertexBuffer, m_indexBuffer);
-		}
+		std::vector<Vertex> triangleVertices =
+		{
+			{ { 0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f } },
+			{ { 0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f } },
+			{ { -0.5f, 0.5f, 0.0f }, { 0.0f, 1.0f } },
+			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f } }
+		};
+		std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
+		std::cout<<sizeof(Vertex)<<std::endl;
+		m_Mesh =std::make_shared<TriangleMesh>(triangleVertices, index_list);
+		
 
 		// Create Texture
 		m_texture = std::make_shared<Texture>(256, 256);
@@ -83,6 +68,7 @@ namespace Samples {
 
 		m_textureObject.SetMesh(m_Mesh);
 		m_textureObject.SetMaterial(m_Material);
+		std::cout<<"Finish Creating Texture"<<std::endl;
 	}
 
 	void TextureTestSample::Render() 

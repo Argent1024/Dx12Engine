@@ -82,33 +82,15 @@ namespace Samples {
 		// Create Mesh
 		{
 			// Define the geometry for a triangle.
-			Vertex triangleVertices[] =
+			std::vector<Vertex> triangleVertices =
 			{
 				{ { 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
 				{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
 				{ { -1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
 				{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 1.0f} }
 			};
-			UINT index_list[] = { 0, 1, 2, 3, 2, 1 };
-
-			const UINT vertexBufferSize = sizeof(triangleVertices);
-			const UINT indexBufferSize = sizeof(index_list);
-			// Use upload type buffer
-			//m_GPUmem = std::make_shared<GPU::UploadBuffer>(vertexBufferSize + indexBufferSize); 
-			//m_GPUmem->Initialize(m_device);
-			m_GPUmem = Engine::MemoryAllocator.CreateCommittedBuffer(vertexBufferSize + indexBufferSize);
-
-			m_vertexBuffer = std::make_shared<VertexBuffer>(m_GPUmem, vertexBufferSize, sizeof(Vertex));
-			m_vertexBuffer->Initialize();
-			m_vertexBuffer->copyData(triangleVertices);
-
-			m_indexBuffer = std::make_shared<IndexBuffer>(m_GPUmem, indexBufferSize);
-			m_indexBuffer->Initialize();
-			m_indexBuffer->copyData((void*)index_list);
-			
-
-
-			m_Mesh =std::make_shared<TriangleMesh>(m_vertexBuffer, m_indexBuffer);
+			std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
+			m_Mesh = std::make_shared<TriangleMesh>(triangleVertices, index_list);
 		}
 
 		m_Material = std::make_shared<NoMaterial>(m_GraphicPSO, m_rootSignature);

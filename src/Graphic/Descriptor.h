@@ -13,13 +13,13 @@ namespace Graphic {
 		Descriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
 			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
 
-		virtual void Initialize() = 0;
-
-		inline void copyData(void* data) { Engine::MemoryAllocator.UploadData(*m_Buffer, data, m_BufferSize, m_Offset); }
+		inline void copyData(const void* data) { Engine::MemoryAllocator.UploadData(*m_Buffer, data, m_BufferSize, m_Offset); }
 
 		inline UINT GetSize() { return m_BufferSize; }
 		
 	protected:
+		virtual void Initialize() = 0;
+
 		ptrGPUMem m_Buffer;
 		UINT m_BufferSize;	
 		UINT m_Offset;
@@ -56,15 +56,18 @@ namespace Graphic {
 	class VertexBuffer : public Descriptor {
 	public:
 		VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize) 
-			:Descriptor(gpubuffer, bufferSize), m_strideSize(strideSize) {}
-
-		void Initialize() override;
+			:Descriptor(gpubuffer, bufferSize), m_strideSize(strideSize) 
+		{
+			this->Initialize();
+		}
 
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
 
 		inline UINT GetStrideSize() const { return m_strideSize; }
 
 	private:
+		void Initialize() override;
+
 		const UINT m_strideSize;
 		D3D12_VERTEX_BUFFER_VIEW m_view;
 	};
@@ -74,13 +77,16 @@ namespace Graphic {
 	class IndexBuffer : public Descriptor  {
 	public:
 		IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
-			: Descriptor(gpubuffer, bufferSize) {}
-
-		void Initialize() override;
+			: Descriptor(gpubuffer, bufferSize) 
+		{
+			this->Initialize();
+		}
 		
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
 		
 	private:
+		void Initialize() override;
+
 		D3D12_INDEX_BUFFER_VIEW m_view;
 	};
 
@@ -91,8 +97,9 @@ namespace Graphic {
 		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap)
 			: HeapDescriptor(gpubuffer, bufferSize) {}
 		
-		void Initialize() override;
 	private:
+		void Initialize() override;
+
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
 	};
 
@@ -100,14 +107,11 @@ namespace Graphic {
 
 	class ShaderResource : public HeapDescriptor {
 	public:
-		ShaderResource(ptrGPUMem gpubuffer, const UINT bufferSize=0) //TODO fix this emmmmmm
-			: HeapDescriptor(gpubuffer, bufferSize) 
-		{}
-
-		inline void SetSRVDesc(const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) { m_srvDesc = desc; }
-
-		// Create SRV on the init descriptor heap
-		void Initialize() override;
+		ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) 
+			: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0) //TODO fix this emmmmmm
+		{ 
+			this->Initialize();
+		}
 
 		void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData) 
 		{
@@ -115,6 +119,9 @@ namespace Graphic {
 		}
 
 	private:
+		// Create SRV on the init descriptor heap
+		void Initialize() override;
+
 		D3D12_SHADER_RESOURCE_VIEW_DESC m_srvDesc;
 	};
 
@@ -128,10 +135,10 @@ namespace Graphic {
 
 		inline void SetUAVDesc(const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc) { m_uavDesc = desc; }
 
+	private:
 		// Create UAV on the init descriptor heap
 		void Initialize() override;
 
-	private:
 		D3D12_UNORDERED_ACCESS_VIEW_DESC m_uavDesc;
 	};
 

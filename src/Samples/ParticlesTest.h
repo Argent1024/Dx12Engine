@@ -1,5 +1,6 @@
 #pragma once
 #include "GraphicCore.h"
+#include "CommandQueue.h"
 #include "../World/Camera.h"
 #include "../World/GObject.h"
 
@@ -8,6 +9,11 @@ namespace Samples {
 
 	using namespace Graphic;
 	using namespace Game;
+
+	struct PointVertex
+    {
+        XMFLOAT3 position;
+    };
 
 	class ParticleTest : public GraphicCore {
 	public:
@@ -18,8 +24,23 @@ namespace Samples {
 		void Render() override;
 
 	private:
+		void CreateGameObject();
+		const std::wstring ShaderPath=L"D:\\work\\tEngine\\Shaders\\particle.hlsl";
+
+		std::shared_ptr<VertexBuffer> m_vertexBuffer;
+		std::shared_ptr<IndexBuffer> m_indexBuffer;
+
+		SwapChain* m_swapChain;
+		ptrRootSigature m_rootSignature;
+		ptrPSO m_GraphicPSO;
+
+		ptrGPUMem m_GPUmem;
+		ptrMesh m_Mesh;
+		ptrTexture m_texture;
+		ptrMaterial m_Material;
+		GObject m_ParticleObject;
+
 		Camera m_Camera;
-		const std::wstring shaderPath=L"D:\\work\\tEngine\\Shaders\\particle.hlsl";
 	};
 }
 

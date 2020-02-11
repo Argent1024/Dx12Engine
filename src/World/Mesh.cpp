@@ -7,7 +7,7 @@ namespace Game {
 		commandList.SetVertexBuffer(*m_VertexBuffer);
 		commandList.SetIndexBuffer(*m_IndexBuffer);
 	}
-	
+
 	void TriangleMesh::Draw(Graphic::CommandList& commandList) {
 		// Index buffer store UINT so, num of index == buffersize / sizeof(UINT)
 		UINT IndexCountPerINstance = m_IndexBuffer->GetSize() / sizeof(UINT);

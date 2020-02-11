@@ -15,7 +15,7 @@ namespace Graphic
 		m_depthOptimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
         m_depthOptimizedClearValue.DepthStencil.Depth = 1.0f;
         m_depthOptimizedClearValue.DepthStencil.Stencil = 0;
-
+	
 		ID3D12Device* device = Engine::GetDevice();
 		ThrowIfFailed(device->CreateCommittedResource(
             &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),

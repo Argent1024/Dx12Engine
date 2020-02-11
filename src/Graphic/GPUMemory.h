@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GraphicCore.h"
-#define ptrGPUMem std::shared_ptr<GPU::GPUMemory>
+#define ptrGPUMem std::shared_ptr<Graphic::GPU::GPUMemory>
 
 namespace Graphic {
 	class CommandManager;
@@ -74,12 +74,12 @@ namespace Graphic {
 			// TODO manage cpu memory by myself
 			ptrGPUMem CreateCommittedBuffer(const UINT bufferSize, const D3D12_HEAP_TYPE m_HeapType=D3D12_HEAP_TYPE_DEFAULT);
 			ptrGPUMem CreateCommittedBuffer(const D3D12_RESOURCE_DESC& desc, const D3D12_HEAP_TYPE heapType=D3D12_HEAP_TYPE_DEFAULT);
-			void UploadData(GPUMemory& dest, void* data, UINT bufferize, UINT offset=0);
+			void UploadData(GPUMemory& dest, const void* data, UINT bufferize, UINT offset=0);
 
 			void UploadTexure(GPUMemory& dest, D3D12_SUBRESOURCE_DATA* textureData);
 
 		private:
-			void _UploadData(GPUMemory& buffer, void* data, UINT size, UINT offset=0);
+			void _UploadData(GPUMemory& buffer, const void* data, UINT size, UINT offset=0);
 
 			void _CopyBuffer(GPUMemory& dest, GPUMemory& src);
 

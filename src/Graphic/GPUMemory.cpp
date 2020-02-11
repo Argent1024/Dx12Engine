@@ -26,7 +26,7 @@ namespace Graphic {
 		}
 
 
-		void MemoryAllocator::UploadData(GPUMemory& dest, void* data, UINT dataSize, UINT offset) {
+		void MemoryAllocator::UploadData(GPUMemory& dest, const void* data, UINT dataSize, UINT offset) {
 			switch (dest.GetHeapType()) 
 			{
 				case D3D12_HEAP_TYPE_DEFAULT:
@@ -66,7 +66,7 @@ namespace Graphic {
 			CopyHelper.Start();
 		}
 
-		void MemoryAllocator::_UploadData(GPUMemory& buffer, void* data, UINT size, UINT offset) {
+		void MemoryAllocator::_UploadData(GPUMemory& buffer, const void* data, UINT size, UINT offset) {
 			assert(buffer.GetHeapType() == D3D12_HEAP_TYPE_UPLOAD);
 			assert(offset + size <= buffer.m_MemSize);
 			ID3D12Resource* resource = buffer.GetResource();

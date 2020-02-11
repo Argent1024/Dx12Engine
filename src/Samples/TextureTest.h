@@ -19,26 +19,20 @@ namespace Samples {
 
 	class TextureTestSample : public GraphicCore {
 	public:
-		TextureTestSample(UINT t_width, UINT t_height, 
-					const std::wstring shaderPath=L"D:\\work\\tEngine\\Shaders\\ray.hlsl",
-					LPCTSTR t_title=L"playground")
-			: GraphicCore(t_width, t_height, t_title), m_shaderPath(m_shaderPath), m_Camera(t_width, t_height) {}
+		TextureTestSample(UINT t_width, UINT t_height, LPCTSTR t_title=L"playground")
+			: GraphicCore(t_width, t_height, t_title), m_Camera(t_width, t_height) {}
 		
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;
 	
 	private:
-		const std::wstring m_shaderPath;
-
-		std::shared_ptr<VertexBuffer> m_vertexBuffer;
-		std::shared_ptr<IndexBuffer> m_indexBuffer;
+		const std::wstring m_shaderPath = L"D:\\work\\tEngine\\Shaders\\shaders.hlsl";
 
 		SwapChain* m_swapChain;
 		ptrRootSigature m_rootSignature;
 		ptrPSO m_GraphicPSO;
 
-		ptrGPUMem m_GPUmem;
-		ptrMesh m_Mesh;
+		std::shared_ptr<TriangleMesh> m_Mesh;
 		ptrTexture m_texture;
 		ptrMaterial m_Material;
 		GObject m_textureObject;

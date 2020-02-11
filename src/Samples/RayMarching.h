@@ -40,15 +40,11 @@ namespace Samples {
 	private :
 		const std::wstring m_shaderPath;
 
-		std::shared_ptr<VertexBuffer> m_vertexBuffer;
-		std::shared_ptr<IndexBuffer> m_indexBuffer;
-
 		SwapChain* m_swapChain;
 		ptrRootSigature m_rootSignature;
 		ptrPSO m_GraphicPSO;
 
-		ptrGPUMem m_GPUmem;
-		ptrMesh m_Mesh;
+		std::shared_ptr<TriangleMesh> m_Mesh;
 		ptrMaterial m_Material;
 		GObject m_rayMarchScreen;
 		Camera m_Camera;
