@@ -56,10 +56,19 @@ namespace Samples {
 			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f } }
 		};
 		std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
-		std::cout<<sizeof(Vertex)<<std::endl;
-		m_Mesh =std::make_shared<TriangleMesh>(triangleVertices, index_list);
 		
 
+		Vertex test[] =
+		{
+			{ { 0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f } },
+			{ { 0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f } },
+			{ { -0.5f, 0.5f, 0.0f }, { 0.0f, 1.0f } },
+			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f } }
+		};
+		const UINT v_s = sizeof(test[0]);
+		const UINT t = sizeof(Vertex);
+		m_Mesh =std::make_shared<TriangleMesh>(triangleVertices, index_list);
+		
 		// Create Texture
 		m_texture = std::make_shared<Texture>(256, 256);
 		m_texture->CreateTexture();
@@ -68,7 +77,6 @@ namespace Samples {
 
 		m_textureObject.SetMesh(m_Mesh);
 		m_textureObject.SetMaterial(m_Material);
-		std::cout<<"Finish Creating Texture"<<std::endl;
 	}
 
 	void TextureTestSample::Render() 
