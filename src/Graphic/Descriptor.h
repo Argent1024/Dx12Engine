@@ -47,6 +47,11 @@ namespace Graphic {
 			device->CopyDescriptorsSimple(1, destCPUHandle, srcCPUHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//TODO type
 		}
 
+		inline void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData) 
+		{
+			Engine::MemoryAllocator.UploadTexure(*m_Buffer, textureData);
+		}
+
 	protected:
 		UINT m_HeapIndex;
 	};
@@ -109,14 +114,7 @@ namespace Graphic {
 	public:
 		ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) 
 			: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0) //TODO fix this emmmmmm
-		{ 
-			this->Initialize();
-		}
-
-		void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData) 
-		{
-			Engine::MemoryAllocator.UploadTexure(*m_Buffer, textureData);
-		}
+		{  this->Initialize(); }
 
 	private:
 		// Create SRV on the init descriptor heap

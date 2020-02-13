@@ -74,6 +74,11 @@ Graphic::GPU::MemoryAllocator Engine::MemoryAllocator;
 Graphic::CommandManager CopyHelper(1);
 Graphic::CommandManager GraphicsCommandManager(2);
 
+void Engine::InitializeEngine() {
+
+		
+}
+
 namespace Engine {
 
 	ComPtr<ID3D12Device> dxDevice;

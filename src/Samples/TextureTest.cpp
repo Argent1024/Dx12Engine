@@ -65,8 +65,7 @@ namespace Samples {
 		m_Mesh =std::make_shared<TriangleMesh>(triangleVertices, index_list);
 		
 		// Create Texture
-		m_texture = std::make_shared<Texture>(256, 256);
-		m_texture->CreateTexture();
+		m_texture = std::make_shared<Texture2D>(256, 256);
 
 		m_Material = std::make_shared<TextureMaterial>(m_GraphicPSO, m_rootSignature, m_texture);
 

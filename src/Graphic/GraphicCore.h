@@ -48,4 +48,5 @@ namespace Engine
 	void EnableDebug();
 	void CreateHardwareAdapter(IDXGIFactory2* pFactory, IDXGIAdapter1** ppAdapter);
 	void CreateDevice();
+	void InitializeEngine();
 }
