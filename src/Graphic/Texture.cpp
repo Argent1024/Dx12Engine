@@ -62,28 +62,27 @@ namespace Graphic {
 		default:
 			break;
 		}
+
 		m_textureDesc =  CD3DX12_RESOURCE_DESC::Buffer(size, flag);
-		ptrGPUMem gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
-
-		switch (m_Type)
-		{
-		case Graphic::TEXTURE_SRV:
-			CreateSRV();
-			break;
-		case Graphic::TEXTURE_UAV:
-			CreateUAV();
-			break;
-		default:
-			throw std::runtime_error("Wrong Texture type");
-			break;
-		}	
-
+		m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
+		CreateView();
 	}
 
-	void TextureBuffer::CreateSRV() {}
+	void TextureBuffer::CreateSRV() 
+	{
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+        srvDesc.Buffer.FirstElement = 0;
+        srvDesc.Buffer.NumElements = m_size;
+        srvDesc.Buffer.StructureByteStride = m_stride;
+        srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		m_SRV = new ShaderResource(m_gpuMem, srvDesc);
+	}
 
-	void TextureBuffer::CreateUAV() {
-		ptrGPUMem gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
+	void TextureBuffer::CreateUAV() 
+	{
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
@@ -92,7 +91,7 @@ namespace Graphic {
 		uavDesc.Buffer.StructureByteStride = m_stride;
 		uavDesc.Buffer.CounterOffsetInBytes = 0;
 		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-		m_View = new UnorderedAccess(gpuMem, uavDesc);
+		m_UAV = new UnorderedAccess(m_gpuMem, uavDesc);
 	}
 
 	Texture2D::Texture2D(UINT width, UINT height, TextureType type, const std::wstring& textureFile)
@@ -109,31 +108,20 @@ namespace Graphic {
 		m_textureDesc.SampleDesc.Quality = 0;
 		m_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
+		m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
+		CreateView();
 
-		switch (m_Type)
-		{
-		case Graphic::TEXTURE_SRV:
-			CreateSRV();
-			break;
-		case Graphic::TEXTURE_UAV:
-			CreateUAV();
-			break;
-		default:
-			throw std::runtime_error("Wrong Texture type");
-			break;
-		}	
 		TextureData tdata(m_textureDesc.Width, m_textureDesc.Height);
 		UploadTexture(tdata);
 	}
 
 	void Texture2D::CreateSRV() {
-		ptrGPUMem gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		srvDesc.Format = m_textureDesc.Format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
-		m_View = new ShaderResource(gpuMem, srvDesc);
+		m_SRV = new ShaderResource(m_gpuMem, srvDesc);
 	}
 
 	void Texture2D::CreateUAV() {

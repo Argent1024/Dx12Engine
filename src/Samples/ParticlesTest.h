@@ -12,11 +12,12 @@ namespace Samples {
 
 	struct PointVertex
     {
-        XMFLOAT3 position;
+        XMFLOAT4 position;
     };
 
 	class ParticleTest : public GraphicCore {
 	public:
+		const size_t NumParticles = 1000;
 		ParticleTest(UINT t_width, UINT t_height,  LPCTSTR t_title=L"playground") 
 			: GraphicCore(t_width, t_height, t_title), m_Camera(t_width, t_height) {}
 

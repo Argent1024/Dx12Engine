@@ -38,15 +38,10 @@ namespace Samples {
 		CreatSwapChain(m_appHwnd);
 
 		// Initialize Root Signature and pass constant into it
-		{
-			m_rootSignature = std::make_shared<RayMarchingRootSignature>();
-			m_rootSignature->Initialize();
-			/*ScreenConstantData data;
-			data.ScreenSize = XMFLOAT4((float)m_width, (float)m_height, 0.0, 0.0);
-			// Emmmmmmm need a D3D12_Direct command list to set root signature
-			// Change the way copyCommandManager work, put it inside the GPU mem allocator
-			*/
-		}
+		
+		m_rootSignature = std::make_shared<RayMarchingRootSignature>();
+		m_rootSignature->Initialize();
+		
 
 		// TODO do more thing on pso
 		// Compile Shader and Initialize PSO
@@ -86,7 +81,6 @@ namespace Samples {
 				XMFLOAT3 position;
 				XMFLOAT4 color;
 			};
-
 
 			// Define the geometry for a triangle.
 			std::vector<RayMarchVertex> triangleVertices =
