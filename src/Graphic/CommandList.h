@@ -83,6 +83,10 @@ namespace Graphic {
 			m_commandList->CopyBufferRegion(dest.GetResource(), destOffset, src.GetResource(), srcOffset, sizeBytes); 
 		}
 
+		inline void CopyTextureRegion() {
+			throw std::runtime_error("not implemented!");
+		}
+
 		// Descriptor stuff
 		inline void SetDescriptorHeap(DescriptorHeap& descriptorHeap) 
 		{

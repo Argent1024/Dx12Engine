@@ -53,7 +53,7 @@ namespace Graphic {
 
 		// Create 1d texture data
 		template <class T>
-		D3D12_SUBRESOURCE_DATA CreateTextureData(const std::vector<T>&  data) {
+		static D3D12_SUBRESOURCE_DATA CreateTextureData(const std::vector<T>&  data) {
 			D3D12_SUBRESOURCE_DATA textureData = {};
 			textureData.pData = &data[0];
 			textureData.RowPitch = data.size() * sizeof(T);
@@ -62,7 +62,7 @@ namespace Graphic {
 		}
 		
 		// TODO Template
-		D3D12_SUBRESOURCE_DATA CreateTextureData(const UINT width, const UINT height, const UINT pixelSize, 
+		static D3D12_SUBRESOURCE_DATA CreateTextureData(const UINT width, const UINT height, const UINT pixelSize, 
 												 const std::vector<UINT8>& data) 
 		{
 			D3D12_SUBRESOURCE_DATA textureData = {};
@@ -107,7 +107,7 @@ namespace Graphic {
 	// Texture 
 	class TextureBuffer : public Texture {
 	public:
-		TextureBuffer(UINT size, UINT stride, TextureType type=TEXTURE_SRV);
+		TextureBuffer(UINT elementSize, UINT stride, TextureType type=TEXTURE_SRV);
 	private:
 		void CreateSRV() override;
 		void CreateUAV() override;

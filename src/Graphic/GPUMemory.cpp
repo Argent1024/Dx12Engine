@@ -39,7 +39,7 @@ namespace Graphic {
 					break;
 				//TODO Placed heap
 				default:
-					break;
+					break; 
 					//assert(FALSE && "Wrong heap type");
 			}
 		}
@@ -60,7 +60,7 @@ namespace Graphic {
 			CommandList copycl;
 			CopyHelper.Start();
 			CopyHelper.InitCommandList(&copycl);
-			UpdateSubresources(copycl.GetCommandList(), dest.GetResource(), textureUploadHeap.Get(), 0, 0, 1, textureData);
+			UpdateSubresources<1>(copycl.GetCommandList(), dest.GetResource(), textureUploadHeap.Get(), 0, 0, 1, textureData);
 			CopyHelper.ExecuteCommandList(&copycl);
 			CopyHelper.End();
 			CopyHelper.Start();

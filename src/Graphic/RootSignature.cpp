@@ -18,11 +18,11 @@ namespace Graphic {
 		
 		// Define the Descriptor table
 		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0-t1
-
+		
 		// A Root CBV at regisiter 0, space 0
 		rootParameters[0].InitAsConstants(sizeof(DirectX::XMMATRIX) / 4,  0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 		// A descriptor table
-		rootParameters[1].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_PIXEL);
+		rootParameters[1].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
 
 
 		D3D12_STATIC_SAMPLER_DESC sampler = {};

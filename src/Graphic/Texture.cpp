@@ -36,22 +36,24 @@ namespace Graphic {
 	}
 
 
-	TextureBuffer::TextureBuffer(UINT size, UINT stride, TextureType type) 
-		:Texture(type), m_size(size), m_stride(stride)
+	TextureBuffer::TextureBuffer(UINT elementSize, UINT stride, TextureType type) 
+		:Texture(type), m_size(elementSize), m_stride(stride)
 	{
 		// TODO consider flags
-		D3D12_RESOURCE_FLAGS flag;
+		D3D12_RESOURCE_FLAGS flag;;
 		switch (type)
 		{
 		case Graphic::TEXTURE_SRV:
 			flag = D3D12_RESOURCE_FLAG_NONE;
 		case Graphic::TEXTURE_UAV:
 			flag = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		case Graphic::TEXTURE_RW:
+			flag = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 		default:
 			break;
 		}
 
-		m_textureDesc =  CD3DX12_RESOURCE_DESC::Buffer(size, flag);
+		m_textureDesc =  CD3DX12_RESOURCE_DESC::Buffer(elementSize * m_stride, flag);
 		m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
 		CreateView();
 	}

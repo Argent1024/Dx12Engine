@@ -6,19 +6,24 @@ namespace Samples {
 	void ParticleTest::Init(const HWND m_appHwnd) {
 		Engine::EnableDebug();
 		Engine::CreateDevice();
-	
+
 		// Initialize Command Manager
 		//CopyCommandManager.Initialize(m_device);
 		CopyHelper.Initialize();
 		GraphicsCommandManager.Initialize();
+
+		DescriptorHeap* initHeap = Engine::GetInitHeap();
+		initHeap->Initialize();
+		DescriptorHeap* useHeap = Engine::GetInUseHeap();
+		useHeap->Initialize();
 		
 		m_swapChain = new SwapChain(m_appHwnd, m_width, m_height);
 		m_swapChain->Initialize(GraphicsCommandManager.GetCommadnQueue());
 
 		// Initialize Root Signature and pass constant into it
 		
-		m_rootSignature = std::make_shared<RootSignature>();
-		m_rootSignature->Initialize();
+		m_GraphicRootSignature = std::make_shared<RootSignature>();
+		m_GraphicRootSignature->Initialize();
 		
 		
 
@@ -27,10 +32,14 @@ namespace Samples {
 		{
 			UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 			ComPtr<ID3DBlob> VS;
+			ComPtr<ID3DBlob> GS;
 			ComPtr<ID3DBlob> PS;
-			const std::wstring path = L"D:\\work\\tEngine\\Shaders\\ray.hlsl";
-			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &VS, nullptr));
-			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &PS, nullptr));
+			ID3DBlob* errorBlob;
+			const std::wstring ShaderPath=L"D:\\work\\tEngine\\Shaders\\particletest.hlsl";
+
+			ThrowIfFailed(D3DCompileFromFile(ShaderPath.c_str(), nullptr, nullptr, "VSParticleDraw", "vs_5_0", compileFlags, 0, &VS, nullptr));
+			ThrowIfFailed(D3DCompileFromFile(ShaderPath.c_str(), nullptr, nullptr, "GSParticleDraw", "gs_5_0", compileFlags, 0, &GS, nullptr));
+			ThrowIfFailed(D3DCompileFromFile(ShaderPath.c_str(), nullptr, nullptr, "PSParticleDraw", "ps_5_0", compileFlags, 0, &PS, nullptr));
 
 			// Input for vertex 
 			D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -39,10 +48,11 @@ namespace Samples {
 			};
 
 			m_GraphicPSO = std::make_shared<GraphicsPSO>();
-			m_GraphicPSO->SetRootSigature(m_rootSignature->GetRootSignature());
+			m_GraphicPSO->SetRootSigature(m_GraphicRootSignature->GetRootSignature());
 			m_GraphicPSO->SetVertexShader(CD3DX12_SHADER_BYTECODE(VS.Get()));
+			m_GraphicPSO->SetGeometryShader(CD3DX12_SHADER_BYTECODE(GS.Get()));
 			m_GraphicPSO->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
-			m_GraphicPSO->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+			m_GraphicPSO->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT);
 			m_GraphicPSO->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
 			m_GraphicPSO->Initialize();
 		}
@@ -53,10 +63,21 @@ namespace Samples {
 	void ParticleTest::CreateGameObject() 
 	{ 
 		// Create Mesh
-		std::vector<PointVertex> PointVertics(NumParticles, { {0.0f, 0.0f, 0.0f, 0.0f} });
+		std::vector<PointVertex> PointVertics;
+		PointVertics.resize(NumParticles);
+		for (UINT i = 0; i < NumParticles; i++) {
+			PointVertics[0] = { {0.1, 0.1, 0.9, 0.0} };
+		}
 		m_Mesh = std::make_shared<PointMesh>(PointVertics);
 		
-		m_Material = std::make_shared<NoMaterial>(m_GraphicPSO, m_rootSignature);
+		// Create Texture
+		std::vector<ParticleData> textureData;
+		GenerateParticlesTexture(textureData);
+		m_texture = std::make_shared<TextureBuffer>(NumParticles, sizeof(ParticleData), TEXTURE_RW);
+		D3D12_SUBRESOURCE_DATA tData = Texture::CreateTextureData<ParticleData>(textureData);
+		m_texture->UploadTexture(tData);
+
+		m_Material = std::make_shared<TextureMaterial>(m_GraphicPSO, m_GraphicRootSignature, m_texture);
 
 		m_ParticleObject.SetMesh(m_Mesh);
 		m_ParticleObject.SetMaterial(m_Material);		
@@ -66,6 +87,10 @@ namespace Samples {
 	{	
 		
 		GraphicsCommandManager.Start();
+		DescriptorHeap* UseHeap = Engine::GetInUseHeap();
+		UseHeap->Reset();
+
+
 		CommandList mainCommandList;
 		const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 		GraphicsCommandManager.InitCommandList(&mainCommandList);
