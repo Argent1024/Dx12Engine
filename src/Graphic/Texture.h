@@ -12,31 +12,9 @@ namespace Graphic {
 		TEXTURE_RW	// Create both SRV & UAV
 	};
 
-	// Helper class to upload texture data
-	// Usage:
-	//	In Texture Class
-	//	{	
-	//		TextureData t(...);	<-- Init 
-	//		for(i in 1:100) {
-	//			t[i] = ??? <-- Load data
-	//      }
-	//		UploadTexture(t);	<-- do upload
-	//		return;
-	//	}
-	class TextureData {
-	public:
 
-		TextureData(const UINT size);
-
-		// Load chess board texture data
-		TextureData(const UINT width, const UINT height, const UINT piexlSize=4);
-		inline D3D12_SUBRESOURCE_DATA GetTextureData() const {return m_textureData; }
-		inline UINT8& operator[](std::size_t n) { return m_data[n]; }
-
-	private:
-		std::vector<UINT8> m_data;
-		D3D12_SUBRESOURCE_DATA m_textureData;
-	};
+	void LoadChessBoard(const UINT width, const UINT height, const UINT pixelSize, std::vector<UINT8>& data);
+	
 
 	// Texture
 	// Texture class implement this base class should 
@@ -71,8 +49,29 @@ namespace Graphic {
 
 		// Write texture data to gpu memory
 		// Only need to upload once since SRV, UAV will point to the same memory!
-		inline void UploadTexture(const TextureData& textureData) 
-		{ m_SRV->CopyTexture(&textureData.GetTextureData()); }
+		inline void UploadTexture(D3D12_SUBRESOURCE_DATA& data) { m_SRV->CopyTexture(&data); }
+
+		// Create 1d texture data
+		template <class T>
+		D3D12_SUBRESOURCE_DATA CreateTextureData(const std::vector<T>&  data) {
+			D3D12_SUBRESOURCE_DATA textureData = {};
+			textureData.pData = &data[0];
+			textureData.RowPitch = data.size() * sizeof(T);
+			textureData.SlicePitch = data.size() * sizeof(T);
+			return textureData;
+		}
+		
+		// TODO Template
+		D3D12_SUBRESOURCE_DATA CreateTextureData(const UINT width, const UINT height, const UINT pixelSize, 
+												 const std::vector<UINT8>& data) 
+		{
+			D3D12_SUBRESOURCE_DATA textureData = {};
+			// Set infomation to m_textureData
+			textureData.pData = &data[0];
+			textureData.RowPitch = width * pixelSize;
+			textureData.SlicePitch = textureData.RowPitch * height;
+			return textureData;
+		}
 
 	protected:
 		virtual void CreateSRV() = 0;

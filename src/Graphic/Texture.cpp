@@ -2,24 +2,11 @@
 
 namespace Graphic {
 
-	TextureData::TextureData(const UINT size) 
-		: m_data(size)
+	void LoadChessBoard(const UINT width, const UINT height, const UINT pixelSize, std::vector<UINT8>& data)
 	{
-		m_textureData.pData = &m_data[0];
-		m_textureData.RowPitch = size;
-		m_textureData.SlicePitch = size;
-	}
-
-	TextureData::TextureData(const UINT width, const UINT height, const UINT pixelSize) 
-		: m_data(width * height* pixelSize)
-	{
-		// Set infomation to m_textureData
-		m_textureData.pData = &m_data[0];
-		m_textureData.RowPitch = width * pixelSize;
-		m_textureData.SlicePitch = m_textureData.RowPitch * height;
-
-		const UINT textureSize = m_textureData.SlicePitch;
-		const UINT rowPitch = m_textureData.RowPitch;
+		const UINT rowPitch = width * pixelSize;
+		const UINT textureSize = rowPitch * height;
+		data.resize(textureSize);
 		const UINT cellPitch = rowPitch >> 3;        // The width of a cell in the checkboard texture.
 		const UINT cellHeight = width >> 3;    // The height of a cell in the checkerboard texture.
 		// Load Chess Board
@@ -32,21 +19,22 @@ namespace Graphic {
 
 			if (i % 2 == j % 2)
 			{
-				m_data[n] = 0x00;        // R
-				m_data[n + 1] = 0x00;    // G
-				m_data[n + 2] = 0x00;    // B
-				m_data[n + 3] = 0xff;    // A
+				data[n] = 0x00;        // R
+				data[n + 1] = 0x00;    // G
+				data[n + 2] = 0x00;    // B
+				data[n + 3] = 0xff;    // A
 			}
 			else
 			{
-				m_data[n] = 0xff;        // R
-				m_data[n + 1] = 0xff;    // G
-				m_data[n + 2] = 0xff;    // B
-				m_data[n + 3] = 0xff;    // A
+				data[n] = 0xff;        // R
+				data[n + 1] = 0xff;    // G
+				data[n + 2] = 0xff;    // B
+				data[n + 3] = 0xff;    // A
 			}
 			
 		}
 	}
+
 
 	TextureBuffer::TextureBuffer(UINT size, UINT stride, TextureType type) 
 		:Texture(type), m_size(size), m_stride(stride)
@@ -111,8 +99,10 @@ namespace Graphic {
 		m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
 		CreateView();
 
-		TextureData tdata(m_textureDesc.Width, m_textureDesc.Height);
-		UploadTexture(tdata);
+		std::vector<UINT8> data;
+		LoadChessBoard(m_textureDesc.Width, m_textureDesc.Height, 4, data);
+		D3D12_SUBRESOURCE_DATA textureData = CreateTextureData(m_textureDesc.Width, m_textureDesc.Height, 4, data);
+		UploadTexture(textureData);
 	}
 
 	void Texture2D::CreateSRV() {
