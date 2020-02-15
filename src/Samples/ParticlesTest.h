@@ -25,7 +25,7 @@ namespace Samples {
 		const size_t NumRow = 10;//Particle in one row
 		const size_t NumParticles = NumRow * NumRow * NumRow;
 		const float RowLength = 0.5;
-		const float Delta = RowLength / NumRow;
+		const float Delta = 2.0f * RowLength / NumRow;
 		const XMFLOAT4 LeftCorner = XMFLOAT4(-RowLength, -RowLength, -RowLength, 0.0);
 
 		ParticleTest(UINT t_width, UINT t_height,  LPCTSTR t_title=L"playground") 

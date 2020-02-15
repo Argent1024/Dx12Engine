@@ -66,7 +66,7 @@ namespace Samples {
 		std::vector<PointVertex> PointVertics;
 		PointVertics.resize(NumParticles);
 		for (UINT i = 0; i < NumParticles; i++) {
-			PointVertics[0] = { {0.1, 0.1, 0.9, 0.0} };
+			PointVertics[i] = { {0.1, 0.1, 0.9, 0.0} };
 		}
 		m_Mesh = std::make_shared<PointMesh>(PointVertics);
 		
