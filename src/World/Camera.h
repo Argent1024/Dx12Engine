@@ -33,16 +33,19 @@ namespace Game {
 
 	class ProjectiveCamera : public Camera { 
 	public:
-		ProjectiveCamera(const UINT width, const UINT height, 
-			const Vector3& Position, const Vector3& ViewDir, const Vector3& WorldUp): Camera(width, height)
-		{ LookAt(Position, ViewDir, WorldUp); }
+		ProjectiveCamera(const UINT width, const UINT height)
+			: Camera(width, height) {}
 
-		inline void LookAt(const Vector3& Position, const Vector3& ViewDir, const Vector3& WorldUp)
+		ProjectiveCamera(const UINT width, const UINT height, 
+			const Vector3& Position, const Vector3& Target, const Vector3& WorldUp): Camera(width, height)
+		{ LookAt(Position, Target, WorldUp); }
+
+		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
-			Vector3 z = -ViewDir;
+			Vector3 z = Normalize(Target - Position);
 			Vector3 x = Normalize(CrossProduct(WorldUp, z));
 			Vector3 y = CrossProduct(z, x);
-			m_ViewTransform = Transform(x, y ,z, -Position);
+			m_ViewTransform = Transform(x, y, z, -Position);
 		}
 
 		void UseCamera(Graphic::CommandList& commmandList) override;

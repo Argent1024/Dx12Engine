@@ -92,7 +92,7 @@ namespace Samples {
 
 
 		CommandList mainCommandList;
-		const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+		const float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		GraphicsCommandManager.InitCommandList(&mainCommandList);
 		mainCommandList.SetSwapChain(*m_swapChain);
 		mainCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
