@@ -18,12 +18,14 @@ struct VSParticleDrawOut
 
 struct GSParticleDrawOut
 {
+    float2 tex            : TEXCOORD0;
     float4 color        : COLOR;
     float4 pos            : SV_POSITION;
 };
 
 struct PSParticleDrawIn
 {
+    float2 tex            : TEXCOORD0;
     float4 color        : COLOR;
 };
 
@@ -36,7 +38,7 @@ StructuredBuffer<PosVelo> g_bufPosVelo : register(t0);
 
 cbuffer cb1
 {
-    static float g_fParticleRad = 0.015f;
+    static float g_fParticleRad = 0.02f;
 };
 
 cbuffer cbImmutable
@@ -79,14 +81,13 @@ VSParticleDrawOut VSParticleDraw(VSParticleIn input)
 void GSParticleDraw(point VSParticleDrawOut input[1], inout TriangleStream<GSParticleDrawOut> SpriteStream)
 {
     GSParticleDrawOut output;
-    
-    // Emit two new triangles.
+
+    // Emit two new triangles at the particlePos, perpendicular to view
 	for (int i = 0; i < 4; i++)
 	{
 		float3 position = g_positions[i] * g_fParticleRad;
-		position = position + input[0].pos;
-		output.pos = mul(float4(position, 1.0), ViewMatrix);
-
+		output.pos = mul(float4(input[0].pos + position, 1.0), ViewMatrix);
+		output.tex = g_texcoords[i];
 		output.color = float4(input[0].pos, 1.0);//input[0].color;
 		SpriteStream.Append(output);
 	}
@@ -99,5 +100,7 @@ void GSParticleDraw(point VSParticleDrawOut input[1], inout TriangleStream<GSPar
 //
 float4 PSParticleDraw(PSParticleDrawIn input) : SV_Target
 {
-    return 1.5 * input.color;
+	float intensity = 0.5f - length(float2(0.5f, 0.5f) - input.tex);
+    intensity = clamp(intensity, 0.0f, 0.5f) * 2.0;
+    return float4(input.color.xyz, intensity);
 }

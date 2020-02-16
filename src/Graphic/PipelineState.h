@@ -35,11 +35,26 @@ namespace Graphic {
 		inline void SetTopologyType(const D3D12_PRIMITIVE_TOPOLOGY_TYPE type) { m_psoDesc.PrimitiveTopologyType = type; }
 		// TODO maybe a new class of input layout
 		inline void SetInoutLayout(UINT NumElements, D3D12_INPUT_ELEMENT_DESC* InputDescs) {m_psoDesc.InputLayout = D3D12_INPUT_LAYOUT_DESC{ InputDescs, NumElements};}
-		inline void SetDepthStencilState() { m_psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); }
+		
+		inline void SetDepthStencilState(D3D12_DEPTH_STENCIL_DESC desc)
+		{ 
+			m_psoDesc.DepthStencilState = desc; 
+		}
+		
+		inline void SetBlendState(D3D12_BLEND_DESC desc)
+		{
+			m_psoDesc.BlendState = desc;
+		}
+
+		inline void SetRasterState(D3D12_RASTERIZER_DESC desc) 
+		{
+			m_psoDesc.RasterizerState = desc;
+		}
+
 		//TODO Modify
 		void SetDefault() {
 			m_psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			m_psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+			//m_psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 			m_psoDesc.SampleMask = UINT_MAX;
 			m_psoDesc.NumRenderTargets = 1;
 			m_psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;

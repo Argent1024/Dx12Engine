@@ -55,7 +55,20 @@ namespace Samples {
 			m_GraphicPSO->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
 			m_GraphicPSO->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT);
 			m_GraphicPSO->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
-			m_GraphicPSO->SetDepthStencilState();
+
+			CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(D3D12_DEFAULT);
+			depthStencilDesc.DepthEnable = FALSE;
+			depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+			m_GraphicPSO->SetDepthStencilState(depthStencilDesc);
+
+			 CD3DX12_BLEND_DESC blendDesc(D3D12_DEFAULT);
+			blendDesc.RenderTarget[0].BlendEnable = TRUE;
+			blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+			blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+			blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
+			blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+			m_GraphicPSO->SetBlendState(blendDesc);
+
 			m_GraphicPSO->Initialize();
 		}
 
@@ -117,8 +130,8 @@ namespace Samples {
 			// Barrier Draw
 			ThreadCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 			
-			//ThreadCommandList.SetSwapChain(*m_swapChain);
-			ThreadCommandList.SetSwapChain(*m_swapChain, *m_depthBuffer);
+			ThreadCommandList.SetSwapChain(*m_swapChain);
+			//ThreadCommandList.SetSwapChain(*m_swapChain, *m_depthBuffer);
 			m_ParticleObject.Draw(ThreadCommandList);
 
 			ThreadCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
