@@ -30,7 +30,7 @@ namespace Samples {
 
 		ParticleTest(UINT t_width, UINT t_height,  LPCTSTR t_title=L"playground") 
 			: GraphicCore(t_width, t_height, t_title), 
-			  m_Camera(t_width, t_height, Vector3(-2.5, 0.0, -2.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0)) {}
+			  m_Camera(t_width, t_height, Vector3(-1.0, 0.0, -1.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0)) {}
 
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;
@@ -60,7 +60,9 @@ namespace Samples {
 		std::shared_ptr<VertexBuffer> m_vertexBuffer;
 		std::shared_ptr<IndexBuffer> m_indexBuffer;
 
+		DepthBuffer* m_depthBuffer;
 		SwapChain* m_swapChain;
+
 		ptrRootSigature m_GraphicRootSignature;
 		ptrPSO m_GraphicPSO;
 

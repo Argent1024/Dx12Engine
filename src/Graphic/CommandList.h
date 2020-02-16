@@ -70,7 +70,7 @@ namespace Graphic {
 		inline void ClearSwapChain(const SwapChain& swapChain, const float color[4]) const { m_commandList->ClearRenderTargetView(swapChain.GetBackBufferCPUHandle(), color, 0, nullptr);}
 		inline void ResourceBarrier(const SwapChain& swapChain, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) { m_commandList->ResourceBarrier(1, &(swapChain.Barrier(before, after))); }
 		
-		inline void ClearDepthChain(DepthBuffer& depthBuffer, const float color[4]) { m_commandList->ClearDepthStencilView(depthBuffer.GetDepthBufferCPUHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr); }
+		inline void ClearDepthChain(DepthBuffer& depthBuffer) { m_commandList->ClearDepthStencilView(depthBuffer.GetDepthBufferCPUHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr); }
 
 		// ProjectiveCamera
 		inline void SetViewPorts(const CD3DX12_VIEWPORT* viewPort) { m_commandList->RSSetViewports(1, viewPort); }

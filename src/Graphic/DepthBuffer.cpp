@@ -6,6 +6,8 @@ namespace Graphic
 		: m_width(width), m_height(height),
 		  m_dsvHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_NONE)
 	{
+		m_dsvHeap.Initialize();
+
 		m_depthStencilDesc = {};
 		m_depthStencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
         m_depthStencilDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;

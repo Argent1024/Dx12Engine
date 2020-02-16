@@ -36,7 +36,7 @@ StructuredBuffer<PosVelo> g_bufPosVelo : register(t0);
 
 cbuffer cb1
 {
-    static float g_fParticleRad = 0.02f;
+    static float g_fParticleRad = 0.015f;
 };
 
 cbuffer cbImmutable
@@ -99,5 +99,5 @@ void GSParticleDraw(point VSParticleDrawOut input[1], inout TriangleStream<GSPar
 //
 float4 PSParticleDraw(PSParticleDrawIn input) : SV_Target
 {
-    return input.color;
+    return 1.5 * input.color;
 }

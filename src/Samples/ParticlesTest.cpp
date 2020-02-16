@@ -20,12 +20,13 @@ namespace Samples {
 		m_swapChain = new SwapChain(m_appHwnd, m_width, m_height);
 		m_swapChain->Initialize(GraphicsCommandManager.GetCommadnQueue());
 
+		m_depthBuffer = new DepthBuffer(m_width, m_height);
+
 		// Initialize Root Signature and pass constant into it
 		
 		m_GraphicRootSignature = std::make_shared<RootSignature>();
 		m_GraphicRootSignature->Initialize();
-		
-		
+			
 
 		// TODO do more thing on pso
 		// Compile Shader and Initialize PSO
@@ -34,7 +35,7 @@ namespace Samples {
 			ComPtr<ID3DBlob> VS;
 			ComPtr<ID3DBlob> GS;
 			ComPtr<ID3DBlob> PS;
-			ID3DBlob* errorBlob;
+			
 			const std::wstring ShaderPath=L"D:\\work\\tEngine\\Shaders\\particletest.hlsl";
 
 			ThrowIfFailed(D3DCompileFromFile(ShaderPath.c_str(), nullptr, nullptr, "VSParticleDraw", "vs_5_0", compileFlags, 0, &VS, nullptr));
@@ -54,6 +55,7 @@ namespace Samples {
 			m_GraphicPSO->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
 			m_GraphicPSO->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT);
 			m_GraphicPSO->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
+			m_GraphicPSO->SetDepthStencilState();
 			m_GraphicPSO->Initialize();
 		}
 
@@ -90,13 +92,14 @@ namespace Samples {
 		DescriptorHeap* UseHeap = Engine::GetInUseHeap();
 		UseHeap->Reset();
 
-
 		CommandList mainCommandList;
-		const float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		const float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		GraphicsCommandManager.InitCommandList(&mainCommandList);
+
 		mainCommandList.SetSwapChain(*m_swapChain);
 		mainCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		mainCommandList.ClearSwapChain(*m_swapChain, clearColor);
+		
 		mainCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		GraphicsCommandManager.ExecuteCommandList(&mainCommandList);
 
@@ -105,6 +108,8 @@ namespace Samples {
 			CommandList ThreadCommandList;
 			GraphicsCommandManager.InitCommandList(&ThreadCommandList);
 			
+			ThreadCommandList.ClearDepthChain(*m_depthBuffer);
+
 			m_ParticleObject.RecordCommand(ThreadCommandList);
 			m_Camera.UseCamera(ThreadCommandList);
 			
@@ -112,7 +117,8 @@ namespace Samples {
 			// Barrier Draw
 			ThreadCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 			
-			ThreadCommandList.SetSwapChain(*m_swapChain);
+			//ThreadCommandList.SetSwapChain(*m_swapChain);
+			ThreadCommandList.SetSwapChain(*m_swapChain, *m_depthBuffer);
 			m_ParticleObject.Draw(ThreadCommandList);
 
 			ThreadCommandList.ResourceBarrier(*m_swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);

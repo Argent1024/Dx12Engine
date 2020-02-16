@@ -11,6 +11,7 @@ namespace Graphic
 
 		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetDepthBufferCPUHandle() const { return m_dsvHeap.GetCPUHandle(0); }
 
+		
 	private:
 		const UINT m_width;
 		const UINT m_height;
