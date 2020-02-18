@@ -31,9 +31,11 @@ namespace Math
 		static INLINE Matrix3 MakeScale(Vector3 scale) { return Matrix3(XMMatrixScalingFromVector(scale)); }
 
 		INLINE operator XMMATRIX() const { return (const XMMATRIX&)m_mat; }
+		INLINE Matrix3 Transpose() const { return Matrix3(XMMatrixTranspose((const XMMATRIX&)m_mat)); }
 
 		INLINE Vector3 operator* (Vector3 vec) const { return Vector3(XMVector3TransformNormal(vec, *this)); }
 		INLINE Matrix3 operator* (const Matrix3& mat) const { return Matrix3(*this * mat.GetX(), *this * mat.GetY(), *this * mat.GetZ()); }
+
 
 	protected:
 		Vector3 m_mat[3];

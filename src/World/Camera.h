@@ -42,10 +42,8 @@ namespace Game {
 
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
-			Vector3 z = Normalize(Target - Position);
-			Vector3 x = Normalize(CrossProduct(WorldUp, z));
-			Vector3 y = CrossProduct(z, x);
-			m_ViewTransform = Transform(x, y, z, -Position);
+			Matrix4 view(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp));
+			m_ViewTransform = Transform(view);
 		}
 
 		void UseCamera(Graphic::CommandList& commmandList) override;

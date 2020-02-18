@@ -22,7 +22,7 @@ namespace Samples {
 
 	class ParticleTest : public GraphicCore {
 	public:
-		const size_t NumRow = 20;//Particle in one row
+		const size_t NumRow = 15;//Particle in one row
 		const size_t NumParticles = NumRow * NumRow * NumRow;
 		const float RowLength = 0.5;
 		const float Delta = 2.0f * RowLength / NumRow;
@@ -30,7 +30,7 @@ namespace Samples {
 
 		ParticleTest(UINT t_width, UINT t_height,  LPCTSTR t_title=L"playground") 
 			: GraphicCore(t_width, t_height, t_title), 
-			  m_Camera(t_width, t_height, Vector3(-0.0, 0.0, -10.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0)) {}
+			  m_Camera(t_width, t_height, Vector3(0.0, 0.0, -1.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0)) {}
 
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;

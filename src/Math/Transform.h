@@ -10,6 +10,7 @@ namespace Math {
 		INLINE explicit Transform(const Vector3& x, const Vector3& y, const Vector3& z, const Vector3& w)
 			: m_mat(x, y, z, w) {}
 		INLINE explicit Transform(const Matrix3& mat, Vector3 v): m_mat(mat, v) {}
+		INLINE explicit Transform(const Matrix4& mat) : m_mat(mat) {}
 
 		INLINE const Matrix3& GetRotation() { return m_mat.Get3x3(); }
 		INLINE Vector3 GetTranslation() { return m_mat.GetW(); }

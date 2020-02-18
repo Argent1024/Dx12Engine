@@ -61,7 +61,7 @@ namespace Samples {
 			depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 			m_GraphicPSO->SetDepthStencilState(depthStencilDesc);
 
-			 CD3DX12_BLEND_DESC blendDesc(D3D12_DEFAULT);
+			CD3DX12_BLEND_DESC blendDesc(D3D12_DEFAULT);
 			blendDesc.RenderTarget[0].BlendEnable = TRUE;
 			blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 			blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
