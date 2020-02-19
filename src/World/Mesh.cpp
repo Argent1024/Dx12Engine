@@ -1,6 +1,7 @@
 #include "Mesh.h"
 
 namespace Game {
+
 	void TriangleMesh::UseMesh(Graphic::CommandList& commandList) {
 		assert(m_VertexBuffer != nullptr && m_IndexBuffer != nullptr);
 		commandList.SetPrimitiveTopology(TopologyType);

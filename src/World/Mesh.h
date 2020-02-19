@@ -9,7 +9,6 @@
 
 
 namespace Game {
-	
 	class Mesh {
 	public:
 		virtual void UseMesh(Graphic::CommandList& commandList) = 0;
@@ -47,7 +46,6 @@ namespace Game {
 		ptrIndexBuffer m_IndexBuffer;
 
 	};
-
 
 	// Class that store point, used for particle system
 	class PointMesh : public Mesh {
