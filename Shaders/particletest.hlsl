@@ -1,6 +1,7 @@
 cbuffer Camera : register(b0) 
 {
-	float4x4 ViewMatrix;
+	float4x4 ViewProjective;
+	float4x4 World2Camera;
 };
 
 
@@ -87,11 +88,13 @@ void GSParticleDraw(point VSParticleDrawOut input[1], inout TriangleStream<GSPar
 	{
 		float3 position = g_positions[i] * g_fParticleRad;
         position = position + input[0].pos;
-		//output.pos = mul(float4(position,1.0), ViewMatrix);
-		output.pos = float4(position,1.0);
+		output.pos = mul(float4(position,1.0), ViewProjective);
+		//output.pos.w = 0.7;
+		//output.pos = float4(position, 1.0);
 
 		output.tex = g_texcoords[i];
-		output.color = float4(input[0].pos, 1.0);//input[0].color;
+		output.color = float4(position, 1.0);
+		//output.color =  mul(float4(1., 1., 0., 1.0), ViewProjective).z;
 		SpriteStream.Append(output);
 	}
     SpriteStream.RestartStrip();
@@ -104,7 +107,14 @@ void GSParticleDraw(point VSParticleDrawOut input[1], inout TriangleStream<GSPar
 float4 PSParticleDraw(PSParticleDrawIn input) : SV_Target
 {
 	float intensity = 0.5f - length(float2(0.5f, 0.5f) - input.tex);
-    intensity = clamp(intensity, 0.0f, 0.5f) * 2.0;
-    //return float4(input.color.xyz, intensity);
-	return float4(0.1, 0.1, 0.8, intensity);
+    //intensity = clamp(intensity, 0.0f, 0.5f) * 2.0;
+	if (intensity > 0) {
+		intensity = 1;
+	}
+	else {
+		intensity = 0;
+	}
+
+	return float4(input.color.xyz, intensity);
+	//return float4(0.1, 0.1, 0.8, intensity);
 }

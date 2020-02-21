@@ -75,6 +75,8 @@ namespace Samples {
 
 	void TextureTestSample::Render() 
 	{	
+
+		//m_Camera.LookAt(Vector3(0.,0.,0.), Vector3(0., 0., 0.), Vector3(0., 1., 0.));
 		
 		GraphicsCommandManager.Start();
 		DescriptorHeap* UseHeap = Engine::GetInUseHeap();

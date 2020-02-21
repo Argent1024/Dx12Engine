@@ -31,8 +31,10 @@ namespace Samples {
 		GObject m_textureObject;
 
 		Camera m_Camera;
+		//ProjectiveCamera m_Camera;
 
-		void CreatSwapChain(const HWND t_appHwnd) {
+		void CreatSwapChain(const HWND t_appHwnd) 
+		{
 			m_swapChain = new SwapChain(t_appHwnd, m_width, m_height);
 			m_swapChain->Initialize(GraphicsCommandManager.GetCommadnQueue());
 		}

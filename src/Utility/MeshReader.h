@@ -24,7 +24,7 @@ namespace MeshReader
 		}
 
 		template<class T>
-		void AddToList(std::vector<T> v, const UINT index) 
+		void AddToList(std::vector<T>& v, const UINT index) 
 		{
 			if (v.size() > index) {
 				return;
@@ -48,7 +48,7 @@ namespace MeshReader
 				// contains w
 				if (tokens.size() == 5) { float w = atof(tokens[4].c_str()); }
 				vertex[index].position = DirectX::XMFLOAT4(x, y, z, w);
-
+				count[0] += 1;
 			} else if (type.compare("vn")) {
 				const UINT index = count[1];
 				AddToList(vertex, index);
@@ -56,14 +56,14 @@ namespace MeshReader
 				float y = atof(tokens[2].c_str());
 				float z = atof(tokens[3].c_str());
 				vertex[index].normal = DirectX::XMFLOAT3(x, y, z);
-
+				count[1] += 1;
 			} else if (type.compare("vt")) {
 				const UINT index = count[2];
 				AddToList(vertex, index);
 				float x = atof(tokens[1].c_str());
 				float y = atof(tokens[2].c_str());
 				vertex[index].texcoor = DirectX::XMFLOAT2(x, y);
-
+				count[2] += 1;
 			}
 			else {
 				throw std::runtime_error("Unexpected type meet in reading obj file");
@@ -83,11 +83,13 @@ namespace MeshReader
 		}
 	}
 
-	void ReadOBJ(const std::wstring& filePath,
+	void ReadOBJ(const std::string& filePath,
 				std::vector<DefaultVertex>& vertex,
 				std::vector<UINT>& index) 
 	{
-		std::ifstream infile(filePath);
+		std::ifstream infile;
+		infile.open(filePath.c_str());
+
 		std::string line;
 		std::vector<std::string> tokens;
 		std::vector<UINT> vertexCount {0, 0, 0}; // v_i, n_i, t_i
@@ -95,6 +97,7 @@ namespace MeshReader
 		while (std::getline(infile, line)) 
 		{
 			ParseLine(tokens, line);
+			if (tokens.size() == 0) { continue; }
 			std::string type = tokens[0];
 			
 			const char t0 = type[0];

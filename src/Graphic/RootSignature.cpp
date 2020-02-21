@@ -23,7 +23,7 @@ namespace Graphic {
 
 		// A Root CBV at regisiter 0, space 0
 		// Store View transformation
-		rootParameters[0].InitAsConstants(sizeof(DirectX::XMMATRIX) / 4,  0, 0, D3D12_SHADER_VISIBILITY_ALL);
+		rootParameters[0].InitAsConstants(2 * sizeof(DirectX::XMMATRIX) / 4,  0, 0, D3D12_SHADER_VISIBILITY_ALL);
 		// Descriptor table
 		// t0-t1, u0-u1
 		rootParameters[1].InitAsDescriptorTable(2, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);

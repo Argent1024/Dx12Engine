@@ -5,6 +5,7 @@
 //#include "src/Samples/RayMarching.h"
 //#include "src/Samples/TextureTest.h"
 #include "src/Samples/ParticlesTest.h"
+#include "src/Utility/MeshReader.h"
 
 #include <iostream>
 
@@ -12,6 +13,9 @@
 _Use_decl_annotations_
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
+	//std::vector<DefaultVertex> vertex;
+	//std::vector<UINT> index;
+	//MeshReader::ReadOBJ("bunny.obj", vertex, index);
 
 	//Graphic::GraphicCore *graphic_core = new Samples::RayMarching(1280, 720);
 	Graphic::GraphicCore *graphic_core = new Samples::ParticleTest(960, 960);
