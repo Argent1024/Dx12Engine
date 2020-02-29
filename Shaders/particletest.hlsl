@@ -1,7 +1,7 @@
 cbuffer Camera : register(b0) 
 {
 	float4x4 ViewProjective;
-	float4x4 World2Camera;
+	float4x4 Camera2World;
 };
 
 

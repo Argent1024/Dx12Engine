@@ -19,6 +19,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
 	//Graphic::GraphicCore *graphic_core = new Samples::RayMarching(1280, 720);
 	Graphic::GraphicCore *graphic_core = new Samples::ParticleTest(960, 960);
+	//Graphic::GraphicCore * graphic_core = new Samples::TextureTestSample(960, 960);
 	return WinApp::RunApp(graphic_core, hInstance, nCmdShow);
 }
 

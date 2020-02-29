@@ -13,6 +13,7 @@ namespace Game {
 		inline void SetMaterial(ptrMaterial mat) { m_Material = mat; }
 		inline void SetMesh(ptrMesh mesh) { m_Mesh = mesh; }
 
+		// Prepare for drawing
 		virtual void RecordCommand(Graphic::CommandList& commandList) {
 			m_Material->UseMaterial(commandList);
 			m_Mesh->UseMesh(commandList);

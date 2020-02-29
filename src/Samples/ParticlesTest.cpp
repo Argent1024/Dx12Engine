@@ -27,50 +27,11 @@ namespace Samples {
 		m_GraphicRootSignature = std::make_shared<RootSignature>();
 		m_GraphicRootSignature->Initialize();
 			
-
-		// TODO do more thing on pso
-		// Compile Shader and Initialize PSO
-		{
-			UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-			ComPtr<ID3DBlob> VS;
-			ComPtr<ID3DBlob> GS;
-			ComPtr<ID3DBlob> PS;
-			
-			const std::wstring ShaderPath=L"D:\\work\\tEngine\\Shaders\\particletest.hlsl";
-
-			ThrowIfFailed(D3DCompileFromFile(ShaderPath.c_str(), nullptr, nullptr, "VSParticleDraw", "vs_5_0", compileFlags, 0, &VS, nullptr));
-			ThrowIfFailed(D3DCompileFromFile(ShaderPath.c_str(), nullptr, nullptr, "GSParticleDraw", "gs_5_0", compileFlags, 0, &GS, nullptr));
-			ThrowIfFailed(D3DCompileFromFile(ShaderPath.c_str(), nullptr, nullptr, "PSParticleDraw", "ps_5_0", compileFlags, 0, &PS, nullptr));
-
-			// Input for vertex 
-			D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
-			{
-				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-			};
-
-			m_GraphicPSO = std::make_shared<GraphicsPSO>();
-			m_GraphicPSO->SetRootSigature(m_GraphicRootSignature->GetRootSignature());
-			m_GraphicPSO->SetVertexShader(CD3DX12_SHADER_BYTECODE(VS.Get()));
-			m_GraphicPSO->SetGeometryShader(CD3DX12_SHADER_BYTECODE(GS.Get()));
-			m_GraphicPSO->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
-			m_GraphicPSO->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT);
-			m_GraphicPSO->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
-
-			CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(D3D12_DEFAULT);
-			depthStencilDesc.DepthEnable = FALSE;
-			depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-			m_GraphicPSO->SetDepthStencilState(depthStencilDesc);
-
-			CD3DX12_BLEND_DESC blendDesc(D3D12_DEFAULT);
-			blendDesc.RenderTarget[0].BlendEnable = TRUE;
-			blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-			blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-			blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
-			blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-			m_GraphicPSO->SetBlendState(blendDesc);
-
-			m_GraphicPSO->Initialize();
-		}
+		// Create PSO
+		m_GraphicPSO = std::make_shared<ParticleTestPSO>();
+		m_GraphicPSO->SetRootSigature(m_GraphicRootSignature->GetRootSignature());
+		m_GraphicPSO->Initialize();
+		
 
 		CreateGameObject();
 	}

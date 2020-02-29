@@ -31,6 +31,7 @@ namespace Graphic {
 							nullptr,
 							IID_PPV_ARGS(&m_Resource))
 			);
+			// TODO Don't call this method if this memory is going to be used as texture
 			m_GPUAddr = m_Resource->GetGPUVirtualAddress();
 		}
 

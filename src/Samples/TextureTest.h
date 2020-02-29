@@ -13,7 +13,9 @@ namespace Samples {
 	class TextureTestSample : public GraphicCore {
 	public:
 		TextureTestSample(UINT t_width, UINT t_height, LPCTSTR t_title=L"playground")
-			: GraphicCore(t_width, t_height, t_title), m_Camera(t_width, t_height) {}
+			: GraphicCore(t_width, t_height, t_title), 
+			m_Camera(t_width, t_height)
+		{}
 		
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;
