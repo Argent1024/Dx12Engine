@@ -102,7 +102,8 @@ namespace Graphic {
 		CreateView();
 
 		std::vector<UINT8> data;
-		LoadChessBoard(m_textureDesc.Width, m_textureDesc.Height, 4, data);
+		LoadChessBoard(width, height, 4, data);
+
 		D3D12_SUBRESOURCE_DATA textureData = CreateTextureData(m_textureDesc.Width, m_textureDesc.Height, 4, data);
 		UploadTexture(textureData);
 	}
