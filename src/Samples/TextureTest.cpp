@@ -15,35 +15,16 @@ namespace Samples {
 		DescriptorHeap* useHeap = Engine::GetInUseHeap();
 		useHeap->Initialize();
 
-		CreatSwapChain(m_appHwnd);
-		{
-			m_rootSignature = std::make_shared<RootSignature>();
-			m_rootSignature->Initialize();
-		}
+		// Swap Chain
+		m_swapChain = new SwapChain(m_appHwnd, m_width, m_height);
+		m_swapChain->Initialize(GraphicsCommandManager.GetCommadnQueue());
 
-		{
-			UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-			ComPtr<ID3DBlob> VS;
-			ComPtr<ID3DBlob> PS;
-			const std::wstring path = L"D:\\work\\tEngine\\Shaders\\TextureTest.hlsl";
-			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &VS, nullptr));
-			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &PS, nullptr));
-
-			// Input for vertex 
-			D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
-			{
-					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-			};
-
-			m_GraphicPSO = std::make_shared<GraphicsPSO>();
-			m_GraphicPSO->SetRootSigature(m_rootSignature->GetRootSignature());
-			m_GraphicPSO->SetVertexShader(CD3DX12_SHADER_BYTECODE(VS.Get()));
-			m_GraphicPSO->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
-			m_GraphicPSO->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-			m_GraphicPSO->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
-			m_GraphicPSO->Initialize();
-		}
+		m_rootSignature = std::make_shared<RootSignature>();
+		m_rootSignature->Initialize();
+	
+		m_GraphicPSO = std::make_shared<TextureTestPSO>();
+		m_GraphicPSO->SetRootSigature(m_rootSignature->GetRootSignature());
+		m_GraphicPSO->Initialize();	
 		
 		// Create Assert
 		

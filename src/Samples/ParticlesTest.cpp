@@ -17,6 +17,7 @@ namespace Samples {
 		DescriptorHeap* useHeap = Engine::GetInUseHeap();
 		useHeap->Initialize();
 		
+		// Swap Chain
 		m_swapChain = new SwapChain(m_appHwnd, m_width, m_height);
 		m_swapChain->Initialize(GraphicsCommandManager.GetCommadnQueue());
 
@@ -32,7 +33,6 @@ namespace Samples {
 		m_GraphicPSO->SetRootSigature(m_GraphicRootSignature->GetRootSignature());
 		m_GraphicPSO->Initialize();
 		
-
 		CreateGameObject();
 	}
 
@@ -42,7 +42,7 @@ namespace Samples {
 		std::vector<PointVertex> PointVertics;
 		PointVertics.resize(NumParticles);
 		for (UINT i = 0; i < NumParticles; i++) {
-			PointVertics[i] = { {0.1, 0.1, 0.9, 0.0} };
+			PointVertics[i] = { {0.1f, 0.1f, 0.9f, 0.0f} };
 		}
 		m_Mesh = std::make_shared<PointMesh>(PointVertics);
 		

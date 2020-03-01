@@ -32,6 +32,8 @@ namespace Graphic {
 	// 4. Call pso->SetRootSignature(m_GraphicRootSignature->GetRootSignature())
 	// 5. Call pso->Initialize()
 	class GraphicsPSO : public PipelineStateObject {
+	public:
+		GraphicsPSO(): m_psoDesc() {}
 
 	protected:
 		// Compile and set shaders
@@ -105,6 +107,8 @@ namespace Graphic {
 		inline void SetDepthStencilState(D3D12_DEPTH_STENCIL_DESC desc=CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT)){ m_psoDesc.DepthStencilState = desc; }
 		inline void SetBlendState(D3D12_BLEND_DESC desc=CD3DX12_BLEND_DESC(D3D12_DEFAULT)) { m_psoDesc.BlendState = desc; }
 		inline void SetRasterState(D3D12_RASTERIZER_DESC desc=CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT)) { m_psoDesc.RasterizerState = desc; }
+
+		inline void SetNumRenderTargets(UINT num=1) { m_psoDesc.NumRenderTargets = 1; }
 
 		//TODO lol
 		void SetStuffThatIdontKnowYet() {
