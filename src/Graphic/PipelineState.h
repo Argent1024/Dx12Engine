@@ -114,6 +114,13 @@ namespace Graphic {
 			m_psoDesc.SampleDesc.Count = 1;
 		}
 
+		// Create the PSO using m_psoDesc
+		inline void CreatePSO()
+		{
+			ID3D12Device* device = Engine::GetDevice();
+			device->CreateGraphicsPipelineState(&m_psoDesc, IID_PPV_ARGS(&m_pipelineState));
+		}
+
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC m_psoDesc;
 		std::vector<D3D12_INPUT_ELEMENT_DESC> m_inputLayouts;
 	};

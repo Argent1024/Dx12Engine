@@ -47,9 +47,9 @@ namespace Samples {
 			ThrowIfFailed(D3DCompileFromFile(ShaderPath.c_str(), nullptr, nullptr, "VSParticleDraw", "vs_5_0", CompileFlags, 0, &VS, nullptr));
 			ThrowIfFailed(D3DCompileFromFile(ShaderPath.c_str(), nullptr, nullptr, "GSParticleDraw", "gs_5_0", CompileFlags, 0, &GS, nullptr));
 			ThrowIfFailed(D3DCompileFromFile(ShaderPath.c_str(), nullptr, nullptr, "PSParticleDraw", "ps_5_0", CompileFlags, 0, &PS, nullptr));
-			SetVertexShader(CD3DX12_SHADER_BYTECODE(VS.Get()));
-			SetGeometryShader(CD3DX12_SHADER_BYTECODE(GS.Get()));
-			SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
+			this->SetVertexShader(CD3DX12_SHADER_BYTECODE(VS.Get()));
+			this->SetGeometryShader(CD3DX12_SHADER_BYTECODE(GS.Get()));
+			this->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
 
 
 			// Input layout for vertex 
@@ -58,13 +58,13 @@ namespace Samples {
 				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 			};
 
-			SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT);
-			SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
+			this->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT);
+			this->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
 
 			CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(D3D12_DEFAULT);
 			depthStencilDesc.DepthEnable = FALSE;
 			depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-			SetDepthStencilState(depthStencilDesc);
+			this->SetDepthStencilState(depthStencilDesc);
 
 			CD3DX12_BLEND_DESC blendDesc(D3D12_DEFAULT);
 			blendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -72,15 +72,14 @@ namespace Samples {
 			blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 			blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
 			blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-			SetBlendState(blendDesc);
+			this->SetBlendState(blendDesc);
 
-			SetRasterState();
+			this->SetRasterState();
 			
 			//lol
 			SetStuffThatIdontKnowYet();
 
-			ID3D12Device* device = Engine::GetDevice();
-			ThrowIfFailed(device->CreateGraphicsPipelineState(&m_psoDesc, IID_PPV_ARGS(&m_pipelineState)));
+			this->CreatePSO();
 		}
 	
 	};

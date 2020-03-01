@@ -26,7 +26,7 @@ namespace Samples {
 		ThrowIfFailed(device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
 	}
 
-	void RayMarching::Init(const HWND m_appHwnd) {
+	void RayMarching::Init(const HWND t_appHwnd) {
 		Engine::EnableDebug();
 		Engine::CreateDevice();
 	
@@ -35,7 +35,9 @@ namespace Samples {
 		CopyHelper.Initialize();
 		GraphicsCommandManager.Initialize();
 		
-		CreatSwapChain(m_appHwnd);
+		// Swap Chain
+		m_swapChain = new SwapChain(t_appHwnd, m_width, m_height);
+		m_swapChain->Initialize(GraphicsCommandManager.GetCommadnQueue());
 
 		// Initialize Root Signature and pass constant into it
 		
@@ -43,31 +45,11 @@ namespace Samples {
 		m_rootSignature->Initialize();
 		
 
-		// TODO do more thing on pso
-		// Compile Shader and Initialize PSO
-		{
-			UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-			ComPtr<ID3DBlob> VS;
-			ComPtr<ID3DBlob> PS;
-			const std::wstring path = L"D:\\work\\tEngine\\Shaders\\ray.hlsl";
-			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &VS, nullptr));
-			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &PS, nullptr));
-
-			// Input for vertex 
-			D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
-			{
-					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-			};
-
-			m_GraphicPSO = std::make_shared<GraphicsPSO>();
-			m_GraphicPSO->SetRootSigature(m_rootSignature->GetRootSignature());
-			m_GraphicPSO->SetVertexShader(CD3DX12_SHADER_BYTECODE(VS.Get()));
-			m_GraphicPSO->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
-			m_GraphicPSO->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-			m_GraphicPSO->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
-			m_GraphicPSO->Initialize();
-		}
+		// PSO
+		m_GraphicPSO = std::make_shared<RayMarchingPSO>();
+		m_GraphicPSO->SetRootSigature(m_rootSignature->GetRootSignature());
+		m_GraphicPSO->Initialize();
+		
 
 		CreateGameObject();
 	}
