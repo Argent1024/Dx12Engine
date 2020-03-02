@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
+// Struct that store default vertex data
 struct DefaultVertex 
 {
 	DirectX::XMFLOAT4 position;
