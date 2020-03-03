@@ -122,7 +122,7 @@ namespace Graphic {
 		inline void CreatePSO()
 		{
 			ID3D12Device* device = Engine::GetDevice();
-			device->CreateGraphicsPipelineState(&m_psoDesc, IID_PPV_ARGS(&m_pipelineState));
+			ThrowIfFailed(device->CreateGraphicsPipelineState(&m_psoDesc, IID_PPV_ARGS(&m_pipelineState)));
 		}
 
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC m_psoDesc;

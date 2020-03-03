@@ -26,7 +26,7 @@ namespace Samples {
 			D3D12_INPUT_ELEMENT_DESC  inputElementDescs[] =
 			{
 				{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "NORMAL",	  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "NORMAL",	  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 			};
 
@@ -36,8 +36,12 @@ namespace Samples {
 			this->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
 
 			// configrations
-			this->SetDepthStencilState();
+			CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(D3D12_DEFAULT);
+			depthStencilDesc.DepthEnable = FALSE;
+			depthStencilDesc.StencilEnable = FALSE;
+			this->SetDepthStencilState(depthStencilDesc);
 			this->SetBlendState();
+			this->SetRasterState();
 
 			this->SetStuffThatIdontKnowYet();
 			this->CreatePSO();

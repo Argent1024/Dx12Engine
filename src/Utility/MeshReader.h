@@ -24,61 +24,68 @@ namespace MeshReader
 			}
 		}
 
-		template<class T>
-		void AddToList(std::vector<T>& v, const UINT index) 
-		{
-			if (v.size() > index) {
-				return;
-			}
-			v.push_back(T());
-		}
-
-		void CreateVertex(std::vector<DefaultVertex>& vertex, 
-						std::vector<UINT>& count,			// contain 3 UINT, v_i, n_i, t_i
+		void CreateVertex(std::vector<DirectX::XMFLOAT4>& pos_list,
+						std::vector<DirectX::XMFLOAT3>& nor_list,
+						std::vector<DirectX::XMFLOAT2>& tex_list,
 						const std::vector<std::string>& tokens)
 		{
 			const std::string type = tokens[0];
 			
 			if (type.compare("v") == 0) {
-				const UINT index = count[0];
-				AddToList(vertex, index);
+				
 				float x = atof(tokens[1].c_str());
 				float y = atof(tokens[2].c_str());
 				float z = atof(tokens[3].c_str());
 				float w = 0.0;
 				// contains w
 				if (tokens.size() == 5) { float w = atof(tokens[4].c_str()); }
-				vertex[index].position = DirectX::XMFLOAT4(x, y, z, w);
-				count[0] += 1;
-			} else if (type.compare("vn")) {
-				const UINT index = count[1];
-				AddToList(vertex, index);
+				pos_list.push_back(DirectX::XMFLOAT4(x, y, z, w));
+				
+			} else if (type.compare("vn") == 0) {
+	
 				float x = atof(tokens[1].c_str());
 				float y = atof(tokens[2].c_str());
 				float z = atof(tokens[3].c_str());
-				vertex[index].normal = DirectX::XMFLOAT3(x, y, z);
-				count[1] += 1;
-			} else if (type.compare("vt")) {
-				const UINT index = count[2];
-				AddToList(vertex, index);
+				nor_list.push_back(DirectX::XMFLOAT3(x, y, z));
+				
+			} else if (type.compare("vt") == 0) {
+
 				float x = atof(tokens[1].c_str());
 				float y = atof(tokens[2].c_str());
-				vertex[index].texcoor = DirectX::XMFLOAT2(x, y);
-				count[2] += 1;
-			}
-			else {
+				tex_list.push_back(DirectX::XMFLOAT2(x, y));
+
+			} else {
+
 				throw std::runtime_error("Unexpected type meet in reading obj file");
+
 			}
 
 		}
 
-		void CreateFace(std::vector<UINT>& index, const std::vector<std::string>& tokens)
+		void CreateFace(std::vector<DefaultVertex>& vertex,
+						std::vector<UINT>& index, 
+						const std::vector<DirectX::XMFLOAT4>& pos_list,
+						const std::vector<DirectX::XMFLOAT3>& nor_list,
+						const std::vector<DirectX::XMFLOAT2>& tex_list,
+						const std::vector<std::string>& tokens)
 		{
-			std::vector<std::string> vtn;
-			for (const auto& s : tokens) {
-				ParseLine(vtn, s, '/');
-				UINT v_num = atoi(vtn[0].c_str());
-				index.push_back(v_num);
+			std::vector<std::string> v_t_n;
+			for (const auto& s : tokens) 
+			{
+				if (s.compare("f") == 0) { continue; }
+				ParseLine(v_t_n, s, '/');
+				// TODO consider vertex without normal or tex
+				UINT v_num = atoi(v_t_n[0].c_str()) - 1;
+				UINT t_num = atoi(v_t_n[1].c_str()) - 1;
+				UINT n_num = atoi(v_t_n[2].c_str()) - 1;
+				DefaultVertex v;
+				v.position = pos_list[v_num];
+				v.texcoor = tex_list[t_num];
+				v.normal = nor_list[n_num];
+
+				// TODO reuse vertex ??
+				vertex.push_back(v);
+				index.push_back(vertex.size());
 			}
 
 		}
@@ -93,8 +100,11 @@ namespace MeshReader
 
 		std::string line;
 		std::vector<std::string> tokens;
-		std::vector<UINT> vertexCount {0, 0, 0}; // v_i, n_i, t_i
-	
+
+		std::vector<DirectX::XMFLOAT4> pos_list;
+		std::vector<DirectX::XMFLOAT3> nor_list;
+		std::vector<DirectX::XMFLOAT2> tex_list;
+
 		while (std::getline(infile, line)) 
 		{
 			ParseLine(tokens, line);
@@ -107,10 +117,10 @@ namespace MeshReader
 			case('#'):
 				break;
 			case('v'):
-				CreateVertex(vertex, vertexCount, tokens);
+				CreateVertex(pos_list, nor_list, tex_list, tokens);
 				break;
 			case('f'):
-				CreateFace(index, tokens);
+				CreateFace(vertex, index, pos_list, nor_list, tex_list, tokens);
 				break;
 			default:
 				//TODO add line number
