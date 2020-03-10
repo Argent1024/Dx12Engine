@@ -165,6 +165,7 @@
     <ClInclude Include="src\Samples\RayMarching.h" />
     <ClInclude Include="src\Samples\TextureTest.h" />
     <ClInclude Include="src\Utility\Input.h" />
+    <ClInclude Include="src\Utility\Logger.h" />
     <ClInclude Include="src\Utility\MeshReader.h" />
     <ClInclude Include="src\World\Camera.h" />
     <ClInclude Include="src\d3dx12.h" />

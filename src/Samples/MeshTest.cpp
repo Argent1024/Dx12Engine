@@ -29,8 +29,12 @@ namespace Samples {
 
 		this->LoadAssert();
 
+		/* TODO Error in creating smart pointer
 		// Load Camera
-		m_Camera = std::make_shared<Camera>(m_width, m_height);
+		const Vector3 Position(0.0, 0.0, -1.0);
+		const Vector3 Target(0.0, 0.0, 0.0);
+		const Vector3 WorldUp(0.0, 1.0, 0.0);
+		m_Camera = std::make_shared<ProjectiveCamera>(m_width, m_height, Position, Target, WorldUp);*/
 	}
 
 	void MeshTest::LoadAssert() 
@@ -66,7 +70,7 @@ namespace Samples {
 			GraphicsCommandManager.InitCommandList(&ThreadCommandList);
 			
 			m_Bunny.RecordCommand(ThreadCommandList);
-			m_Camera->UseCamera(ThreadCommandList);
+			m_Camera.UseCamera(ThreadCommandList);
 			
 
 			// Barrier Draw

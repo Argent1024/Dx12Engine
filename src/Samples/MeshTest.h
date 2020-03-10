@@ -52,7 +52,8 @@ namespace Samples {
 	class MeshTest : public GraphicCore {
 	public:
 		MeshTest(UINT t_width, UINT t_height, LPCTSTR t_title = L"playground")
-			: GraphicCore(t_width, t_height, t_title) {}
+			: GraphicCore(t_width, t_height, t_title), 
+			  m_Camera(t_width, t_height, Vector3(0.0, 0.0, 1.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0)) {}
 
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;
@@ -63,7 +64,7 @@ namespace Samples {
 		SwapChain* m_swapChain;
 		ptrRootSigature m_rootSignature;
 		ptrPSO m_GraphicPSO;
-		std::shared_ptr<Camera> m_Camera;
+		ProjectiveCamera m_Camera;
 
 		std::shared_ptr<TriangleMesh> m_Mesh;
 		ptrMaterial m_Material;

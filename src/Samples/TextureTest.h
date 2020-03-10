@@ -55,15 +55,13 @@ namespace Samples {
 	public:
 		TextureTestSample(UINT t_width, UINT t_height, LPCTSTR t_title=L"playground")
 			: GraphicCore(t_width, t_height, t_title), 
-			m_Camera(t_width, t_height)
+			  m_Camera(t_width, t_height, Vector3(0.0, 0.0, 1.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0))
 		{}
 		
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;
 	
 	private:
-		const std::wstring m_shaderPath = L"D:\\work\\tEngine\\Shaders\\shaders.hlsl";
-
 		SwapChain* m_swapChain;
 		ptrRootSigature m_rootSignature;
 		ptrPSO m_GraphicPSO;
@@ -73,8 +71,8 @@ namespace Samples {
 		ptrMaterial m_Material;
 		GObject m_textureObject;
 
-		Camera m_Camera;
-		//ProjectiveCamera m_Camera;
+		//Camera m_Camera;
+		ProjectiveCamera m_Camera;
 
 		void CreatSwapChain(const HWND t_appHwnd) 
 		{

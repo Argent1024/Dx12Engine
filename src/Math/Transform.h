@@ -15,6 +15,9 @@ namespace Math {
 		INLINE const Matrix3& GetRotation() { return m_mat.Get3x3(); }
 		INLINE Vector3 GetTranslation() { return m_mat.GetW(); }
 		
+		// Apply transformation to Vector3
+		INLINE Vector3 operator()(const Vector3& v) { return m_mat * v; }
+
 		INLINE operator XMMATRIX() { return m_mat; }
 	private:
 		Matrix4 m_mat;

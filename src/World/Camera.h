@@ -43,10 +43,19 @@ namespace Game {
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
 			Matrix4 cameraTransform(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp));
-			Matrix4 view(DirectX::XMMatrixOrthographicRH(2.0, 2.0, 1.0, 10.0));
-			//m_ViewProjective = Transform(view);
-			m_ViewProjective = Transform(view * cameraTransform);
+			Matrix4 view(DirectX::XMMatrixPerspectiveRH(2.0f, 2.0f, 1.0f, 10.0f));
+			m_ViewProjective = Transform(view);
+			
+			//m_ViewProjective = Transform(view * cameraTransform);
 			//m_InvTransform = Transform(DirectX::XMMatrixInverse(cameraTransform));
+			
+			Vector3 v1(0.5f, 0.5f, 0.0f);
+			Vector3 tv1 = cameraTransform * v1;
+			Vector3 pv1 = view * tv1;
+
+			Vector3 v2(0.5f, -0.5f, 0.0f);
+			Vector3 tv2 = cameraTransform * v2;
+			Vector3 pv2 = m_ViewProjective(v2);
 		}
 
 		void UseCamera(Graphic::CommandList& commmandList) override;
