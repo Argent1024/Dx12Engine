@@ -50,14 +50,7 @@ namespace Game {
 			// In DirectX, vector's dimension is 1 * 4.
 			// So a matrix(transform) M mutiply(apply to) a vector v should be written as v * M
 			m_ViewProjective = Transform(view * proj);
-			// m_ViewProjective = Transform(proj);
 			//m_InvTransform = Transform(DirectX::XMMatrixInverse(cameraTransform));
-			
-			// Test the camera's transformation
-			Vector3 v(1.0f, 1.0f, 0.0f);
-			Vector3 tv = view * v;
-			Vector3 pv = proj * tv;
-			Vector3 ans = m_ViewProjective(v);
 		}
 
 		void UseCamera(Graphic::CommandList& commmandList) override;
