@@ -46,7 +46,8 @@ namespace Math {
 		INLINE const Vector3 GetW() { return Vector3(m_mat.r[3]); }
 
 		INLINE Matrix4 operator* (const Matrix4& mat) const { return Matrix4(XMMatrixMultiply(m_mat, mat.m_mat)); }
-		INLINE Vector3 operator* (Vector3 vec) const { return Vector3(XMVector3Transform(vec, m_mat)); } 
+		// NOTICE! XMVector3Transform ignore w in the result! w maybe not equal to 1.0
+		INLINE Vector3 operator* (const Vector3& vec) const { return Vector3(XMVector3Transform(vec, m_mat)); } 
 		
 		INLINE operator XMMATRIX() { return m_mat; }
 	protected:

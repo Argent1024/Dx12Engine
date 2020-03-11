@@ -36,10 +36,10 @@ namespace Samples {
 		// Define the geometry for a triangle.
 		std::vector<TextureVertex> triangleVertices =
 		{
-			{ { 0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f } },
-			{ { 0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f } },
-			{ { -0.5f, 0.5f, 0.0f }, { 0.0f, 1.0f } },
-			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f } }
+			{ {  1.0f,  1.0f, -1.0f }, { 1.0f, 1.0f } },
+			{ {  1.0f, -1.0f, -1.0f }, { 1.0f, 0.0f } },
+			{ { -1.0f,  1.0f, -1.0f }, { 0.0f, 1.0f } },
+			{ { -1.0f, -1.0f, -1.0f }, { 0.0f, 0.0f } }
 		};
 		std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
 		

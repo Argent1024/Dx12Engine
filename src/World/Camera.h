@@ -42,25 +42,28 @@ namespace Game {
 
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
-			Matrix4 cameraTransform(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp));
-			Matrix4 view(DirectX::XMMatrixPerspectiveRH(2.0f, 2.0f, 1.0f, 10.0f));
-			m_ViewProjective = Transform(view);
+			Matrix4 view(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp));
+			// TODO fix view width & height 
+			Matrix4 proj(DirectX::XMMatrixPerspectiveRH(10.0f, 10.0f, 0.1f, 10.0f));
 			
-			//m_ViewProjective = Transform(view * cameraTransform);
+			// ***IMPORTANT***
+			// In DirectX, vector's dimension is 1 * 4.
+			// So a matrix(transform) M mutiply(apply to) a vector v should be written as v * M
+			m_ViewProjective = Transform(view * proj);
+			// m_ViewProjective = Transform(proj);
 			//m_InvTransform = Transform(DirectX::XMMatrixInverse(cameraTransform));
 			
-			Vector3 v1(0.5f, 0.5f, 0.0f);
-			Vector3 tv1 = cameraTransform * v1;
-			Vector3 pv1 = view * tv1;
-
-			Vector3 v2(0.5f, -0.5f, 0.0f);
-			Vector3 tv2 = cameraTransform * v2;
-			Vector3 pv2 = m_ViewProjective(v2);
+			// Test the camera's transformation
+			Vector3 v(1.0f, 1.0f, 0.0f);
+			Vector3 tv = view * v;
+			Vector3 pv = proj * tv;
+			Vector3 ans = m_ViewProjective(v);
 		}
 
 		void UseCamera(Graphic::CommandList& commmandList) override;
 
 	private:
+		// world to view & projective
 		Transform m_ViewProjective;
 		Transform m_InvTransform;
 	};

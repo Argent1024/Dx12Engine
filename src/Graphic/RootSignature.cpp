@@ -23,7 +23,6 @@ namespace Graphic {
 
 		// A Root CBV at regisiter 0, space 0
 		// Store camera's View&Projective Transformation at 0, 
-		// Store camera's inv transformation at 1
 		rootParameters[0].InitAsConstants(2 * sizeof(DirectX::XMMATRIX) / 4,  0, 0, D3D12_SHADER_VISIBILITY_ALL);
 		// Descriptor table
 		// t0-t1, u0-u1
