@@ -1,4 +1,4 @@
-cbuffer Transformations : register(b0) 
+cbuffer Transformation : register(b0) 
 {
 	float4x4 ViewProjective;
 };
@@ -14,8 +14,8 @@ struct VSInput
 struct PSInput
 {
     float4 position : SV_POSITION;
-	float3 normal : COLOR0;
-    float2 uv : TEXCOORD0;
+	float3 normal   : COLOR0;
+    float2 uv		: TEXCOORD0;
 };
 
 
@@ -33,5 +33,5 @@ PSInput VSMain(VSInput input)
 
 float4 PSMain(PSInput input) : SV_TARGET
 {
-	return float4(input.normal, 1);
+	return 1.0f;//float4(input.normal, 1);
 }

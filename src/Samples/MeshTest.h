@@ -25,9 +25,9 @@ namespace Samples {
 
 			D3D12_INPUT_ELEMENT_DESC  inputElementDescs[] =
 			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "NORMAL",	  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "NORMAL",	  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 			};
 
 			this->SetVertexShader(CD3DX12_SHADER_BYTECODE(VS.Get()));
@@ -53,7 +53,7 @@ namespace Samples {
 	public:
 		MeshTest(UINT t_width, UINT t_height, LPCTSTR t_title = L"playground")
 			: GraphicCore(t_width, t_height, t_title), 
-			  m_Camera(t_width, t_height, Vector3(0.0, 0.0, 1.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0)) {}
+			  m_Camera(t_width, t_height, Vector3(0.0, 0.0, 0.1), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0)) {}
 
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;
