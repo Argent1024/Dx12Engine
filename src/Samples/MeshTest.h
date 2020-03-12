@@ -53,12 +53,13 @@ namespace Samples {
 	public:
 		MeshTest(UINT t_width, UINT t_height, LPCTSTR t_title = L"playground")
 			: GraphicCore(t_width, t_height, t_title), 
-			  m_Camera(t_width, t_height, Vector3(0.0, 0.0, 0.1), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0)) {}
+			  m_Camera(t_width, t_height, Vector3(0.0f, 0.0f, 10.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)) {}
 
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;
 
 	private:
+		float t = 10.0;
 		void LoadAssert();
 
 		SwapChain* m_swapChain;

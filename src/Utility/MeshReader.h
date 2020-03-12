@@ -33,9 +33,9 @@ namespace MeshReader
 			
 			if (type.compare("v") == 0) {
 				
-				float x = atof(tokens[1].c_str());
-				float y = atof(tokens[2].c_str());
-				float z = atof(tokens[3].c_str());
+				float x = std::stof(tokens[1].c_str());
+				float y = std::stof(tokens[2].c_str());
+				float z = std::stof(tokens[3].c_str());
 				//float w = 0.0f;
 				// contains w
 				//if (tokens.size() == 5) { float w = atof(tokens[4].c_str()); }
@@ -43,15 +43,15 @@ namespace MeshReader
 				
 			} else if (type.compare("vn") == 0) {
 	
-				float x = atof(tokens[1].c_str());
-				float y = atof(tokens[2].c_str());
-				float z = atof(tokens[3].c_str());
+				float x = std::stof(tokens[1].c_str());
+				float y = std::stof(tokens[2].c_str());
+				float z = std::stof(tokens[3].c_str());
 				nor_list.push_back(DirectX::XMFLOAT3(x, y, z));
 				
 			} else if (type.compare("vt") == 0) {
 
-				float x = atof(tokens[1].c_str());
-				float y = atof(tokens[2].c_str());
+				float x = std::stof(tokens[1].c_str());
+				float y = std::stof(tokens[2].c_str());
 				tex_list.push_back(DirectX::XMFLOAT2(x, y));
 
 			} else {
@@ -80,7 +80,7 @@ namespace MeshReader
 				ParseLine(v_t_n, s, '/');
 
 				DefaultVertex v;
-				if (v_t_n.size() == 1) 
+				if (v_t_n.size() == 1)	
 				{
 					// write only the vertex
 					UINT v_num = atoi(v_t_n[0].c_str()) - 1;

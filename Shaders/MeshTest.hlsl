@@ -24,7 +24,7 @@ PSInput VSMain(VSInput input)
 {
     PSInput result;
 	
-    result.position = mul(input.position, ViewProjective);
+    result.position = mul(ViewProjective, input.position);
 	result.normal = input.normal;
     result.uv = input.uv;
     return result;

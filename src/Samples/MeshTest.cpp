@@ -29,12 +29,6 @@ namespace Samples {
 
 		this->LoadAssert();
 
-		/* TODO Error in creating smart pointer
-		// Load Camera
-		const Vector3 Position(0.0, 0.0, -1.0);
-		const Vector3 Target(0.0, 0.0, 0.0);
-		const Vector3 WorldUp(0.0, 1.0, 0.0);
-		m_Camera = std::make_shared<ProjectiveCamera>(m_width, m_height, Position, Target, WorldUp);*/
 	}
 
 	void MeshTest::LoadAssert() 
@@ -51,6 +45,12 @@ namespace Samples {
 
 	void MeshTest::Render()
 	{
+		Vector3 Pos(0.0f, 0.0f, t);
+		if (t >= 2.0) {t -= 0.05;}
+		Vector3 Target(0.0f, 0.0f, 0.0f);
+		Vector3 UP(0.0f, 1.0f, 0.0f);
+		m_Camera.LookAt(Pos, Target, UP);
+
 		GraphicsCommandManager.Start();
 		DescriptorHeap* UseHeap = Engine::GetInUseHeap();
 		UseHeap->Reset();
@@ -66,6 +66,7 @@ namespace Samples {
 
 		// Record commands for each object, only have one object here
 		{
+			
 			CommandList ThreadCommandList;
 			GraphicsCommandManager.InitCommandList(&ThreadCommandList);
 			
