@@ -62,6 +62,17 @@ namespace MeshReader
 
 		}
 
+		inline UINT GetIndex(const std::string& index, const UINT maxIndex) {
+			int x = atoi(index.c_str());
+			if (x > 0) {
+				return(x - 1);
+			} else {
+				//TODO never test this
+				return maxIndex + x;
+			}
+
+		}
+
 		void CreateFace(std::vector<DefaultVertex>& vertex,
 						std::vector<UINT>& index, 
 						const std::vector<DirectX::XMFLOAT3>& pos_list,
@@ -82,20 +93,26 @@ namespace MeshReader
 				DefaultVertex v;
 				if (v_t_n.size() == 1)	
 				{
-					// write only the vertex
+					// the line write only the vertex: v
 					UINT v_num = atoi(v_t_n[0].c_str()) - 1;
 					v.position = pos_list[v_num];
 				}
 				else 
 				{
-					// Write // (v/t/n)
-					// TODO consider vertex without normal or tex
-					UINT v_num = atoi(v_t_n[0].c_str()) - 1;
-					UINT t_num = atoi(v_t_n[1].c_str()) - 1;
-					UINT n_num = atoi(v_t_n[2].c_str()) - 1;
+					// the line write: v// or v/t/n
+					assert(v_t_n[0] != "" && "Vertex index should not be empty!");
+					UINT v_num = GetIndex(v_t_n[0], pos_list.size());
 					v.position = pos_list[v_num];
-					v.texcoor = tex_list[t_num];
-					v.normal = nor_list[n_num];
+
+					if (v_t_n[1] != "") {
+						UINT t_num = GetIndex(v_t_n[1], tex_list.size());
+						v.texcoor = tex_list[t_num];
+					}
+
+					if (v_t_n[2] != "") {
+						UINT n_num = GetIndex(v_t_n[2], nor_list.size());
+						v.normal = nor_list[n_num];
+					}
 				}
 				vertex.push_back(v);
 			}

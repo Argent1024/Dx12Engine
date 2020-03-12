@@ -35,7 +35,7 @@ namespace Samples {
 	{
 		std::vector<DefaultVertex> vertex;
 		std::vector<UINT> index;
-		MeshReader::ReadOBJ("D:\\work\\tEngine\\test.obj", vertex, index);
+		MeshReader::ReadOBJ("D:\\work\\tEngine\\bunny.obj", vertex, index);
 
 		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
 		m_Material = std::make_shared<NoMaterial>(m_GraphicPSO, m_rootSignature);
@@ -45,8 +45,8 @@ namespace Samples {
 
 	void MeshTest::Render()
 	{
-		Vector3 Pos(0.0f, 0.0f, t);
-		if (t >= 2.0) {t -= 0.05;}
+		Vector3 Pos(0.0f, 0.0f, 5.f);
+		//if (t >= 2.0) {t -= 0.05;}
 		Vector3 Target(0.0f, 0.0f, 0.0f);
 		Vector3 UP(0.0f, 1.0f, 0.0f);
 		m_Camera.LookAt(Pos, Target, UP);
