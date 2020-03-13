@@ -13,10 +13,13 @@ namespace Game {
 		GObject() {}
 		
 		GObject(ptrMaterial mat, ptrMesh mesh, const Math::Transform& T= Math::Transform()) 
-			: m_Material(mat), m_Mesh(mesh), m_ModelTransform(T) {}
+			: m_Material(mat), m_Mesh(mesh), m_Transform(T) {}
 
 		inline void SetMaterial(ptrMaterial mat) { m_Material = mat; }
 		inline void SetMesh(ptrMesh mesh) { m_Mesh = mesh; }
+		inline void SetTransform(const Math::Transform& T) { m_Transform = T; }
+
+		inline Math::Transform GetTransform() const { return m_Transform; }
 
 		// Prepare for drawing
 		virtual void RecordCommand(Graphic::CommandList& commandList) {
@@ -37,7 +40,7 @@ namespace Game {
 		}
 
 	protected:
-		Math::Transform m_ModelTransform;
+		Math::Transform m_Transform;
 		ptrMaterial m_Material;
 		ptrMesh m_Mesh;
 	};

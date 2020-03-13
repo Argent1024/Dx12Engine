@@ -19,13 +19,9 @@ namespace Math {
 		INLINE Vector3 operator*(const Vector3& v) const { return m_mat * v; }
 
 		INLINE operator XMMATRIX() { return m_mat; }
-		
-		// Transformation multiply
-		INLINE Transform operator*(const Transform& t) const { 
-			Matrix4 ans = m_mat * t.m_mat;
-			return Transform(ans);
-		}
-	
+		INLINE operator Matrix4() { return m_mat; }
+
+	private:
 		Matrix4 m_mat;
 	};
 }

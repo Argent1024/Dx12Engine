@@ -9,15 +9,15 @@ namespace Game {
 		m_RootCBV = std::make_shared<Graphic::RootConstantBuffer>(gpumem, cbSize);
 	}
 
-	void ProjectiveCamera::UseCamera(Graphic::CommandList& commandList, const Transform& ModelTransformation) {
+	void ProjectiveCamera::UseCamera(Graphic::CommandList& commandList, Transform model) {
 		commandList.SetViewPorts(&m_Viewport);
 		commandList.SetScissorRects(&m_ScissorRect);
 		//TODO Camera space transform
 		// Root Signature is used for projective camera should use b0 as the view matrix
 		//commandList.SetGraphicsRootConstants(0, sizeof(DirectX::XMMATRIX) / 4,  &(DirectX::XMMATRIX)m_ViewProjective);
-
+		//Transform modelT = Transform(Matrix4(XMMatrixRotationAxis((XMVECTOR)Vector3(0.f,1.f,0.f), 0.0)));
 		// Calculate & set model_view_projective matrix
-		Transform mvp = ModelTransformation * m_ViewProjective;
+		Transform mvp( (Matrix4)model * (Matrix4)m_ViewProjective);
 		m_RootCBV->copyData(&(DirectX::XMMATRIX)mvp);
 		// TODO set to b0, however this knowledge should only be known by the RootSignature
 		commandList.SetGraphicRootCBV(*m_RootCBV, 0);
