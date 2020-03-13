@@ -36,7 +36,7 @@ namespace Samples {
 	{
 		std::vector<DefaultVertex> vertex;
 		std::vector<UINT> index;
-		MeshReader::ReadOBJ("D:\\work\\tEngine\\bunny.obj", vertex, index);
+		MeshReader::ReadOBJ("D:\\work\\tEngine\\test.obj", vertex, index);
 
 		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
 		m_Material = std::make_shared<NoMaterial>(m_GraphicPSO, m_rootSignature);
@@ -46,11 +46,13 @@ namespace Samples {
 
 	void MeshTest::Render()
 	{
-		Vector3 Pos(0.0f, 0.0f, 5.f);
+		Vector3 Pos(0.0f, 0.0f, 3.f);
 		//if (t >= 2.0) {t -= 0.05;}
 		Vector3 Target(0.0f, 0.0f, 0.0f);
 		Vector3 UP(0.0f, 1.0f, 0.0f);
 		m_Camera.LookAt(Pos, Target, UP);
+		angle += 3.14f / 100.0f;
+		Transform modelT = Transform(Matrix4(XMMatrixRotationAxis((XMVECTOR)Vector3(0.f,1.f,0.f),  angle)));
 
 		GraphicsCommandManager.Start();
 		DescriptorHeap* UseHeap = Engine::GetInUseHeap();
@@ -72,7 +74,7 @@ namespace Samples {
 			GraphicsCommandManager.InitCommandList(&ThreadCommandList);
 			
 			m_Bunny.RecordCommand(ThreadCommandList);
-			m_Camera.UseCamera(ThreadCommandList);
+			m_Camera.UseCamera(ThreadCommandList, modelT);
 			
 
 			// Barrier Draw

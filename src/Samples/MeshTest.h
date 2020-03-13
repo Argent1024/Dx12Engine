@@ -59,6 +59,7 @@ namespace Samples {
 		void Render() override;
 
 	private:
+		float angle = 0.0;
 		float t = 10.0;
 		void LoadAssert();
 

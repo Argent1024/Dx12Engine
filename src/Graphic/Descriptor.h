@@ -104,7 +104,7 @@ namespace Graphic {
 	{
 	public:
 		RootConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
-			: Descriptor(gpubuffer, bufferSize) 
+			: Descriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)) 
 		{
 			this->Initialize();
 		}
@@ -123,7 +123,7 @@ namespace Graphic {
 	class ConstantBuffer : public HeapDescriptor {
 	public:
 		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
-			: HeapDescriptor(gpubuffer, bufferSize) { this->Initialize(); }
+			: HeapDescriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)) { this->Initialize(); }
 		
 	private:
 		void Initialize() override;

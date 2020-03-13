@@ -24,19 +24,21 @@ namespace Graphic {
 		UINT HeapIndex = m_descriptorHeap->MallocHeap();
 		assert(m_Offset == 0 && "I believe there should be a new gpumem for Root CBV?");
 		assert(HeapIndex == 0 && "I believe there should be a new descriptor heap for a root cbv");
+		assert(m_BufferSize % 256 == 0 && "Constant buffer size not aligned");
 		m_cbvDesc.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
-		m_cbvDesc.SizeInBytes = (m_BufferSize + 255) & ~255;  
+		m_cbvDesc.SizeInBytes = m_BufferSize;  
 		device->CreateConstantBufferView(&m_cbvDesc, m_descriptorHeap->GetCPUHandle(HeapIndex));
 	}
 
 	void ConstantBuffer::Initialize() {
+		assert(m_BufferSize % 256 == 0 && "Constant buffer size not aligned");
 		ID3D12Device* device = Engine::GetDevice();
 		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_HeapIndex = descriptorHeap->MallocHeap();
 
 		m_cbvDesc.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
-		m_cbvDesc.SizeInBytes = (m_BufferSize+ 255) & ~255;  
+		m_cbvDesc.SizeInBytes = m_BufferSize;  
 		device->CreateConstantBufferView(&m_cbvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
 	}	
 
