@@ -27,6 +27,7 @@ namespace Samples {
 		m_GraphicPSO->SetRootSigature(m_rootSignature->GetRootSignature());
 		m_GraphicPSO->Initialize();
 
+		m_Camera.CreateCBV();
 		this->LoadAssert();
 
 	}

@@ -195,6 +195,7 @@
     <ClInclude Include="src\WinApp.h" />
     <ClInclude Include="src\World\Mesh.h" />
     <ClInclude Include="src\World\GObject.h" />
+    <ClInclude Include="src\World\Scene.h" />
     <ClInclude Include="src\World\World.h" />
     <ClInclude Include="src\Graphic\SwapChain.h" />
   </ItemGroup>

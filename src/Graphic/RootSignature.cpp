@@ -21,11 +21,9 @@ namespace Graphic {
 		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0-t1
 		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
 
-		// A Root CBV at regisiter 0, space 0
-		// Store camera's View&Projective Transformation at 0, 
-		rootParameters[0].InitAsConstants(2 * sizeof(DirectX::XMMATRIX) / 4,  0, 0, D3D12_SHADER_VISIBILITY_ALL);
-		// Descriptor table
-		// t0-t1, u0-u1
+		// A Root CBV (b0) Store Transformations
+		rootParameters[0].InitAsConstantBufferView(0, 0);
+		// Descriptor table 1: t0-t1, u0-u1
 		rootParameters[1].InitAsDescriptorTable(2, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
 		
 

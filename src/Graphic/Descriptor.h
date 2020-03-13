@@ -3,6 +3,10 @@
 #include "GPUBuffer.h"
 #include "DescriptorHeap.h"
 
+#define ptrVertexBuffer std::shared_ptr<Graphic::VertexBuffer>
+#define ptrIndexBuffer std::shared_ptr<Graphic::IndexBuffer>
+#define ptrRootCBV std::shared_ptr<Graphic::RootConstantBuffer>
+#define ptrCBV std::shared_ptr<Graphic::ConstantBuffer>
 
 namespace Graphic {
 
@@ -95,12 +99,31 @@ namespace Graphic {
 		D3D12_INDEX_BUFFER_VIEW m_view;
 	};
 
+	// A constant buffer that does not require the init/inuse descriptor heap
+	class RootConstantBuffer : public Descriptor 
+	{
+	public:
+		RootConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
+			: Descriptor(gpubuffer, bufferSize) 
+		{
+			this->Initialize();
+		}
+
+		
+		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const { return m_cbvDesc.BufferLocation; }
+
+	private:
+		void Initialize() override;
+
+		DescriptorHeap* m_descriptorHeap;
+		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
+	};
 
 
 	class ConstantBuffer : public HeapDescriptor {
 	public:
-		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap*  descriptorHeap)
-			: HeapDescriptor(gpubuffer, bufferSize) {}
+		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
+			: HeapDescriptor(gpubuffer, bufferSize) { this->Initialize(); }
 		
 	private:
 		void Initialize() override;

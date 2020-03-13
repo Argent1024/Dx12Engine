@@ -15,6 +15,20 @@ namespace Graphic {
 		m_view.SizeInBytes = m_BufferSize;
 	}
 
+	void RootConstantBuffer::Initialize() 
+	{
+		ID3D12Device* device = Engine::GetDevice();
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		m_descriptorHeap = new DescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+		m_descriptorHeap->Initialize();
+		UINT HeapIndex = m_descriptorHeap->MallocHeap();
+		assert(m_Offset == 0 && "I believe there should be a new gpumem for Root CBV?");
+		assert(HeapIndex == 0 && "I believe there should be a new descriptor heap for a root cbv");
+		m_cbvDesc.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
+		m_cbvDesc.SizeInBytes = (m_BufferSize + 255) & ~255;  
+		device->CreateConstantBufferView(&m_cbvDesc, m_descriptorHeap->GetCPUHandle(HeapIndex));
+	}
+
 	void ConstantBuffer::Initialize() {
 		ID3D12Device* device = Engine::GetDevice();
 		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();

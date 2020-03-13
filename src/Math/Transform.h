@@ -16,9 +16,12 @@ namespace Math {
 		INLINE Vector3 GetTranslation() { return m_mat.GetW(); }
 		
 		// Apply transformation to Vector3
-		INLINE Vector3 operator()(const Vector3& v) { return m_mat * v; }
+		INLINE Vector3 operator()(const Vector3& v) const { return m_mat * v; }
 
 		INLINE operator XMMATRIX() { return m_mat; }
+		
+		// Transformation multiply
+		INLINE Transform operator*(const Transform& t) const { return Transform(m_mat * t.m_mat); }
 	private:
 		Matrix4 m_mat;
 	};

@@ -2,9 +2,6 @@
 #include "CommandList.h"
 #include "Descriptor.h"
 
-
-#define ptrVertexBuffer std::shared_ptr<Graphic::VertexBuffer>
-#define ptrIndexBuffer std::shared_ptr<Graphic::IndexBuffer>
 #define ptrMesh std::shared_ptr<Game::Mesh>
 
 

@@ -17,7 +17,7 @@ namespace Game {
 			 m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 		{ }
 
-		virtual void UseCamera(Graphic::CommandList& commandList) 
+		virtual void UseCamera(Graphic::CommandList& commandList, const Transform& ModelTransformation=Transform()) 
 		{
 			commandList.SetViewPorts(&m_Viewport);
 			commandList.SetScissorRects(&m_ScissorRect);
@@ -65,9 +65,15 @@ namespace Game {
 			m_ViewProjective = Transform(view * proj);
 		}*/
 
-		void UseCamera(Graphic::CommandList& commmandList) override;
+		void UseCamera(Graphic::CommandList& commmandList, const Transform& ModelTransformation=Transform()) override;
 
+		void CreateCBV();
 	private:
+
+
+		// CBV where transformations are stored
+		ptrRootCBV m_RootCBV;
+
 		// world to view & projective
 		Transform m_ViewProjective;
 		Transform m_InvTransform;
