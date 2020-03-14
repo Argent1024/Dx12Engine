@@ -1,22 +1,27 @@
 #include "Descriptor.h"
 
 namespace Graphic {
-	void VertexBuffer::Initialize() {
+	VertexBuffer::VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize) 
+		:Descriptor(gpubuffer, bufferSize), m_strideSize(strideSize) 
+	{
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
 		m_view.StrideInBytes = m_strideSize;
 		m_view.SizeInBytes = m_BufferSize;
 	}
 
-	void IndexBuffer::Initialize() {
+	IndexBuffer::IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
+		: Descriptor(gpubuffer, bufferSize) 
+	{
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
 		m_view.Format = DXGI_FORMAT_R32_UINT;
 		m_view.SizeInBytes = m_BufferSize;
 	}
 
-	void RootConstantBuffer::Initialize() 
-	{
+	RootConstantBuffer::RootConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
+		: Descriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)) 
+	{	
 		ID3D12Device* device = Engine::GetDevice();
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_descriptorHeap = new DescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
@@ -30,10 +35,22 @@ namespace Graphic {
 		device->CreateConstantBufferView(&m_cbvDesc, m_descriptorHeap->GetCPUHandle(HeapIndex));
 	}
 
-	void ConstantBuffer::Initialize() {
+	ConstantBuffer::ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize,  DescriptorHeap* descriptorHeap)
+		: HeapDescriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)),
+		  m_isRootCBV(descriptorHeap != nullptr)
+	{
 		assert(m_BufferSize % 256 == 0 && "Constant buffer size not aligned");
 		ID3D12Device* device = Engine::GetDevice();
-		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
+
+		if (m_isRootCBV) {
+			D3D12_DESCRIPTOR_HEAP_TYPE  type = descriptorHeap->GetDescriptorHeapType();
+			D3D12_DESCRIPTOR_HEAP_FLAGS flags = descriptorHeap->GetDescriptorHeapFlags();
+			assert(type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV && "descriptor provide type dismatch!");
+			assert(flags == D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE && "Root CBV should be shader visible");
+		} else {
+			descriptorHeap = Engine::GetInitHeap();
+		}
+
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_HeapIndex = descriptorHeap->MallocHeap();
 
@@ -42,7 +59,10 @@ namespace Graphic {
 		device->CreateConstantBufferView(&m_cbvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
 	}	
 
-	void ShaderResource::Initialize() {
+
+	ShaderResource::ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) 
+		: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0)
+	{
 		ID3D12Device* device = Engine::GetDevice();
 		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
@@ -51,7 +71,9 @@ namespace Graphic {
 	}
 
 	
-	void UnorderedAccess::Initialize() {
+	UnorderedAccess::UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc)
+		: m_uavDesc(desc), HeapDescriptor(gpubuffer, 0) 
+	{
 		ID3D12Device* device = Engine::GetDevice();
 		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);

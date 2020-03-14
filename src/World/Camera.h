@@ -39,7 +39,8 @@ namespace Game {
 			: Camera(width, height) {}
 
 		ProjectiveCamera(const UINT width, const UINT height, 
-			const Vector3& Position, const Vector3& Target, const Vector3& WorldUp): Camera(width, height)
+			const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
+			: Camera(width, height)
 		{ LookAt(Position, Target, WorldUp); }
 
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
@@ -71,7 +72,7 @@ namespace Game {
 	private:
 
 		// CBV where transformations are stored
-		ptrRootCBV m_RootCBV;
+		std::shared_ptr<Graphic::RootConstantBuffer> m_RootCBV;
 
 		// world to view & projective
 		Transform m_ViewProjective;

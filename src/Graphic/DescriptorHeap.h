@@ -57,7 +57,7 @@ namespace Graphic {
 		}
 
 		inline D3D12_DESCRIPTOR_HEAP_TYPE GetDescriptorHeapType() const { return m_HeapDesc.Type; }
-
+		inline D3D12_DESCRIPTOR_HEAP_FLAGS GetDescriptorHeapFlags() const { return m_HeapDesc.Flags; }
 	private:
 		D3D12_DESCRIPTOR_HEAP_DESC m_HeapDesc;
 		ComPtr<ID3D12DescriptorHeap> m_heap;

@@ -5,7 +5,6 @@
 
 #define ptrVertexBuffer std::shared_ptr<Graphic::VertexBuffer>
 #define ptrIndexBuffer std::shared_ptr<Graphic::IndexBuffer>
-#define ptrRootCBV std::shared_ptr<Graphic::RootConstantBuffer>
 #define ptrCBV std::shared_ptr<Graphic::ConstantBuffer>
 
 namespace Graphic {
@@ -22,8 +21,6 @@ namespace Graphic {
 		inline UINT GetSize() { return m_BufferSize; }
 		
 	protected:
-		virtual void Initialize() = 0;
-
 		ptrGPUMem m_Buffer;
 		UINT m_BufferSize;	
 		UINT m_Offset;
@@ -39,7 +36,8 @@ namespace Graphic {
 		inline UINT GetHeapIndex() const { return m_HeapIndex; }
 
 		// Copy this descriptor to the in use descriptor heap for rendering
-		inline void BindDescriptor(UINT index) const {
+		inline void BindDescriptor(UINT index) const 
+		{
 			DescriptorHeap* InitHeap = Engine::GetInUseHeap();
 			CD3DX12_CPU_DESCRIPTOR_HANDLE destCPUHandle = InitHeap->GetCPUHandle(m_HeapIndex);
 
@@ -64,19 +62,13 @@ namespace Graphic {
 
 	class VertexBuffer : public Descriptor {
 	public:
-		VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize) 
-			:Descriptor(gpubuffer, bufferSize), m_strideSize(strideSize) 
-		{
-			this->Initialize();
-		}
+		VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize);
 
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
 
 		inline UINT GetStrideSize() const { return m_strideSize; }
 
 	private:
-		void Initialize() override;
-
 		const UINT m_strideSize;
 		D3D12_VERTEX_BUFFER_VIEW m_view;
 	};
@@ -85,36 +77,26 @@ namespace Graphic {
 
 	class IndexBuffer : public Descriptor  {
 	public:
-		IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
-			: Descriptor(gpubuffer, bufferSize) 
-		{
-			this->Initialize();
-		}
+		IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize);
 		
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
 		
 	private:
-		void Initialize() override;
-
 		D3D12_INDEX_BUFFER_VIEW m_view;
 	};
 
+
+	// TODO Goint to remove this 
 	// A constant buffer that does not require the init/inuse descriptor heap
 	class RootConstantBuffer : public Descriptor 
 	{
 	public:
-		RootConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
-			: Descriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)) 
-		{
-			this->Initialize();
-		}
-
+		RootConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize);
 		
 		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const { return m_cbvDesc.BufferLocation; }
 
 	private:
-		void Initialize() override;
-
+		
 		DescriptorHeap* m_descriptorHeap;
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
 	};
@@ -122,12 +104,18 @@ namespace Graphic {
 
 	class ConstantBuffer : public HeapDescriptor {
 	public:
-		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
-			: HeapDescriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)) { this->Initialize(); }
-		
-	private:
-		void Initialize() override;
+		// Create a CBV, descriptor Heap is nullptr if we are creating a normal cbv, 
+		// if provide decriptorHeap, we are creaing a root CBV
+		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap* descriptorHeap=nullptr);
 
+		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const 
+		{
+			assert(m_isRootCBV && "CBV should be a root CBV to call this function");
+			return m_cbvDesc.BufferLocation; 
+		}
+
+	private:
+		bool m_isRootCBV;
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
 	};
 
@@ -135,13 +123,11 @@ namespace Graphic {
 
 	class ShaderResource : public HeapDescriptor {
 	public:
-		ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) 
-			: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0) //TODO fix this emmmmmm
-		{  this->Initialize(); }
+		ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc);
 
 	private:
 		// Create SRV on the init descriptor heap
-		void Initialize() override;
+		//void Initialize() override;
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC m_srvDesc;
 	};
@@ -150,13 +136,11 @@ namespace Graphic {
 
 	class UnorderedAccess : public HeapDescriptor {
 	public:
-		UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc)
-			: m_uavDesc(desc), HeapDescriptor(gpubuffer, 0) 
-		{ this->Initialize(); }
+		UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc);
 
 	private:
 		// Create UAV on the init descriptor heap
-		void Initialize() override;
+		//void Initialize() override;
 
 		D3D12_UNORDERED_ACCESS_VIEW_DESC m_uavDesc;
 	};
