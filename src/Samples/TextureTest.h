@@ -63,7 +63,7 @@ namespace Samples {
 	
 	private:
 		SwapChain* m_swapChain;
-		ptrRootSigature m_rootSignature;
+		ptrRootSignature m_rootSignature;
 		ptrPSO m_GraphicPSO;
 
 		std::shared_ptr<TriangleMesh> m_Mesh;

@@ -221,6 +221,7 @@
     <ClCompile Include="src\Graphic\SwapChain.cpp" />
     <ClCompile Include="src\World\Material.cpp" />
     <ClCompile Include="src\World\Mesh.cpp" />
+    <ClCompile Include="src\World\Scene.cpp" />
     <ClCompile Include="tEngine.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

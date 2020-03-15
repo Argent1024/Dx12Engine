@@ -64,7 +64,7 @@ namespace Samples {
 		void LoadAssert();
 
 		SwapChain* m_swapChain;
-		ptrRootSigature m_rootSignature;
+		ptrRootSignature m_rootSignature;
 		ptrPSO m_GraphicPSO;
 		ProjectiveCamera m_Camera;
 

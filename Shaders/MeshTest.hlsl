@@ -1,6 +1,6 @@
 cbuffer Transformation : register(b0) 
 {
-	float4x4 ViewProjective;
+	float4x4 mvp;
 };
 
 struct VSInput 
@@ -24,7 +24,7 @@ PSInput VSMain(VSInput input)
 {
     PSInput result;
 	
-    result.position = mul(ViewProjective, input.position);
+    result.position = mul(mvp, input.position);
 	result.normal = input.normal;
     result.uv = input.uv;
     return result;

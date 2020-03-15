@@ -13,6 +13,7 @@ namespace Graphic {
 			m_HeapDesc.NumDescriptors = num; 
 			m_HeapDesc.Type = type;
 			m_HeapDesc.Flags = flag;
+			
 		}
 
 		~DescriptorHeap() { Destory(); }
@@ -26,7 +27,8 @@ namespace Graphic {
 
 		// TODO Multithreading lock here
 		// Ask num descriptors and return the first offset
-		UINT MallocHeap(UINT num=1) {
+		UINT MallocHeap(UINT num=1)
+		{
 			assert(m_Alloced + num <= m_NumDescriptors);
 			UINT index = m_Alloced;
 			m_Alloced += num;

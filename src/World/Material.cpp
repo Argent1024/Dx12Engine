@@ -1,7 +1,7 @@
 #include "Material.h"
 #include "DescriptorHeap.h"
 namespace Game {
-	TextureMaterial::TextureMaterial(ptrPSO pso, ptrRootSigature rootSignature, ptrTexture texture)
+	TextureMaterial::TextureMaterial(ptrPSO pso, ptrRootSignature rootSignature, ptrTexture texture)
 		: Material(pso, rootSignature), m_texture(texture), m_HeapIndex(0)
 	{
 	

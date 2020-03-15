@@ -6,9 +6,6 @@
 #include "RootSignature.h"
 #include "Texture.h"
 
-#define ptrPSO std::shared_ptr<Graphic::GraphicsPSO>
-#define ptrRootSigature std::shared_ptr<Graphic::RootSignature>
-
 namespace Game {
 	// Class store rendering data
 	// Store pipeline state obj &
@@ -19,10 +16,10 @@ namespace Game {
 	public:
 		Material() {}
 
-		Material(ptrPSO pso, ptrRootSigature rootSignature)
+		Material(ptrPSO pso, ptrRootSignature rootSignature)
 			: m_pso(pso), m_RootSignature(rootSignature) {}
 
-		inline void SetGPUStuff(ptrPSO pso, ptrRootSigature rootSignature) 
+		inline void SetGPUStuff(ptrPSO pso, ptrRootSignature rootSignature) 
 		{
 			m_pso = pso;
 			m_RootSignature = rootSignature;
@@ -31,8 +28,8 @@ namespace Game {
 		inline void UseMaterial(Graphic::CommandList& commandList)
 		{
 			LoadMaterial();
-			commandList.SetPipelineState(*m_pso);
-			commandList.SetGraphicsRootSignature(*m_RootSignature);
+			commandList.SetPipelineState(m_pso);
+			commandList.SetGraphicsRootSignature(m_RootSignature);
 			_UseMaterial(commandList);
 		}
 
@@ -48,14 +45,14 @@ namespace Game {
 		virtual void LoadMaterial() = 0;
 
 		ptrPSO m_pso;
-		ptrRootSigature m_RootSignature;
+		ptrRootSignature m_RootSignature;
 	};
 
 
 	class NoMaterial : public Material 
 	{	
 	public:
-		NoMaterial(ptrPSO pso, ptrRootSigature rootSignature)
+		NoMaterial(ptrPSO pso, ptrRootSignature rootSignature)
 			: Material(pso, rootSignature) {}
 
 		void _UseMaterial(Graphic::CommandList& commandList) const override {}
@@ -66,7 +63,7 @@ namespace Game {
 	class TextureMaterial : public Material 
 	{
 	public:
-		TextureMaterial(ptrPSO pso, ptrRootSigature rootSignature, ptrTexture texture);
+		TextureMaterial(ptrPSO pso, ptrRootSignature rootSignature, ptrTexture texture);
 
 		void _UseMaterial(Graphic::CommandList& commandList) const override;
 		void LoadMaterial() override;

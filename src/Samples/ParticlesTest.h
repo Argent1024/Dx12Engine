@@ -95,7 +95,7 @@ namespace Samples {
 
 		ParticleTest(UINT t_width, UINT t_height,  LPCTSTR t_title=L"playground") 
 			: GraphicCore(t_width, t_height, t_title), 
-			  m_Camera(t_width, t_height, Vector3(0.0, 0.0, 5.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0)) {}
+			  m_Camera(t_width, t_height, Vector3(0.0, 0.0, 2.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0)) {}
 
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;
@@ -128,7 +128,7 @@ namespace Samples {
 		DepthBuffer* m_depthBuffer;
 		SwapChain* m_swapChain;
 
-		ptrRootSigature m_GraphicRootSignature;
+		ptrRootSignature m_GraphicRootSignature;
 		ptrPSO m_GraphicPSO;
 
 		ptrMesh m_Mesh;

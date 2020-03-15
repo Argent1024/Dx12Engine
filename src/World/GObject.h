@@ -1,6 +1,7 @@
 #pragma once
 #include "Material.h"
 #include "Mesh.h"
+#include "Transform.h"
 
 #define ptrMesh std::shared_ptr<Game::Mesh>
 #define ptrMaterial std::shared_ptr<Game::Material>

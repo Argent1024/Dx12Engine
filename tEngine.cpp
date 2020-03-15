@@ -3,7 +3,7 @@
 
 #include "WinApp.h"
 //#include "src/Samples/RayMarching.h"
-#include "src/Samples/TextureTest.h"
+//#include "src/Samples/TextureTest.h"
 //#include "src/Samples/ParticlesTest.h"
 #include "src/Samples/MeshTest.h"
 
@@ -16,7 +16,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
 
 	//Graphic::GraphicCore *graphic_core = new Samples::RayMarching(1280, 720);
-	//Graphic::GraphicCore *graphic_core = new Samples::ParticleTest(960, 960);
+    //	Graphic::GraphicCore *graphic_core = new Samples::ParticleTest(960, 960);
 	//Graphic::GraphicCore * graphic_core = new Samples::TextureTestSample(960, 960);
 	Graphic::GraphicCore * graphic_core = new Samples::MeshTest(960, 960);
 	return WinApp::RunApp(graphic_core, hInstance, nCmdShow);

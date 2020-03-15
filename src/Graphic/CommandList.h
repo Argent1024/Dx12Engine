@@ -25,31 +25,32 @@ namespace Graphic {
 		}
 
 		// Avoid set PSO twice
-		inline void SetPipelineState(const PipelineStateObject& newPSO) {
-			ID3D12PipelineState* newPipelineState = newPSO.GetPSO();
-			if (newPipelineState != m_CurPipelineState) {
+		inline void SetPipelineState(ptrPSO newPSO) {
+			
+			if (newPSO != m_CurPipelineState) {
+				ID3D12PipelineState* newPipelineState = newPSO->GetPSO();
 				m_commandList->SetPipelineState(newPipelineState);
-				m_CurPipelineState = newPipelineState;
+				m_CurPipelineState = newPSO;
 			}
 		}
 
 		// Avoid set root signature twice
-		inline void SetGraphicsRootSignature(const RootSignature& newRS) {
-			ID3D12RootSignature* newRootSignature = newRS.GetRootSignature();
-			if (newRootSignature != m_CurRootSignature) {
+		inline void SetGraphicsRootSignature(ptrRootSignature newRS) {
+			if (newRS != m_CurRootSignature) {
 				assert("");
+				ID3D12RootSignature* newRootSignature = newRS->GetRootSignature();
 				m_commandList->SetGraphicsRootSignature(newRootSignature);
-				m_CurRootSignature = newRootSignature;
+				m_CurRootSignature = newRS;
 			}
 		}
 
 		// Avoid set root signature twice
-		inline void SetComputeRootSignature(const RootSignature& newRS) {
-			ID3D12RootSignature* newRootSignature = newRS.GetRootSignature();
-			if (newRootSignature != m_CurRootSignature) {
+		inline void SetComputeRootSignature(ptrRootSignature newRS) {
+			if (newRS != m_CurRootSignature) {
 				assert("");
+				ID3D12RootSignature* newRootSignature = newRS->GetRootSignature();
 				m_commandList->SetComputeRootSignature(newRootSignature);
-				m_CurRootSignature = newRootSignature;
+				m_CurRootSignature = newRS;
 			}
 		}
 
@@ -59,7 +60,9 @@ namespace Graphic {
 
 		inline void SetVertexBuffer(const VertexBuffer& vb) const {m_commandList->IASetVertexBuffers(0, 1, vb.GetBufferView());}
 
-		inline void SetGraphicRootCBV(const RootConstantBuffer& cb, UINT rootParaIndex) const { m_commandList->SetGraphicsRootConstantBufferView(rootParaIndex, cb.GetRootCBVGPUAdder()); }
+		inline void SetGraphicRootCBV(ptrCBV cbv, UINT rootParaIndex) const {
+			m_commandList->SetGraphicsRootConstantBufferView(rootParaIndex, cbv->GetRootCBVGPUAdder()); 
+		}
 
 		inline void DrawInstanced(UINT VertexCountPerInstance, UINT InstanceCount, UINT StartVertexLocation, UINT StartInstanceLocation) const { m_commandList->DrawInstanced(VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);}
 
@@ -113,8 +116,8 @@ namespace Graphic {
 		// TODO diff between these commandlist?
 		ComPtr<ID3D12GraphicsCommandList> m_commandList;
 
-		ID3D12PipelineState* m_CurPipelineState;
-		ID3D12RootSignature* m_CurRootSignature;
+		ptrPSO m_CurPipelineState;
+		ptrRootSignature m_CurRootSignature;
 	};
 
 		

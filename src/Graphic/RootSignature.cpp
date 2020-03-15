@@ -25,7 +25,6 @@ namespace Graphic {
 		rootParameters[0].InitAsConstantBufferView(0, 0);
 		// Descriptor table 1: t0-t1, u0-u1
 		rootParameters[1].InitAsDescriptorTable(2, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
-		
 
 		D3D12_STATIC_SAMPLER_DESC sampler = {};
         sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;

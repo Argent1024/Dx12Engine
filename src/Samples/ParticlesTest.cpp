@@ -56,7 +56,9 @@ namespace Samples {
 		m_Material = std::make_shared<TextureMaterial>(m_GraphicPSO, m_GraphicRootSignature, m_texture);
 
 		m_ParticleObject.SetMesh(m_Mesh);
-		m_ParticleObject.SetMaterial(m_Material);		
+		m_ParticleObject.SetMaterial(m_Material);	
+
+		m_Camera.CreateCBV();
 	}
 
 	void ParticleTest::Render() 

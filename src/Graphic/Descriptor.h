@@ -6,6 +6,8 @@
 #define ptrVertexBuffer std::shared_ptr<Graphic::VertexBuffer>
 #define ptrIndexBuffer std::shared_ptr<Graphic::IndexBuffer>
 #define ptrCBV std::shared_ptr<Graphic::ConstantBuffer>
+#define ptrSRV std::shared_ptr<Graphic::ShaderResource>
+#define ptrUAV std::shared_ptr<Graphic::UnorderedAccess>
 
 namespace Graphic {
 
@@ -35,6 +37,7 @@ namespace Graphic {
 
 		inline UINT GetHeapIndex() const { return m_HeapIndex; }
 
+		// TODO move this function
 		// Copy this descriptor to the in use descriptor heap for rendering
 		inline void BindDescriptor(UINT index) const 
 		{
@@ -59,7 +62,6 @@ namespace Graphic {
 	};
 
 
-
 	class VertexBuffer : public Descriptor {
 	public:
 		VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize);
@@ -74,7 +76,6 @@ namespace Graphic {
 	};
 
 
-
 	class IndexBuffer : public Descriptor  {
 	public:
 		IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize);
@@ -86,27 +87,11 @@ namespace Graphic {
 	};
 
 
-	// TODO Goint to remove this 
-	// A constant buffer that does not require the init/inuse descriptor heap
-	class RootConstantBuffer : public Descriptor 
-	{
-	public:
-		RootConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize);
-		
-		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const { return m_cbvDesc.BufferLocation; }
-
-	private:
-		
-		DescriptorHeap* m_descriptorHeap;
-		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
-	};
-
-
 	class ConstantBuffer : public HeapDescriptor {
 	public:
 		// Create a CBV, descriptor Heap is nullptr if we are creating a normal cbv, 
 		// if provide decriptorHeap, we are creaing a root CBV
-		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorHeap* descriptorHeap=nullptr);
+		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, bool isRoot=false);
 
 		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const 
 		{
@@ -118,7 +103,6 @@ namespace Graphic {
 		bool m_isRootCBV;
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
 	};
-
 
 
 	class ShaderResource : public HeapDescriptor {

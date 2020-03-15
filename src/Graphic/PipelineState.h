@@ -8,6 +8,7 @@
 
 #include "GraphicCore.h"
 
+#define ptrPSO std::shared_ptr<Graphic::GraphicsPSO>
 namespace Graphic {
 
 	class PipelineStateObject {

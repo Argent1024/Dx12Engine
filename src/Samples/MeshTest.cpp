@@ -21,7 +21,6 @@ namespace Samples {
 		m_swapChain->Initialize(GraphicsCommandManager.GetCommadnQueue());
 
 		m_rootSignature = std::make_shared<RootSignature>();
-		m_rootSignature->Initialize();
 
 		m_GraphicPSO = std::make_shared<MeshTestPSO>();
 		m_GraphicPSO->SetRootSigature(m_rootSignature->GetRootSignature());
