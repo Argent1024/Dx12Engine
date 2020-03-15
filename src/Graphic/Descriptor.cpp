@@ -19,22 +19,6 @@ namespace Graphic {
 		m_view.SizeInBytes = m_BufferSize;
 	}
 
-	/*RootConstantBuffer::RootConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
-		: Descriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)) 
-	{	
-		ID3D12Device* device = Engine::GetDevice();
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
-		m_descriptorHeap = new DescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
-		m_descriptorHeap->Initialize();
-		UINT HeapIndex = m_descriptorHeap->MallocHeap();
-		assert(m_Offset == 0 && "I believe there should be a new gpumem for Root CBV?");
-		assert(HeapIndex == 0 && "I believe there should be a new descriptor heap for a root cbv");
-		assert(m_BufferSize % 256 == 0 && "Constant buffer size not aligned");
-		m_cbvDesc.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
-		m_cbvDesc.SizeInBytes = m_BufferSize;  
-		device->CreateConstantBufferView(&m_cbvDesc, m_descriptorHeap->GetCPUHandle(HeapIndex));
-	}*/
-
 	ConstantBuffer::ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize,  bool isRoot)
 		: HeapDescriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)), m_isRootCBV(isRoot)
 	{

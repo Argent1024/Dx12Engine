@@ -37,7 +37,7 @@ namespace Graphic {
 
 		inline UINT GetHeapIndex() const { return m_HeapIndex; }
 
-		// TODO move this function
+		// TODO move this function & create a new one for copy multiple views
 		// Copy this descriptor to the in use descriptor heap for rendering
 		inline void BindDescriptor(UINT index) const 
 		{
