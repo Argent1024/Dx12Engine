@@ -8,7 +8,9 @@
 
 namespace Game {
 	using namespace Math;
-
+	// ***IMPORTANT***
+	// In DirectX's cpu code, vector's dimension is 1 * 4.
+	// So a matrix(transform) M mutiply(apply to) a vector v should be written as v * M
 	class Camera {
 	public:
 		Camera(const UINT width, const UINT height) :
@@ -47,13 +49,8 @@ namespace Game {
 		{
 			Matrix4 view(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp));			
 			Matrix4 proj(DirectX::XMMatrixPerspectiveFovRH(3.14f / 1.5f, m_aspectRatio, 1.0f, 1000.0f));
-
-			// ***IMPORTANT***
-			// In DirectX, vector's dimension is 1 * 4.
-			// So a matrix(transform) M mutiply(apply to) a vector v should be written as v * M
 			m_ViewProjective = Transform(view * proj);
-
-			//m_InvTransform = Transform(DirectX::XMMatrixInverse(cameraTransform));
+			
 		}
 
 		void UseCamera(Graphic::CommandList& commmandList, Transform model=Transform()) override;
@@ -66,7 +63,38 @@ namespace Game {
 
 		// world to view & projective
 		Transform m_ViewProjective;
-		Transform m_InvTransform;
+		//Transform m_InvTransform;
+	};
+
+	class OrthonormalCamera : public Camera {
+	public:
+		OrthonormalCamera(const UINT width, const UINT height)
+			: Camera(width, height) {}
+
+		OrthonormalCamera(const UINT width, const UINT height, 
+			const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
+			: Camera(width, height)
+		{ LookAt(Position, Target, WorldUp); }
+
+		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
+		{
+			Matrix4 view(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp));			
+			Matrix4 orthonormal(DirectX::XMMatrixOrthographicRH(3.14f / 1.5f, m_aspectRatio, 1.0f, 1000.0f));
+			m_ViewOrthormal = Transform(view * orthonormal);
+			
+		}
+		
+		void UseCamera(Graphic::CommandList& commmandList, Transform model=Transform()) override;
+
+		void CreateCBV();
+	
+	private:	
+		// CBV where transformations are stored
+		std::shared_ptr<Graphic::ConstantBuffer> m_RootCBV;
+
+		// world to view & orthonormal 
+		Transform m_ViewOrthormal;
+		// Transform m_InvTransform;
 	};
 }
 
