@@ -159,7 +159,7 @@ namespace MeshReader
 				break;
 			default:
 				//TODO add line number
-				throw std::runtime_error("Unexpected type meet in reading obj file");
+				// throw std::runtime_error("Unexpected type meet in reading obj file");
 				break;
 			}
 

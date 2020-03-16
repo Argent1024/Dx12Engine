@@ -35,7 +35,7 @@ namespace Samples {
 	{
 		std::vector<DefaultVertex> vertex;
 		std::vector<UINT> index;
-		MeshReader::ReadOBJ("D:\\work\\tEngine\\bunny.obj", vertex, index);
+		MeshReader::ReadOBJ("D:\\work\\tEngine\\airboat.obj", vertex, index);
 
 		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
 		m_Material = std::make_shared<NoMaterial>(m_GraphicPSO, m_rootSignature);

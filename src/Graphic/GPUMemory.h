@@ -8,6 +8,8 @@ namespace Graphic {
 	class CommandList;
 	class ShaderResource;
 	class UnorderedAccess;
+	class RenderTarget;
+
 	namespace GPU {
 
 		class GPUMemory {
@@ -17,6 +19,7 @@ namespace Graphic {
 			friend CommandList;
 			friend ShaderResource;
 			friend UnorderedAccess;
+			friend RenderTarget;
 			friend class MemoryAllocator;
 		
 			GPUMemory(const D3D12_RESOURCE_DESC& desc)

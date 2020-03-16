@@ -129,4 +129,12 @@ namespace Graphic {
 		D3D12_UNORDERED_ACCESS_VIEW_DESC m_uavDesc;
 	};
 
+
+	class RenderTarget : public HeapDescriptor {
+	public:
+		RenderTarget(ptrGPUMem gpubuffer, const D3D12_RENDER_TARGET_VIEW_DESC& desc, DescriptorHeap* descriptorHeap);
+
+	private:
+		D3D12_RENDER_TARGET_VIEW_DESC m_rtvDesc;
+	};
 }

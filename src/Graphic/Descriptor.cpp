@@ -43,7 +43,7 @@ namespace Graphic {
 		device->CreateConstantBufferView(&m_cbvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
 	}	
 
-
+	// TODO fix buffer size
 	ShaderResource::ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) 
 		: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0)
 	{
@@ -62,8 +62,18 @@ namespace Graphic {
 		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_HeapIndex = descriptorHeap->MallocHeap();
+		// TODO what's the parameter
 		device->CreateUnorderedAccessView(m_Buffer->GetResource(), nullptr, &m_uavDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
 	}
 
+
+	RenderTarget::RenderTarget(ptrGPUMem gpubuffer, const D3D12_RENDER_TARGET_VIEW_DESC& desc, DescriptorHeap* descriptorHeap) 
+		: m_rtvDesc(desc), HeapDescriptor(gpubuffer, 0) 
+	{
+		ID3D12Device* device = Engine::GetDevice();
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		m_HeapIndex = descriptorHeap->MallocHeap();
+		device->CreateRenderTargetView(m_Buffer->GetResource(), &m_rtvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
+	}
 
 }

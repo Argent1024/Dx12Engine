@@ -3,8 +3,11 @@
 #include "CommandList.h"
 #include "GObject.h"
 #include "Camera.h"
+#include "Light.h"
 
-namespace Game {
+namespace Game 
+{
+
 	class Scene 
 	{
 	public:
@@ -15,6 +18,7 @@ namespace Game {
 	protected:
 		// TODO need change
 		Camera m_Camera;
+		std::vector<ptrLight> m_LightList;
 		std::vector<ptrGobject> m_ObjList;
 	};
 
