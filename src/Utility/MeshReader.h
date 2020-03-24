@@ -152,7 +152,8 @@ namespace MeshReader
 
 	}
 
-	void ReadMaterial(const std::string& filePath, MaterialData& mtl) 
+	void ReadMaterial(const std::string& filePath, 
+		std::map<std::string, MaterialData>& mtl_list) 
 	{
 		std::ifstream infile;
 		infile.open(filePath.c_str());
@@ -160,6 +161,7 @@ namespace MeshReader
 		std::string line;
 		std::vector<std::string> tokens;
 
+		std::string mtl_name;
 		while (std::getline(infile, line))
 		{
 			ParseLine(tokens, line); // Parse by space
@@ -169,6 +171,10 @@ namespace MeshReader
 			const char t0 = type[0];
 			switch (t0)
 			{
+			case('n'):
+				mtl_name = tokens[1];
+				mtl_list[mtl_name] = MaterialData();
+				break;
 			case('K'):
 			{
 				assert(tokens.size() == 4 && "Too few parameters for creating Kx in mtl");
@@ -177,13 +183,13 @@ namespace MeshReader
 				float z = std::stof(tokens[3].c_str());
 				DirectX::XMFLOAT3 value = DirectX::XMFLOAT3(x, y, z);
 				if (type.compare("Ka")) {
-					mtl.Ka = value;
+					mtl_list[mtl_name].Ka = value;
 				}
 				else if (type.compare("Kd")) {
-					mtl.Kd = value;
+					mtl_list[mtl_name].Kd = value;
 				}
 				else if (type.compare("Ks")) {
-					mtl.Ks = value;
+					mtl_list[mtl_name].Ks = value;
 				}
 				else {
 					throw std::runtime_error("Unexpected type meet in reading mtl file");
@@ -192,19 +198,19 @@ namespace MeshReader
 			}
 			case('T'):
 				assert(tokens.size() == 2 && "Too few parameters for creating Tr in mtl file");
-				mtl.d = 1 - std::stof(tokens[1].c_str());
+				mtl_list[mtl_name].d = 1 - std::stof(tokens[1].c_str());
 				break;
 			case('d'):
 				assert(tokens.size() == 2 && "Too few parameters for creating d in mtl file");
-				mtl.d = std::stof(tokens[1].c_str());
+				mtl_list[mtl_name].d = std::stof(tokens[1].c_str());
 				break;
 			case('N'):
 				assert(tokens.size() == 2 && "Too few parameters for creating Ns in mtl file");
-				mtl.Ns = std::stof(tokens[1].c_str());
+				mtl_list[mtl_name].Ns = std::stof(tokens[1].c_str());
 				break;
 			case('m'):
 				assert(tokens.size() == 2 && "Too few parameters for creating texture in mtl file");
-				mtl.map_Ka = tokens[1];
+				mtl_list[mtl_name].map_Ka = tokens[1];
 				break;
 			default:
 				break;
