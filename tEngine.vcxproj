@@ -181,6 +181,7 @@
     <ClInclude Include="src\Graphic\PipelineState.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Graphic\RootSignature.h" />
+    <ClInclude Include="src\World\Light.h" />
     <ClInclude Include="src\World\Material.h" />
     <ClInclude Include="src\Graphic\Primitive.h" />
     <ClInclude Include="src\Math\MathUtility.h" />

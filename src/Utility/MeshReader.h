@@ -9,6 +9,30 @@ struct DefaultVertex
 	DirectX::XMFLOAT2 texcoor;
 };
 
+// Describe the material data in mtl file
+struct MaterialData 
+{
+	MaterialData() :
+		Ka(0.2f, 0.2f, 0.2f),
+		Kd(0.8f, 0.8f, 0.8f),
+		Ks(1.0f, 1.0f, 1.0f),
+		d(1.0f),
+		Ns(0.0f),
+		illum(1),
+		map_Ka("")
+	{}
+
+	DirectX::XMFLOAT3 Ka;
+	DirectX::XMFLOAT3 Kd;
+	DirectX::XMFLOAT3 Ks;
+	
+	std::string map_Ka; // Texture file
+	float d;
+	float Ns;
+	UINT illum; // illumination, 1 indicates no specular highlights
+				//               2 denotes the presence of specular highlights so Ks is required
+};
+
 namespace MeshReader
 {
 	namespace // Helper functions
@@ -32,7 +56,7 @@ namespace MeshReader
 			const std::string type = tokens[0];
 			
 			if (type.compare("v") == 0) {
-				
+			
 				float x = std::stof(tokens[1].c_str());
 				float y = std::stof(tokens[2].c_str());
 				float z = std::stof(tokens[3].c_str());
@@ -122,6 +146,68 @@ namespace MeshReader
 				index.push_back(index0);
 				index.push_back(i - 1);
 				index.push_back(i);
+			}
+		}
+		
+
+	}
+
+	void ReadMaterial(const std::string& filePath, MaterialData& mtl) 
+	{
+		std::ifstream infile;
+		infile.open(filePath.c_str());
+
+		std::string line;
+		std::vector<std::string> tokens;
+
+		while (std::getline(infile, line))
+		{
+			ParseLine(tokens, line); // Parse by space
+			if (tokens.size() == 0) { continue; }
+			std::string type = tokens[0];
+
+			const char t0 = type[0];
+			switch (t0)
+			{
+			case('K'):
+			{
+				assert(tokens.size() == 4 && "Too few parameters for creating Kx in mtl");
+				float x = std::stof(tokens[1].c_str());
+				float y = std::stof(tokens[2].c_str());
+				float z = std::stof(tokens[3].c_str());
+				DirectX::XMFLOAT3 value = DirectX::XMFLOAT3(x, y, z);
+				if (type.compare("Ka")) {
+					mtl.Ka = value;
+				}
+				else if (type.compare("Kd")) {
+					mtl.Kd = value;
+				}
+				else if (type.compare("Ks")) {
+					mtl.Ks = value;
+				}
+				else {
+					throw std::runtime_error("Unexpected type meet in reading mtl file");
+				}
+				break;
+			}
+			case('T'):
+				assert(tokens.size() == 2 && "Too few parameters for creating Tr in mtl file");
+				mtl.d = 1 - std::stof(tokens[1].c_str());
+				break;
+			case('d'):
+				assert(tokens.size() == 2 && "Too few parameters for creating d in mtl file");
+				mtl.d = std::stof(tokens[1].c_str());
+				break;
+			case('N'):
+				assert(tokens.size() == 2 && "Too few parameters for creating Ns in mtl file");
+				mtl.Ns = std::stof(tokens[1].c_str());
+				break;
+			case('m'):
+				assert(tokens.size() == 2 && "Too few parameters for creating texture in mtl file");
+				mtl.map_Ka = tokens[1];
+				break;
+			default:
+				break;
 			}
 		}
 	}
