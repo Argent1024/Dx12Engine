@@ -10,6 +10,7 @@ namespace Game {
 	}
 
 	void TriangleMesh::Draw(Graphic::CommandList& commandList) {
+		// TODO modify
 		// Index buffer store UINT so, num of index == buffersize / sizeof(UINT)
 		UINT IndexCountPerINstance = m_IndexBuffer->GetSize() / sizeof(UINT);
 		commandList.DrawIndexedInstanced(IndexCountPerINstance, 1, 0, 0, 0);

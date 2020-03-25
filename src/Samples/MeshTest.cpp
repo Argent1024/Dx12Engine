@@ -33,9 +33,11 @@ namespace Samples {
 
 	void MeshTest::LoadAssert() 
 	{
-		std::vector<DefaultVertex> vertex;
-		std::vector<UINT> index;
-		MeshReader::ReadOBJ("D:\\work\\tEngine\\airboat.obj", vertex, index);
+		MeshReader reader;
+		reader.ReadOBJ("D:\\work\\tEngine\\bunny.obj");
+
+		std::vector<DefaultVertex>& vertex = reader.m_vertex;
+		std::vector<UINT>& index = reader.m_index;
 
 		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
 		m_Material = std::make_shared<NoMaterial>(m_GraphicPSO, m_rootSignature);

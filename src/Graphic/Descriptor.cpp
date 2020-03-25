@@ -11,9 +11,20 @@ namespace Graphic {
 	}
 
 	IndexBuffer::IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
-		: Descriptor(gpubuffer, bufferSize) 
+		: Descriptor(gpubuffer, bufferSize), m_start(0)
 	{
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
+		m_view.Format = DXGI_FORMAT_R32_UINT;
+		m_view.SizeInBytes = m_BufferSize;
+	}
+
+	// TODO check whether buffersize & start is correct
+	IndexBuffer::IndexBuffer(IndexBuffer& buffer, const UINT start, const UINT end)
+		: Descriptor(buffer.m_Buffer, (end - start) * sizeof(UINT)) // bufferSize = (end - start) * sizeof(UINT)
+	{
+		assert(start + m_BufferSize <= buffer.m_BufferSize && "start position plus bufferSize too large");
+		m_Offset = buffer.m_Offset + start;
 		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
 		m_view.Format = DXGI_FORMAT_R32_UINT;
 		m_view.SizeInBytes = m_BufferSize;

@@ -80,9 +80,17 @@ namespace Graphic {
 	public:
 		IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize);
 		
+		// Suballocate from a index buffer
+		// Example use:
+		//		1. Create an large index buffer store everything
+		//		2. Suballocate from the large one by calling this constructor
+		//      3. When rendering, we're going to use the m_start variable
+		IndexBuffer(IndexBuffer& buffer, const UINT start, const UINT end);
+
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
 		
 	private:
+		UINT m_start;
 		D3D12_INDEX_BUFFER_VIEW m_view;
 	};
 
