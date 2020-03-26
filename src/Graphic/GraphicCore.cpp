@@ -75,8 +75,16 @@ Graphic::CommandManager CopyHelper(1);
 Graphic::CommandManager GraphicsCommandManager(2);
 
 void Engine::InitializeEngine() {
+	EnableDebug();
+	CreateDevice();
 
-		
+	CopyHelper.Initialize();
+	GraphicsCommandManager.Initialize();
+
+	Graphic::DescriptorHeap* initHeap = Engine::GetInitHeap();
+	initHeap->Initialize();
+	Graphic::DescriptorHeap* useHeap = Engine::GetInUseHeap();
+	useHeap->Initialize();
 }
 
 namespace Engine {

@@ -5,16 +5,7 @@ namespace Samples {
 
 	void MeshTest::Init(const HWND m_appHwnd)
 	{
-		Engine::EnableDebug();
-		Engine::CreateDevice();
-
-		CopyHelper.Initialize();
-		GraphicsCommandManager.Initialize();
-
-		DescriptorHeap* initHeap = Engine::GetInitHeap();
-		initHeap->Initialize();
-		DescriptorHeap* useHeap = Engine::GetInUseHeap();
-		useHeap->Initialize();
+		Engine::InitializeEngine();
 
 		m_rootSignature = std::make_shared<RootSignature>();
 
