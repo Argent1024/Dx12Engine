@@ -158,6 +158,7 @@
   <ItemGroup>
     <ClInclude Include="src\Graphic\DepthBuffer.h" />
     <ClInclude Include="src\Graphic\Texture.h" />
+    <ClInclude Include="src\Math\BoundingBox.h" />
     <ClInclude Include="src\Math\MathCommon.h" />
     <ClInclude Include="src\Physic\PhysicSystem.h" />
     <ClInclude Include="src\Samples\MeshTest.h" />
@@ -209,6 +210,7 @@
     <ClCompile Include="src\Samples\ParticlesTest.cpp" />
     <ClCompile Include="src\Samples\RayMarching.cpp" />
     <ClCompile Include="src\Samples\TextureTest.cpp" />
+    <ClCompile Include="src\Utility\MeshReader.cpp" />
     <ClCompile Include="src\World\Camera.cpp" />
     <ClCompile Include="src\Graphic\CommandList.cpp" />
     <ClCompile Include="src\Graphic\CommandQueue.cpp" />

@@ -207,7 +207,7 @@ void MeshReader::ReadOBJ(const std::string& filePath)
 			else {
 				GroupName = "";
 			}
-			assert(m_groupIndex.find(GroupName) == m_groupIndex.end);
+			assert(m_groupIndex.find(GroupName) == m_groupIndex.end() && "Already used group name");
 			m_groupIndex[GroupName] = {index, 0};
 			break;
 		}

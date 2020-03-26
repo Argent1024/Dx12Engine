@@ -3,14 +3,21 @@
 namespace Game {
 	
 	Scene::Scene(const HWND AppHwnd, const UINT width, const UINT height)
-		: m_SwapChain(AppHwnd, width, height), m_Camera(width, height)
+		: m_SwapChain(AppHwnd, width, height),
+		  m_Camera(width, height, Vector3(0.0f, 0.0f, 10.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f))
 	{
 		m_SwapChain.Initialize(GraphicsCommandManager.GetCommadnQueue());
+		// TODO fix camera
 		m_Camera.CreateCBV();
 	}
 
+	Scene::Scene(const HWND m_appHwnd, const UINT width, const UINT height, ProjectiveCamera& camera)
+		: m_SwapChain(m_appHwnd, width, height), m_Camera(camera) {}
+
 	void Scene::Render()
 	{
+		BeginRender();
+
 		// TODO multi threading here
 		Graphic::CommandList ThreadCommandList;
 		GraphicsCommandManager.InitCommandList(&ThreadCommandList);
@@ -25,20 +32,29 @@ namespace Game {
 			g_obj->Draw(ThreadCommandList);
 			ThreadCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		}
-
 		GraphicsCommandManager.ExecuteCommandList(&ThreadCommandList);
+		// Multithreading join here
+
+		EndRender();
 	}
 
 	void Scene::BeginRender() 
 	{
+		GraphicsCommandManager.Start();
+		Graphic::DescriptorHeap* UseHeap = Engine::GetInUseHeap();
+		UseHeap->Reset();
+
 		Graphic::CommandList mainCommandList;
 		const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 		GraphicsCommandManager.InitCommandList(&mainCommandList);
 
+		// Record main command list
 		mainCommandList.SetSwapChain(m_SwapChain);
 		mainCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		mainCommandList.ClearSwapChain(m_SwapChain, clearColor);
 		mainCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		
+		GraphicsCommandManager.ExecuteCommandList(&mainCommandList);
 	}
 
 	void Scene::EndRender()
@@ -51,5 +67,10 @@ namespace Game {
 	{
 		// TODO DO NOTHING FOR NOW
 
+	}
+
+	void Scene::AddGameObj(GObject* obj) 
+	{
+		m_ObjList.push_back(obj);
 	}
 }

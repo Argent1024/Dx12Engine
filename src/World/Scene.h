@@ -15,9 +15,17 @@ namespace Game
 	public:
 		Scene(const HWND m_appHwnd, const UINT width, const UINT height);
 
+		Scene(const HWND m_appHwnd, const UINT width, const UINT height, ProjectiveCamera& camera);
+
 		virtual void Render();
 
 		virtual void Update();
+
+		// TODO accel structure
+		void AddGameObj(GObject* obj);
+
+		// TODO
+		void DeleteGameObj(GObject* obj) {}
 
 	protected:
 
@@ -27,7 +35,7 @@ namespace Game
 		// TODO need change
 		ProjectiveCamera m_Camera;
 		std::vector<ptrLight> m_LightList;
-		std::vector<ptrGobject> m_ObjList;
+		std::vector<GObject*> m_ObjList;
 
 		Graphic::SwapChain m_SwapChain;
 	};

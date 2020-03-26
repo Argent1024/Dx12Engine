@@ -19,12 +19,12 @@ namespace Game {
 			 m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 		{ }
 
-		virtual void UseCamera(Graphic::CommandList& commandList, Transform ModelTransformation=Transform()) 
+		virtual void UseCamera(Graphic::CommandList& commandList, Transform ModelTransformation = Transform())
 		{
 			commandList.SetViewPorts(&m_Viewport);
 			commandList.SetScissorRects(&m_ScissorRect);
 		}
-		
+
 		void SetViewPort(CD3DX12_VIEWPORT newViewPort) { m_Viewport = newViewPort; }
 		void SetScissorRect(CD3DX12_RECT newScissorRect) { m_ScissorRect = newScissorRect; } 
 
