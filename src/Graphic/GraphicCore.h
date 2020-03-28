@@ -41,7 +41,8 @@ namespace Engine
 	extern UINT NumDescriptors;
 	extern Graphic::DescriptorHeap InitHeap;
 	extern Graphic::DescriptorHeap InUseHeap;
-	
+	extern Graphic::DescriptorHeap DSVHeap;
+	extern Graphic::DescriptorHeap RTVHeap;
 
 	inline ID3D12Device* GetDevice() { return dxDevice.Get(); }
 	inline IDXGIFactory4* GetFactory() { return dxFactory.Get(); }

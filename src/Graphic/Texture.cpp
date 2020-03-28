@@ -40,22 +40,31 @@ namespace Graphic {
 		:Texture(type), m_size(elementSize), m_stride(stride)
 	{
 		// TODO consider flags
-		D3D12_RESOURCE_FLAGS flag;;
+		D3D12_RESOURCE_FLAGS flag;
 		switch (type)
 		{
 		case Graphic::TEXTURE_SRV:
 			flag = D3D12_RESOURCE_FLAG_NONE;
+			break;
 		case Graphic::TEXTURE_UAV:
 			flag = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-		case Graphic::TEXTURE_RW:
-			flag = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+			break;
+		case Graphic::TEXTURE_CBV:
+			flag = D3D12_RESOURCE_FLAG_NONE;
+			break;
+		case Graphic::TEXTURE_DSV:
+			flag = D3D12_RESOURCE_FLAG_NONE; //?
+			break;
+		case Graphic::TEXTURE_RTV:
+			flag = D3D12_RESOURCE_FLAG_NONE;
+			break;
 		default:
 			break;
 		}
 
 		m_textureDesc =  CD3DX12_RESOURCE_DESC::Buffer(elementSize * m_stride, flag);
 		m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
-		CreateView();
+		CreateViews();
 	}
 
 	void TextureBuffer::CreateSRV() 
@@ -84,6 +93,11 @@ namespace Graphic {
 		m_UAV = new UnorderedAccess(m_gpuMem, uavDesc);
 	}
 
+	void TextureBuffer::CreateDSV()
+	{
+		assert(false && "Not implementend!");
+	}
+
 	Texture2D::Texture2D(UINT width, UINT height, TextureType type, const std::wstring& textureFile)
 		: Texture(type)
 	{
@@ -98,9 +112,28 @@ namespace Graphic {
 		m_textureDesc.SampleDesc.Quality = 0;
 		m_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
-		m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
-		CreateView();
+		if (m_Type & TEXTURE_DSV) {
+			// if we are using texture as a depth buffer
+			m_textureDesc.Format = DXGI_FORMAT_D32_FLOAT;
 
+			D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+			D3D12_CLEAR_VALUE clearValue = {};
+			clearValue.Format = DXGI_FORMAT_D32_FLOAT;
+			clearValue.DepthStencil.Depth = 1.0f;
+			clearValue.DepthStencil.Stencil = 0;
+			m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc, clearValue, D3D12_HEAP_TYPE_DEFAULT, initState);
+		}
+		else {
+			m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);		
+		}
+		
+
+		CreateViews();
+		if (m_Type & TEXTURE_DSV || m_Type & TEXTURE_RTV) {
+			// I think we are not going to write these kind of views
+			return;
+		}
+		
 		std::vector<UINT8> data;
 		LoadChessBoard(width, height, 4, data);
 
@@ -119,5 +152,15 @@ namespace Graphic {
 
 	void Texture2D::CreateUAV() {
 		assert(FALSE && "Not implemented!");
+	}
+
+	void Texture2D::CreateDSV() {
+		D3D12_DEPTH_STENCIL_VIEW_DESC  dsvDesc = {};
+		// TODO format?
+		dsvDesc.Format = m_textureDesc.Format;
+		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+
+		m_DSV = new DepthStencil(m_gpuMem, dsvDesc, Engine::GetDSVHeap());
 	}
 }

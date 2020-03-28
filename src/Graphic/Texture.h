@@ -7,9 +7,11 @@
 namespace Graphic {
 	enum TextureType 
 	{
-		TEXTURE_SRV,	// Create a SRV texture
-		TEXTURE_UAV,	// Create a UAV texture
-		TEXTURE_RW	// Create both SRV & UAV
+		TEXTURE_SRV = 1,	// Create a SRV texture
+		TEXTURE_UAV = 2,	// Create a UAV texture
+		TEXTURE_CBV = 4,	
+		TEXTURE_DSV = 8,	// Create a DSV texture
+		TEXTURE_RTV = 16
 	};
 
 
@@ -19,15 +21,16 @@ namespace Graphic {
 	// Texture
 	// Texture class implement this base class should 
 	//		1. Allocate memory from GPU mem manager
-	//		2. initialize the view 
+	//		2. initialize views (multiple views using the same gpu memory)
 	//		3. Load data from file and copy(upload) it to the GPU memory
 	class Texture {
 	public:
-		Texture(TextureType type) : m_Type(type) {}
+		Texture(UINT type) : m_Type(type) {}
 
 		// Copy (one)view to in use descriptor heap
 		inline void BindTexture(UINT index, TextureType type=TEXTURE_SRV) const
 		{
+			assert(type & m_Type == 1 && "Binding view type not created");
 			switch (type)
 			{
 			case Graphic::TEXTURE_SRV:
@@ -36,16 +39,37 @@ namespace Graphic {
 			case Graphic::TEXTURE_UAV:
 				m_UAV->BindDescriptor(index);
 				break;
-			case Graphic::TEXTURE_RW:
-				throw std::runtime_error("Bind only one texture(view) at a time!");
+			case Graphic::TEXTURE_CBV:
+				
+				break;
+			case Graphic::TEXTURE_DSV:
+
+				break;
+			case Graphic::TEXTURE_RTV:
+
 				break;
 			default:
 				break;
 			}
 		}
 
-		inline ShaderResource* GetShaderResourceView() const { return m_SRV; }
-		inline UnorderedAccess* GetUnorderedAccessView() const { return m_UAV; }
+		inline ShaderResource* GetShaderResourceView() const 
+		{ 
+			assert(m_Type & TEXTURE_SRV && "SRV not created for this texture");
+			return m_SRV; 
+		}
+		
+		inline UnorderedAccess* GetUnorderedAccessView() const 
+		{ 
+			assert(m_Type & TEXTURE_UAV && "DSV not created for this texture");
+			return m_UAV; 
+		}
+
+		inline DepthStencil* GetDepthStencilView() const 
+		{
+			assert(m_Type & TEXTURE_DSV && "DSV not created for this texture");
+			return m_DSV; 
+		}
 
 		// Write texture data to gpu memory
 		// Only need to upload once since SRV, UAV will point to the same memory!
@@ -62,6 +86,7 @@ namespace Graphic {
 		}
 		
 		// TODO Template
+		// Create 2d texture data
 		static D3D12_SUBRESOURCE_DATA CreateTextureData(const UINT width, const UINT height, const UINT pixelSize, 
 												 const std::vector<UINT8>& data) 
 		{
@@ -76,30 +101,38 @@ namespace Graphic {
 	protected:
 		virtual void CreateSRV() = 0;
 		virtual void CreateUAV() = 0;
-		inline  void CreateRW() {CreateSRV(); CreateUAV();}
-		inline  void CreateView() 
+		virtual void CreateDSV() = 0;
+		// TODO RTV CBV
+
+		inline  void CreateViews()
 		{
-			switch (m_Type)
-			{
-			case Graphic::TEXTURE_SRV:
+			if (m_Type & TEXTURE_SRV) {
 				CreateSRV();
-				break;
-			case Graphic::TEXTURE_UAV:
+			} 
+			if (m_Type & TEXTURE_UAV) {
 				CreateUAV();
-				break;
-			case Graphic::TEXTURE_RW:
-				CreateRW();
-				break;
-			default:
-				throw std::runtime_error("Wrong Texture type");
-				break;
-			}	
+			}
+			if (m_Type & TEXTURE_CBV) {
+
+			}
+			if (m_Type & TEXTURE_DSV) {
+				CreateDSV();
+			}
+			if (m_Type & TEXTURE_RTV) {
+				
+			}
 		}
 
 		ptrGPUMem m_gpuMem;
-		TextureType m_Type;
+
+		// Store or value for texture_type
+		// EX: m_Type = TEXUTRE_SRV | TEXTURE_UAV | TEXTURE_DSV
+		const UINT m_Type;
+
 		ShaderResource* m_SRV;
 		UnorderedAccess* m_UAV;
+		DepthStencil* m_DSV;
+
 		D3D12_RESOURCE_DESC m_textureDesc;
 	};
 
@@ -111,16 +144,19 @@ namespace Graphic {
 	private:
 		void CreateSRV() override;
 		void CreateUAV() override;
+		void CreateDSV() override;
 		UINT m_size;
 		UINT m_stride;
 	};
 
-	class Texture2D : public Texture{
+
+	class Texture2D : public Texture {
 	public:
 		Texture2D(UINT width, UINT height, TextureType type=TEXTURE_SRV, const std::wstring& textureFile=L"");
 	private:
 		void CreateSRV() override;
 		void CreateUAV() override;
+		void CreateDSV() override;
 	};
 
 

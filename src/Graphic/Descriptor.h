@@ -28,7 +28,7 @@ namespace Graphic {
 		UINT m_Offset;
 	};
 
-	
+	// TODO fix gpubuffer size
 	// Base class for those view who use descriptor heap to bind 
 	class HeapDescriptor : public Descriptor {
 	public:
@@ -144,5 +144,14 @@ namespace Graphic {
 
 	private:
 		D3D12_RENDER_TARGET_VIEW_DESC m_rtvDesc;
+	};
+
+
+	class DepthStencil : public HeapDescriptor {
+	public:
+		DepthStencil(ptrGPUMem gpubuffer, const D3D12_DEPTH_STENCIL_VIEW_DESC & desc, DescriptorHeap* descriptorHeap);
+
+	private:
+		D3D12_DEPTH_STENCIL_VIEW_DESC m_dsvDesc;
 	};
 }

@@ -6,9 +6,11 @@
 namespace Graphic {
 	class CommandManager;
 	class CommandList;
+
 	class ShaderResource;
 	class UnorderedAccess;
 	class RenderTarget;
+	class DepthStencil;
 
 	namespace GPU {
 
@@ -20,6 +22,7 @@ namespace Graphic {
 			friend ShaderResource;
 			friend UnorderedAccess;
 			friend RenderTarget;
+			friend DepthStencil;
 			friend class MemoryAllocator;
 		
 			GPUMemory(const D3D12_RESOURCE_DESC& desc)
@@ -75,13 +78,57 @@ namespace Graphic {
 			MemoryAllocator() {}
 
 			// TODO manage cpu memory by myself
-			ptrGPUMem CreateCommittedBuffer(const UINT bufferSize, const D3D12_HEAP_TYPE m_HeapType=D3D12_HEAP_TYPE_DEFAULT);
-			ptrGPUMem CreateCommittedBuffer(const D3D12_RESOURCE_DESC& desc, const D3D12_HEAP_TYPE heapType=D3D12_HEAP_TYPE_DEFAULT);
+
+			// Simple Create CommittedBuffer, Consider nothing
+			ptrGPUMem CreateCommittedBuffer(const UINT bufferSize, 
+				const D3D12_HEAP_TYPE m_HeapType=D3D12_HEAP_TYPE_DEFAULT);
+
+			inline ptrGPUMem CreateCommittedBuffer(const D3D12_RESOURCE_DESC& desc,
+				const D3D12_HEAP_TYPE heapType = D3D12_HEAP_TYPE_DEFAULT) 
+			{
+				D3D12_RESOURCE_STATES initState = DefaultInitState(heapType);
+				return CreateCommittedBuffer(desc, heapType, initState);
+			}
+
+			// Complex Create CommittedBuffer below
+			// Use for creating textures
+			ptrGPUMem CreateCommittedBuffer(const D3D12_RESOURCE_DESC& desc, 
+				const D3D12_HEAP_TYPE heapType,
+				D3D12_RESOURCE_STATES state);
+
+			ptrGPUMem CreateCommittedBuffer(const D3D12_RESOURCE_DESC& desc,
+				const D3D12_CLEAR_VALUE& clearValue,
+				const D3D12_HEAP_TYPE heapType,
+				D3D12_RESOURCE_STATES state);
+			
 			void UploadData(GPUMemory& dest, const void* data, UINT bufferize, UINT offset=0);
 
 			void UploadTexure(GPUMemory& dest, D3D12_SUBRESOURCE_DATA* textureData);
 
 		private:
+			inline static D3D12_RESOURCE_STATES DefaultInitState(D3D12_HEAP_TYPE heapType) 
+			{
+				D3D12_RESOURCE_STATES bufferState = D3D12_RESOURCE_STATE_GENERIC_READ;
+				// TODO
+				switch (heapType)
+				{
+				case D3D12_HEAP_TYPE_DEFAULT:
+					bufferState = D3D12_RESOURCE_STATE_COPY_DEST;
+					break;
+				case D3D12_HEAP_TYPE_UPLOAD:
+					bufferState = D3D12_RESOURCE_STATE_GENERIC_READ;
+					break;
+				case D3D12_HEAP_TYPE_READBACK:
+					break;
+				case D3D12_HEAP_TYPE_CUSTOM:
+					break;
+				default:
+					break;
+				}
+				return bufferState;
+			}
+
+
 			void _UploadData(GPUMemory& buffer, const void* data, UINT size, UINT offset=0);
 
 			void _CopyBuffer(GPUMemory& dest, GPUMemory& src);

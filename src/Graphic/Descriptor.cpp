@@ -87,4 +87,13 @@ namespace Graphic {
 		device->CreateRenderTargetView(m_Buffer->GetResource(), &m_rtvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
 	}
 
+	DepthStencil::DepthStencil(ptrGPUMem gpubuffer, const D3D12_DEPTH_STENCIL_VIEW_DESC & desc, DescriptorHeap* descriptorHeap)
+		: m_dsvDesc(desc), HeapDescriptor(gpubuffer, 0)
+	{
+		ID3D12Device* device = Engine::GetDevice();
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		m_HeapIndex = descriptorHeap->MallocHeap();
+		device->CreateDepthStencilView(m_Buffer->GetResource(), &m_dsvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
+	}
+
 }

@@ -87,13 +87,20 @@ void Engine::InitializeEngine() {
 	useHeap->Initialize();
 }
 
-namespace Engine {
+namespace Engine 
+{
 
 	ComPtr<ID3D12Device> dxDevice;
 	ComPtr<IDXGIFactory4> dxFactory;
 	UINT dxgiFactoryFlags;
+	// TODO read config file
 	UINT NumDescriptors = 10;
+	UINT NumDSV = 10;
+	UINT NumRTV = 10;
+
 	Graphic::DescriptorHeap InitHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, NumDescriptors,  D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 	Graphic::DescriptorHeap InUseHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, NumDescriptors, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
-
+	
+	Graphic::DescriptorHeap DSVHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, NumDSV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+	Graphic::DescriptorHeap RTVHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, NumRTV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 }
