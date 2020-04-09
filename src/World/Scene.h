@@ -29,8 +29,8 @@ namespace Game
 
 	protected:
 
-		void BeginRender();
-		void EndRender();
+		virtual void BeginRender();
+		virtual void EndRender();
 
 		// TODO need change
 		ProjectiveCamera m_Camera;

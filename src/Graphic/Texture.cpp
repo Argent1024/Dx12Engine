@@ -98,6 +98,11 @@ namespace Graphic {
 		assert(false && "Not implementend!");
 	}
 
+	void TextureBuffer::CreateRTV()
+	{
+		assert(false && "Not implementend!");
+	}
+
 	Texture2D::Texture2D(UINT width, UINT height, TextureType type, const std::wstring& textureFile)
 		: Texture(type)
 	{
@@ -113,7 +118,7 @@ namespace Graphic {
 		m_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
 		if (m_Type & TEXTURE_DSV) {
-			// if we are using texture as a depth buffer
+			// provide a clear value if we are using texture as a depth buffer
 			m_textureDesc.Format = DXGI_FORMAT_D32_FLOAT;
 
 			D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
@@ -130,7 +135,7 @@ namespace Graphic {
 
 		CreateViews();
 		if (m_Type & TEXTURE_DSV || m_Type & TEXTURE_RTV) {
-			// I think we are not going to write these kind of views
+			// I think we are not going to write to these kind of views
 			return;
 		}
 		
@@ -162,5 +167,13 @@ namespace Graphic {
 		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 
 		m_DSV = new DepthStencil(m_gpuMem, dsvDesc, Engine::GetDSVHeap());
+	}
+
+	void Texture2D::CreateRTV() {
+		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+		rtvDesc.Format = m_textureDesc.Format;
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+		
+		m_RTV = new RenderTarget(m_gpuMem, rtvDesc, Engine::GetRTVHeap());
 	}
 }

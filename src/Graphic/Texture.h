@@ -9,7 +9,7 @@ namespace Graphic {
 	{
 		TEXTURE_SRV = 1,	// Create a SRV texture
 		TEXTURE_UAV = 2,	// Create a UAV texture
-		TEXTURE_CBV = 4,	
+		TEXTURE_CBV = 4,		
 		TEXTURE_DSV = 8,	// Create a DSV texture
 		TEXTURE_RTV = 16
 	};
@@ -71,9 +71,18 @@ namespace Graphic {
 			return m_DSV; 
 		}
 
+		inline RenderTarget* GetRenderTargetView() const
+		{
+			assert(m_Type & TEXTURE_RTV && "RTV not created for this texture");
+			return m_RTV; 
+		}
+
 		// Write texture data to gpu memory
 		// Only need to upload once since SRV, UAV will point to the same memory!
-		inline void UploadTexture(D3D12_SUBRESOURCE_DATA& data) { m_SRV->CopyTexture(&data); }
+		inline void UploadTexture(D3D12_SUBRESOURCE_DATA& data) {
+			assert(m_Type & TEXTURE_SRV  && "The Texture type doesn't contain SRV");
+			m_SRV->CopyTexture(&data); 
+		}
 
 		// Create 1d texture data
 		template <class T>
@@ -102,6 +111,7 @@ namespace Graphic {
 		virtual void CreateSRV() = 0;
 		virtual void CreateUAV() = 0;
 		virtual void CreateDSV() = 0;
+		virtual void CreateRTV() = 0;
 		// TODO RTV CBV
 
 		inline  void CreateViews()
@@ -119,7 +129,7 @@ namespace Graphic {
 				CreateDSV();
 			}
 			if (m_Type & TEXTURE_RTV) {
-				
+				CreateRTV();
 			}
 		}
 
@@ -132,6 +142,7 @@ namespace Graphic {
 		ShaderResource* m_SRV;
 		UnorderedAccess* m_UAV;
 		DepthStencil* m_DSV;
+		RenderTarget* m_RTV;
 
 		D3D12_RESOURCE_DESC m_textureDesc;
 	};
@@ -145,6 +156,7 @@ namespace Graphic {
 		void CreateSRV() override;
 		void CreateUAV() override;
 		void CreateDSV() override;
+		void CreateRTV() override;
 		UINT m_size;
 		UINT m_stride;
 	};
@@ -157,6 +169,7 @@ namespace Graphic {
 		void CreateSRV() override;
 		void CreateUAV() override;
 		void CreateDSV() override;
+		void CreateRTV() override;
 	};
 
 

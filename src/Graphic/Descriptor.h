@@ -10,6 +10,22 @@
 #define ptrUAV std::shared_ptr<Graphic::UnorderedAccess>
 
 namespace Graphic {
+	// TODO: only srv_uav_cbv for now
+	// Copy descriptors from init heap to inuse heap
+	// Make sure that in init heap, srcIndex .. srcIndex + size - 1 should be those we want to bind
+	inline void BindMultiDescriptor(UINT srcIndex, UINT size, UINT destIndex, D3D12_DESCRIPTOR_HEAP_TYPE heapType=D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) 
+	{
+		DescriptorHeap* InitHeap = Engine::GetInUseHeap();
+		CD3DX12_CPU_DESCRIPTOR_HANDLE destCPUHandle = InitHeap->GetCPUHandle(srcIndex);
+
+		DescriptorHeap* InUseHeap = Engine::GetInitHeap();
+		CD3DX12_CPU_DESCRIPTOR_HANDLE srcCPUHandle = InUseHeap->GetCPUHandle(destIndex);
+
+		ID3D12Device* device = Engine::GetDevice();
+		// Free threaded as long as different threads don't write to a same place
+		device->CopyDescriptorsSimple(size, destCPUHandle, srcCPUHandle, heapType);
+	}
+
 
 	// Most Descriptor here shouldn't be used directly, use Mesh & Material class instead
 	// Descriptors don't need to know about GPU Heap, GPU Buffer should handle all the memory stuff
@@ -21,10 +37,10 @@ namespace Graphic {
 		inline void copyData(const void* data) { Engine::MemoryAllocator.UploadData(*m_Buffer, data, m_BufferSize, m_Offset); }
 
 		inline UINT GetSize() { return m_BufferSize; }
-		
+
 	protected:
 		ptrGPUMem m_Buffer;
-		UINT m_BufferSize;	
+		UINT m_BufferSize;
 		UINT m_Offset;
 	};
 
@@ -32,27 +48,20 @@ namespace Graphic {
 	// Base class for those view who use descriptor heap to bind 
 	class HeapDescriptor : public Descriptor {
 	public:
-		HeapDescriptor(ptrGPUMem gpubuffer, const UINT bufferSize) 
+		HeapDescriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
 			: Descriptor(gpubuffer, bufferSize) {}
 
 		inline UINT GetHeapIndex() const { return m_HeapIndex; }
 
-		// TODO move this function & create a new one for copy multiple views
+		// Simple Bind function, just bind one descriptor to InUse heap (Use Graphics::BindMultiDescriptor instead)
 		// Copy this descriptor to the in use descriptor heap for rendering
-		inline void BindDescriptor(UINT index) const 
+		inline void BindDescriptor(UINT destIndex, 
+			D3D12_DESCRIPTOR_HEAP_TYPE heapType=D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) const
 		{
-			DescriptorHeap* InitHeap = Engine::GetInUseHeap();
-			CD3DX12_CPU_DESCRIPTOR_HANDLE destCPUHandle = InitHeap->GetCPUHandle(m_HeapIndex);
-
-			DescriptorHeap* InUseHeap = Engine::GetInitHeap();
-			CD3DX12_CPU_DESCRIPTOR_HANDLE srcCPUHandle = InUseHeap->GetCPUHandle(index);
-
-			ID3D12Device* device = Engine::GetDevice();
-			// Free threaded as long as different threads don't write to a same place
-			device->CopyDescriptorsSimple(1, destCPUHandle, srcCPUHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);//TODO type
+			BindMultiDescriptor(m_HeapIndex, 1, destIndex, heapType);
 		}
 
-		inline void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData) 
+		inline void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData)
 		{
 			Engine::MemoryAllocator.UploadTexure(*m_Buffer, textureData);
 		}
@@ -60,6 +69,42 @@ namespace Graphic {
 	protected:
 		UINT m_HeapIndex;
 	};
+
+
+	// Manage a list of Heap descriptors
+	// This class malloc n slots from the descriptor heap
+	// Should only be used in one thread
+	class DescriptorTable {
+
+	public:
+		DescriptorTable(UINT size, DescriptorHeap* heap) 
+			: m_size(size)
+		{
+			m_heapIndexStart = heap->MallocHeap(size);
+		}
+
+		inline void BindDescriptorTable() {
+			DescriptorHeap* InUseHeap = Engine::GetInUseHeap();
+			UINT destHeapIndex = InUseHeap->MallocHeap(m_size);
+			BindMultiDescriptor(m_heapIndexStart, m_size, destHeapIndex);
+		}
+
+		inline UINT GetSlot(UINT index) 
+		{
+			assert(index < m_size && "Accessing index out of bound");
+			return m_heapIndexStart + index;
+		}
+
+	private:
+		UINT m_heapIndexStart;
+		const UINT m_size;
+	};
+
+/*****************************************************************
+
+**		Implementation of different Descriptors below			**
+
+******************************************************************/
 
 
 	class VertexBuffer : public Descriptor {
