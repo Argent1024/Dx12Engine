@@ -85,6 +85,12 @@ void Engine::InitializeEngine() {
 	initHeap->Initialize();
 	Graphic::DescriptorHeap* useHeap = Engine::GetInUseHeap();
 	useHeap->Initialize();
+
+	Graphic::DescriptorHeap* dsvHeap = Engine::GetDSVHeap();
+	dsvHeap->Initialize();
+
+	Graphic::DescriptorHeap* rtvHeap = Engine::GetRTVHeap();
+	rtvHeap->Initialize();
 }
 
 namespace Engine 
@@ -101,6 +107,6 @@ namespace Engine
 	Graphic::DescriptorHeap InitHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, NumDescriptors,  D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 	Graphic::DescriptorHeap InUseHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, NumDescriptors, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 	
-	Graphic::DescriptorHeap DSVHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, NumDSV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
-	Graphic::DescriptorHeap RTVHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, NumRTV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+	Graphic::DescriptorHeap DSVHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, NumDSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+	Graphic::DescriptorHeap RTVHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, NumRTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 }

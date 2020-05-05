@@ -37,7 +37,7 @@ namespace Samples {
 
 			// configrations
 			CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(D3D12_DEFAULT);
-			depthStencilDesc.DepthEnable = FALSE;
+			depthStencilDesc.DepthEnable = TRUE;
 			depthStencilDesc.StencilEnable = FALSE;
 			this->SetDepthStencilState(depthStencilDesc);
 			this->SetBlendState();

@@ -16,7 +16,9 @@ namespace Graphic
 		//inline void BindDepthBuffer() {}
 
 		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetDepthBufferCPUHandle() const 
-		{ return m_dsvHandle; }
+		{	
+			return m_dsvHandle; 
+		}
 
 		
 	private:

@@ -4,8 +4,9 @@ namespace Game {
 	
 	Scene::Scene(const HWND AppHwnd, const UINT width, const UINT height)
 		: m_SwapChain(AppHwnd, width, height), m_depthBuffer(width, height),
-		  m_Camera(width, height, Vector3(0.0f, 0.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f))
+		  m_Camera(width, height, Vector3(-1.0f, -1.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f))
 	{
+		m_depthBuffer.Initialize();
 		m_SwapChain.Initialize(GraphicsCommandManager.GetCommadnQueue());
 		// TODO fix camera
 		m_Camera.CreateCBV();
@@ -24,7 +25,8 @@ namespace Game {
 
 		
 		// Main Render Pass
-		ThreadCommandList.SetSwapChain(m_SwapChain);
+		ThreadCommandList.SetSwapChain(m_SwapChain, m_depthBuffer);
+		// ThreadCommandList.SetSwapChain(m_SwapChain);
 		for (auto const& g_obj : m_ObjList)
 		{
 			g_obj->RecordCommand(ThreadCommandList);
@@ -54,7 +56,8 @@ namespace Game {
 		GraphicsCommandManager.InitCommandList(&mainCommandList);
 
 		// Record main command list
-		mainCommandList.SetSwapChain(m_SwapChain);
+		mainCommandList.SetSwapChain(m_SwapChain, m_depthBuffer);
+		mainCommandList.ClearDepthBuffer(m_depthBuffer);
 		mainCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		mainCommandList.ClearSwapChain(m_SwapChain, clearColor);
 		mainCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
