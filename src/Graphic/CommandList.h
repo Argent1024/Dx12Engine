@@ -64,9 +64,6 @@ namespace Graphic {
 			m_commandList->SetGraphicsRootConstantBufferView(rootParaIndex, cbv->GetRootCBVGPUAdder()); 
 		}
 
-		inline void SetRenderTargetView();
-
-
 		inline void DrawInstanced(UINT VertexCountPerInstance, UINT InstanceCount, UINT StartVertexLocation, UINT StartInstanceLocation) const { m_commandList->DrawInstanced(VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);}
 
 		inline void DrawIndexedInstanced(UINT IndexCountPerInstance, UINT InstanceCount, UINT StartIndexLocation, INT BaseVertexLocation, UINT StartInstanceLocation) const {m_commandList->DrawIndexedInstanced(IndexCountPerInstance, InstanceCount, StartIndexLocation, BaseVertexLocation, StartInstanceLocation);}
@@ -74,7 +71,8 @@ namespace Graphic {
 		// Swap Chain
 		inline void SetSwapChain(const SwapChain& swapChain) { m_commandList->OMSetRenderTargets(1, &(swapChain.GetBackBufferCPUHandle()), FALSE, nullptr); }
 		// swap chain with depth buffer
-		inline void SetSwapChain(const SwapChain& swapChain, const DepthBuffer& depthBuffer) { m_commandList->OMSetRenderTargets(1, &(swapChain.GetBackBufferCPUHandle()), FALSE, &(depthBuffer.GetDepthBufferCPUHandle())); }
+		inline void SetSwapChain(const SwapChain& swapChain, const DepthBuffer& depthBuffer)
+		{ m_commandList->OMSetRenderTargets(1, &(swapChain.GetBackBufferCPUHandle()), FALSE, &(depthBuffer.GetDepthBufferCPUHandle())); }
 		
 		inline void ClearSwapChain(const SwapChain& swapChain, const float color[4]) const { m_commandList->ClearRenderTargetView(swapChain.GetBackBufferCPUHandle(), color, 0, nullptr);}
 		

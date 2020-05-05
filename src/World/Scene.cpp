@@ -3,8 +3,8 @@
 namespace Game {
 	
 	Scene::Scene(const HWND AppHwnd, const UINT width, const UINT height)
-		: m_SwapChain(AppHwnd, width, height),
-		  m_Camera(width, height, Vector3(0.0f, 0.0f, 10.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f))
+		: m_SwapChain(AppHwnd, width, height), m_depthBuffer(width, height),
+		  m_Camera(width, height, Vector3(0.0f, 0.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f))
 	{
 		m_SwapChain.Initialize(GraphicsCommandManager.GetCommadnQueue());
 		// TODO fix camera
@@ -12,7 +12,7 @@ namespace Game {
 	}
 
 	Scene::Scene(const HWND m_appHwnd, const UINT width, const UINT height, ProjectiveCamera& camera)
-		: m_SwapChain(m_appHwnd, width, height), m_Camera(camera) {}
+		: m_SwapChain(m_appHwnd, width, height), m_depthBuffer(width, height), m_Camera(camera) {}
 
 	void Scene::Render()
 	{
@@ -21,18 +21,23 @@ namespace Game {
 		// TODO multi threading here
 		Graphic::CommandList ThreadCommandList;
 		GraphicsCommandManager.InitCommandList(&ThreadCommandList);
-		ThreadCommandList.SetSwapChain(m_SwapChain);
 
+		
+		// Main Render Pass
+		ThreadCommandList.SetSwapChain(m_SwapChain);
 		for (auto const& g_obj : m_ObjList)
 		{
 			g_obj->RecordCommand(ThreadCommandList);
 
 			m_Camera.UseCamera(ThreadCommandList, g_obj->GetTransform());
+
+			// Barrier here since we are going to modify SwapChain
 			ThreadCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 			g_obj->Draw(ThreadCommandList);
 			ThreadCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		}
 		GraphicsCommandManager.ExecuteCommandList(&ThreadCommandList);
+		
 		// Multithreading join here
 
 		EndRender();

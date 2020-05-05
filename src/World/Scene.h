@@ -22,10 +22,10 @@ namespace Game
 		virtual void Update();
 
 		// TODO accel structure
-		void AddGameObj(GObject* obj);
+		virtual void AddGameObj(GObject* obj);
 
 		// TODO
-		void DeleteGameObj(GObject* obj) {}
+		virtual void DeleteGameObj(GObject* obj) {}
 
 	protected:
 
@@ -34,9 +34,11 @@ namespace Game
 
 		// TODO need change
 		ProjectiveCamera m_Camera;
+
 		std::vector<ptrLight> m_LightList;
 		std::vector<GObject*> m_ObjList;
 
+		Graphic::DepthBuffer m_depthBuffer;
 		Graphic::SwapChain m_SwapChain;
 	};
 

@@ -6,6 +6,8 @@ namespace Graphic {
 			ID3D12Device* device = Engine::GetDevice();
 			
 			const D3D12_CLEAR_VALUE* optimizedClearValue = nullptr;
+			D3D12_HEAP_FLAGS flag = D3D12_HEAP_FLAG_NONE;
+			// TODO need flag when using clear value
 			if (m_useClear) {
 				optimizedClearValue = &m_ClearValue;
 			}

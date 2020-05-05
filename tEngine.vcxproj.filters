@@ -114,9 +114,6 @@
     <ClInclude Include="src\Graphic\DepthBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Samples\ParticlesTest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Utility\MeshReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -144,7 +141,7 @@
     <ClInclude Include="src\World\Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\BoundingBox.h">
+    <ClInclude Include="src\Math\BoundingVolume.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -201,9 +198,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphic\DepthBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Samples\ParticlesTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Samples\RayMarching.cpp">

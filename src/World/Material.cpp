@@ -13,7 +13,7 @@ namespace Game {
 		// Set Descriptor Heap
 		Graphic::DescriptorHeap* descriptorHeap = Engine::GetInUseHeap();
 		commandList.SetDescriptorHeap(*descriptorHeap);
-		// Set descriptor handle
+		// Set descriptor handle (descriptor table start)
 		CD3DX12_GPU_DESCRIPTOR_HANDLE Hanlde = descriptorHeap->GetGPUHandle(m_HeapIndex);
 		m_texture->BindTexture(m_HeapIndex);
 		commandList.SetGraphicsRootDescriptorTable(1, Hanlde); // TODO emmmm

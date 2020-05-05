@@ -21,6 +21,7 @@ namespace Graphic {
 		DescriptorHeap* InUseHeap = Engine::GetInitHeap();
 		CD3DX12_CPU_DESCRIPTOR_HANDLE srcCPUHandle = InUseHeap->GetCPUHandle(destIndex);
 
+
 		ID3D12Device* device = Engine::GetDevice();
 		// Free threaded as long as different threads don't write to a same place
 		device->CopyDescriptorsSimple(size, destCPUHandle, srcCPUHandle, heapType);
@@ -83,13 +84,13 @@ namespace Graphic {
 			m_heapIndexStart = heap->MallocHeap(size);
 		}
 
-		inline void BindDescriptorTable() {
+		inline void BindDescriptorTable() const {
 			DescriptorHeap* InUseHeap = Engine::GetInUseHeap();
 			UINT destHeapIndex = InUseHeap->MallocHeap(m_size);
 			BindMultiDescriptor(m_heapIndexStart, m_size, destHeapIndex);
 		}
 
-		inline UINT GetSlot(UINT index) 
+		inline UINT GetSlot(UINT index) const 
 		{
 			assert(index < m_size && "Accessing index out of bound");
 			return m_heapIndexStart + index;
@@ -196,7 +197,10 @@ namespace Graphic {
 	public:
 		DepthStencil(ptrGPUMem gpubuffer, const D3D12_DEPTH_STENCIL_VIEW_DESC & desc, DescriptorHeap* descriptorHeap);
 
+		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetDSVCPUHandle() const { return m_dsvHandle; }
+
 	private:
 		D3D12_DEPTH_STENCIL_VIEW_DESC m_dsvDesc;
+		CD3DX12_CPU_DESCRIPTOR_HANDLE m_dsvHandle;
 	};
 }

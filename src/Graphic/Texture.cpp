@@ -36,7 +36,7 @@ namespace Graphic {
 	}
 
 
-	TextureBuffer::TextureBuffer(UINT elementSize, UINT stride, TextureType type) 
+	TextureBuffer::TextureBuffer(UINT elementSize, UINT stride, UINT type) 
 		:Texture(type), m_size(elementSize), m_stride(stride)
 	{
 		// TODO consider flags
@@ -103,7 +103,7 @@ namespace Graphic {
 		assert(false && "Not implementend!");
 	}
 
-	Texture2D::Texture2D(UINT width, UINT height, TextureType type, const std::wstring& textureFile)
+	Texture2D::Texture2D(UINT width, UINT height, UINT type, const std::wstring& textureFile)
 		: Texture(type)
 	{
 		m_textureDesc = {};
@@ -118,14 +118,18 @@ namespace Graphic {
 		m_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
 		if (m_Type & TEXTURE_DSV) {
-			// provide a clear value if we are using texture as a depth buffer
+			
 			m_textureDesc.Format = DXGI_FORMAT_D32_FLOAT;
+			m_textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 			D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+
+			// provide a clear value if we are using texture as a depth buffer
 			D3D12_CLEAR_VALUE clearValue = {};
 			clearValue.Format = DXGI_FORMAT_D32_FLOAT;
 			clearValue.DepthStencil.Depth = 1.0f;
 			clearValue.DepthStencil.Stencil = 0;
+
 			m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc, clearValue, D3D12_HEAP_TYPE_DEFAULT, initState);
 		}
 		else {

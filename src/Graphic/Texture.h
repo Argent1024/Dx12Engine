@@ -1,10 +1,10 @@
 #pragma once
 #include "Descriptor.h"
-#include "CommandList.h"
 
 #define ptrTexture std::shared_ptr<Graphic::Texture>
 
 namespace Graphic {
+
 	enum TextureType 
 	{
 		TEXTURE_SRV = 1,	// Create a SRV texture
@@ -25,12 +25,14 @@ namespace Graphic {
 	//		3. Load data from file and copy(upload) it to the GPU memory
 	class Texture {
 	public:
-		Texture(UINT type) : m_Type(type) {}
+		Texture(UINT type) : m_Type(type) {
+			assert(type != 0 && " At least one type is needed Are you using && instead of || when creating type?");
+		}
 
 		// Copy (one)view to in use descriptor heap
 		inline void BindTexture(UINT index, TextureType type=TEXTURE_SRV) const
 		{
-			assert(type & m_Type == 1 && "Binding view type not created");
+			assert(type & m_Type && "Binding view type not created");
 			switch (type)
 			{
 			case Graphic::TEXTURE_SRV:
@@ -43,7 +45,7 @@ namespace Graphic {
 				
 				break;
 			case Graphic::TEXTURE_DSV:
-
+				// I think we don't need to bind DSV / RTV
 				break;
 			case Graphic::TEXTURE_RTV:
 
@@ -123,7 +125,8 @@ namespace Graphic {
 				CreateUAV();
 			}
 			if (m_Type & TEXTURE_CBV) {
-
+				// TODO implement
+				// CreateCBV();
 			}
 			if (m_Type & TEXTURE_DSV) {
 				CreateDSV();
@@ -151,7 +154,8 @@ namespace Graphic {
 	// Texture 
 	class TextureBuffer : public Texture {
 	public:
-		TextureBuffer(UINT elementSize, UINT stride, TextureType type=TEXTURE_SRV);
+		// TODO better way to express type?
+		TextureBuffer(UINT elementSize, UINT stride, UINT type=TEXTURE_SRV);
 	private:
 		void CreateSRV() override;
 		void CreateUAV() override;
@@ -164,7 +168,8 @@ namespace Graphic {
 
 	class Texture2D : public Texture {
 	public:
-		Texture2D(UINT width, UINT height, TextureType type=TEXTURE_SRV, const std::wstring& textureFile=L"");
+		// TODO better way to express type?
+		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV, const std::wstring& textureFile=L"");
 	private:
 		void CreateSRV() override;
 		void CreateUAV() override;

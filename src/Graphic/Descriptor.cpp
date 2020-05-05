@@ -94,6 +94,7 @@ namespace Graphic {
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_HeapIndex = descriptorHeap->MallocHeap();
 		device->CreateDepthStencilView(m_Buffer->GetResource(), &m_dsvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
+		m_dsvHandle = descriptorHeap->GetCPUHandle(m_HeapIndex);
 	}
 
 }
