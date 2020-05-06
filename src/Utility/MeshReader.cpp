@@ -213,7 +213,7 @@ void MeshReader::ReadOBJ(const std::string& filePath)
 		}
 		case('u'): //usemtl xxx
 		{
-			UINT index = m_index.size();
+			/*UINT index = m_index.size();
 			// We are having a MTL now
 			if (MTLName.compare("") != 0) {
 				m_mtlIndex[MTLName].end = index;
@@ -226,7 +226,7 @@ void MeshReader::ReadOBJ(const std::string& filePath)
 			}
 			assert(m_mtl.find(MTLName) != m_mtl.end() && "Using undefined material");
 			m_mtlIndex[MTLName] = {index, 0};
-			break;
+			break;*/
 		}
 		default:
 			//TODO add line number

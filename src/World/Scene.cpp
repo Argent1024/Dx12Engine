@@ -4,9 +4,10 @@ namespace Game {
 	
 	Scene::Scene(const HWND AppHwnd, const UINT width, const UINT height)
 		: m_SwapChain(AppHwnd, width, height), m_depthBuffer(width, height),
-		  m_Camera(width, height, Vector3(-1.0f, -1.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f))
+		  m_Camera(width, height, Vector3(-1.0f, -1.0f, 10.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f))
 	{
-		m_depthBuffer.Initialize();
+
+		m_depthBuffer.Initialize(Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV);
 		m_SwapChain.Initialize(GraphicsCommandManager.GetCommadnQueue());
 		// TODO fix camera
 		m_Camera.CreateCBV();
@@ -40,6 +41,13 @@ namespace Game {
 		}
 		GraphicsCommandManager.ExecuteCommandList(&ThreadCommandList);
 		
+
+		// Mix Render Pass
+		Graphic::CommandList MixCommandList;
+		GraphicsCommandManager.InitCommandList(&MixCommandList);
+
+
+
 		// Multithreading join here
 
 		EndRender();

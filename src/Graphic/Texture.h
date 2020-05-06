@@ -17,7 +17,7 @@ namespace Graphic {
 
 	void LoadChessBoard(const UINT width, const UINT height, const UINT pixelSize, std::vector<UINT8>& data);
 	
-
+	// TODO when creating views, the control of format stuff need to be exposed outside
 	// Texture
 	// Texture class implement this base class should 
 	//		1. Allocate memory from GPU mem manager

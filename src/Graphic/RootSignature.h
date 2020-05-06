@@ -34,4 +34,16 @@ namespace Graphic {
 	};
 
 
+	// Root Signature just containing a list of textures
+	class MixRootSignature : public RootSignature  {
+	public:
+		MixRootSignature(const UINT num) : RootSignature(), m_textureCount(num) {}
+
+		void Initialize() override;
+
+	private:
+		UINT m_textureCount;
+	};
+
+
 }

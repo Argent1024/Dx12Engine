@@ -8,9 +8,10 @@ namespace Graphic
 	{ 
 	}
 
-	void DepthBuffer::Initialize() 
+	void DepthBuffer::Initialize(UINT type) 
 	{
-		m_depthTexture = new Texture2D(m_width, m_height, TEXTURE_DSV);
+		assert(type & TEXTURE_DSV && "Should include dsv when creating depth buffer");
+		m_depthTexture = new Texture2D(m_width, m_height, type);
 		m_dsvHandle = m_depthTexture->GetDepthStencilView()->GetDSVCPUHandle();
 	}
 }

@@ -1,25 +1,35 @@
 #pragma once
+#include "PipelineState.h"
+#include "RootSignature.h"
+#include "CommandList.h"
+#include "GObject.h"
 
-#include "GraphicCore.h"
-#include "CommandQueue.h"
-#include "../World/Camera.h"
-#include "../World/GObject.h"
-#include "../World/Scene.h"
-
-namespace Samples {
-	using namespace Graphic;
-	using namespace Game;
-
-	class MeshTestPSO : public GraphicsPSO {
+namespace Game {
+	
+	class RenderPass {
 	public:
-		void Initialize() 
+		virtual void Initialize() = 0;
+		virtual void Render(Graphic::CommandList& commandList) = 0;
+
+	private:
+		ptrPSO m_pipeline;
+		ptrRootSignature m_rootSignature;
+	};
+
+	// Combine some texture and output
+	class MixturePSO : public Graphic::GraphicsPSO 
+	{
+	public:
+		MixturePSO(const UINT num) : m_TextureNum(num) {}
+
+		void Initialize() override
 		{
 			assert(m_rootSignature != nullptr);
 			m_psoDesc.pRootSignature = m_rootSignature;
 
 			ComPtr<ID3DBlob> VS;
 			ComPtr<ID3DBlob> PS;
-			const std::wstring path = L"D:\\work\\tEngine\\Shaders\\MeshTest.hlsl";
+			const std::wstring path = L"D:\\work\\tEngine\\Shaders\\MixtureShader.hlsl";
 			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", CompileFlags, 0, &VS, nullptr));
 			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", CompileFlags, 0, &PS, nullptr));
 
@@ -27,7 +37,7 @@ namespace Samples {
 			{
 				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 				{ "NORMAL",	  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 			};
 
 			this->SetVertexShader(CD3DX12_SHADER_BYTECODE(VS.Get()));
@@ -37,41 +47,17 @@ namespace Samples {
 
 			// configrations
 			CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(D3D12_DEFAULT);
-			depthStencilDesc.DepthEnable = TRUE;
+			depthStencilDesc.DepthEnable = FALSE;
 			depthStencilDesc.StencilEnable = FALSE;
 			this->SetDepthStencilState(depthStencilDesc);
 			this->SetBlendState();
 			this->SetRasterState();
-
 			this->SetStuffThatIdontKnowYet();
 			this->CreatePSO();
 		}
-
-	};
-
-	class MeshTest : public GraphicCore {
-	public:
-		MeshTest(UINT t_width, UINT t_height, LPCTSTR t_title = L"playground")
-			: GraphicCore(t_width, t_height, t_title) {}
-			// m_Camera(t_width, t_height, Vector3(0.0f, 0.0f, 10.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)) {}
-
-		void Init(const HWND m_appHwnd) override;
-		void Render() override;
-
 	private:
-		void LoadAssert();
-
-		float angle = 0.0;
-		float t = 10.0;
-
-		Scene* m_Scene;
-		
-		ptrRootSignature m_rootSignature;
-		ptrPSO m_GraphicPSO;		// Main Render Pass
-		ptrPSO m_MixGraphicPSO;		// Mixture Render Pass
-
-		std::shared_ptr<TriangleMesh> m_Mesh;
-		ptrMaterial m_Material;
+		UINT m_TextureNum;
 	};
+
 
 }
