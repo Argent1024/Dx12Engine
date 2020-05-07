@@ -77,7 +77,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(ProjectDir)src\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src\Utility;$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(ProjectDir)src\;$(IncludePath)</IncludePath>
     <SourcePath>$(ProjectDir)src\Physic;$(ProjectDir)src\Samples;$(ProjectDir)src\World;$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(ProjectDir)src\Utility;$(ProjectDir)src\;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -157,13 +157,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Graphic\DepthBuffer.h" />
+    <ClInclude Include="src\World\RenderPass.h" />
     <ClInclude Include="src\Graphic\Texture.h" />
     <ClInclude Include="src\Math\BoundingVolume.h" />
     <ClInclude Include="src\Math\MathCommon.h" />
     <ClInclude Include="src\Physic\PhysicSystem.h" />
     <ClInclude Include="src\Samples\MeshTest.h" />
-    <ClInclude Include="src\Samples\RayMarching.h" />
-    <ClInclude Include="src\Samples\TextureTest.h" />
     <ClInclude Include="src\Utility\Input.h" />
     <ClInclude Include="src\Utility\Logger.h" />
     <ClInclude Include="src\Utility\MeshReader.h" />
@@ -206,8 +205,6 @@
     <ClCompile Include="src\Graphic\Texture.cpp" />
     <ClCompile Include="src\Graphic\GPUMemory.cpp" />
     <ClCompile Include="src\Samples\MeshTest.cpp" />
-    <ClCompile Include="src\Samples\RayMarching.cpp" />
-    <ClCompile Include="src\Samples\TextureTest.cpp" />
     <ClCompile Include="src\Utility\MeshReader.cpp" />
     <ClCompile Include="src\World\Camera.cpp" />
     <ClCompile Include="src\Graphic\CommandList.cpp" />
@@ -222,6 +219,7 @@
     <ClCompile Include="src\Graphic\SwapChain.cpp" />
     <ClCompile Include="src\World\Material.cpp" />
     <ClCompile Include="src\World\Mesh.cpp" />
+    <ClCompile Include="src\World\RenderPass.cpp" />
     <ClCompile Include="src\World\Scene.cpp" />
     <ClCompile Include="tEngine.cpp" />
   </ItemGroup>

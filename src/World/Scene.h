@@ -6,6 +6,7 @@
 #include "GObject.h"
 #include "Camera.h"
 #include "Light.h"
+#include "RenderPass.h"
 
 namespace Game 
 {
@@ -31,6 +32,8 @@ namespace Game
 
 		virtual void BeginRender();
 		virtual void EndRender();
+		
+		DefaultRenderPass m_Renderpass;
 
 		// TODO need change
 		ProjectiveCamera m_Camera;

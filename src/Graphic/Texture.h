@@ -29,7 +29,7 @@ namespace Graphic {
 			assert(type != 0 && " At least one type is needed Are you using && instead of || when creating type?");
 		}
 
-		// Copy (one)view to in use descriptor heap
+		/*// Copy (one)view to in use descriptor heap
 		inline void BindTexture(UINT index, TextureType type=TEXTURE_SRV) const
 		{
 			assert(type & m_Type && "Binding view type not created");
@@ -49,6 +49,30 @@ namespace Graphic {
 				break;
 			case Graphic::TEXTURE_RTV:
 
+				break;
+			default:
+				break;
+			}
+		} */
+
+		// Giving a slot, create the view on that slot
+		inline void CreateView(TextureType type, DescriptorTable* table=nullptr, UINT index=0) {
+			switch (type)
+			{
+			case Graphic::TEXTURE_SRV:
+				CreateSRV(table, index);
+				break;
+			case Graphic::TEXTURE_UAV:
+				CreateUAV(table, index);
+				break;
+			case Graphic::TEXTURE_CBV:
+				// CreateCBV(table, index);
+				break;
+			case Graphic::TEXTURE_DSV:
+				CreateDSV(table, index);
+				break;
+			case Graphic::TEXTURE_RTV:
+				CreateRTV(table, index);
 				break;
 			default:
 				break;
@@ -110,31 +134,12 @@ namespace Graphic {
 		}
 
 	protected:
-		virtual void CreateSRV() = 0;
-		virtual void CreateUAV() = 0;
-		virtual void CreateDSV() = 0;
-		virtual void CreateRTV() = 0;
-		// TODO RTV CBV
-
-		inline  void CreateViews()
-		{
-			if (m_Type & TEXTURE_SRV) {
-				CreateSRV();
-			} 
-			if (m_Type & TEXTURE_UAV) {
-				CreateUAV();
-			}
-			if (m_Type & TEXTURE_CBV) {
-				// TODO implement
-				// CreateCBV();
-			}
-			if (m_Type & TEXTURE_DSV) {
-				CreateDSV();
-			}
-			if (m_Type & TEXTURE_RTV) {
-				CreateRTV();
-			}
-		}
+		// Create the SRV & UAV at the table at tableIndex
+		virtual void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
+		virtual void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
+		virtual void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
+		virtual void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
+		// TODO CBV
 
 		ptrGPUMem m_gpuMem;
 
@@ -142,6 +147,7 @@ namespace Graphic {
 		// EX: m_Type = TEXUTRE_SRV | TEXTURE_UAV | TEXTURE_DSV
 		const UINT m_Type;
 
+		// TODO Use clever way
 		ShaderResource* m_SRV;
 		UnorderedAccess* m_UAV;
 		DepthStencil* m_DSV;
@@ -157,10 +163,10 @@ namespace Graphic {
 		// TODO better way to express type?
 		TextureBuffer(UINT elementSize, UINT stride, UINT type=TEXTURE_SRV);
 	private:
-		void CreateSRV() override;
-		void CreateUAV() override;
-		void CreateDSV() override;
-		void CreateRTV() override;
+		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		UINT m_size;
 		UINT m_stride;
 	};
@@ -171,10 +177,10 @@ namespace Graphic {
 		// TODO better way to express type?
 		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV, const std::wstring& textureFile=L"");
 	private:
-		void CreateSRV() override;
-		void CreateUAV() override;
-		void CreateDSV() override;
-		void CreateRTV() override;
+		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 	};
 
 

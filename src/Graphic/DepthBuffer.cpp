@@ -12,6 +12,8 @@ namespace Graphic
 	{
 		assert(type & TEXTURE_DSV && "Should include dsv when creating depth buffer");
 		m_depthTexture = new Texture2D(m_width, m_height, type);
+		//  TODO TEST
+		m_depthTexture->CreateView(TEXTURE_DSV);
 		m_dsvHandle = m_depthTexture->GetDepthStencilView()->GetDSVCPUHandle();
 	}
 }

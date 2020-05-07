@@ -64,10 +64,10 @@ namespace Graphic {
 
 		m_textureDesc =  CD3DX12_RESOURCE_DESC::Buffer(elementSize * m_stride, flag);
 		m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
-		CreateViews();
+		// CreateViews();
 	}
 
-	void TextureBuffer::CreateSRV() 
+	void TextureBuffer::CreateSRV(DescriptorTable* table, UINT tableIndex) 
 	{
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -77,10 +77,14 @@ namespace Graphic {
         srvDesc.Buffer.NumElements = m_size;
         srvDesc.Buffer.StructureByteStride = m_stride;
         srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-		m_SRV = new ShaderResource(m_gpuMem, srvDesc);
+		if (table) {
+			m_SRV = new ShaderResource(m_gpuMem, srvDesc, *table, tableIndex);
+		} else {
+			m_SRV = new ShaderResource(m_gpuMem, srvDesc);
+		}
 	}
 
-	void TextureBuffer::CreateUAV() 
+	void TextureBuffer::CreateUAV(DescriptorTable* table, UINT tableIndex) 
 	{
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -90,15 +94,19 @@ namespace Graphic {
 		uavDesc.Buffer.StructureByteStride = m_stride;
 		uavDesc.Buffer.CounterOffsetInBytes = 0;
 		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-		m_UAV = new UnorderedAccess(m_gpuMem, uavDesc);
+		if (table) {
+			m_UAV = new UnorderedAccess(m_gpuMem, uavDesc, *table, tableIndex);
+		} else {
+			m_UAV = new UnorderedAccess(m_gpuMem, uavDesc);
+		}
 	}
 
-	void TextureBuffer::CreateDSV()
+	void TextureBuffer::CreateDSV(DescriptorTable* table, UINT tableIndex) 
 	{
 		assert(false && "Not implementend!");
 	}
 
-	void TextureBuffer::CreateRTV()
+	void TextureBuffer::CreateRTV(DescriptorTable* table, UINT tableIndex) 
 	{
 		assert(false && "Not implementend!");
 	}
@@ -140,34 +148,37 @@ namespace Graphic {
 		}
 		
 
-		CreateViews();
 		if (m_Type & TEXTURE_DSV || m_Type & TEXTURE_RTV) {
 			// I think we are not going to write to these kind of views
 			return;
 		}
 		
-		std::vector<UINT8> data;
+		/*std::vector<UINT8> data;
 		LoadChessBoard(width, height, 4, data);
 
 		D3D12_SUBRESOURCE_DATA textureData = CreateTextureData(m_textureDesc.Width, m_textureDesc.Height, 4, data);
-		UploadTexture(textureData);
+		UploadTexture(textureData);*/
 	}
 	
-	void Texture2D::CreateSRV() {
+	void Texture2D::CreateSRV(DescriptorTable* table, UINT tableIndex)  {
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		// srvDesc.Format = m_textureDesc.Format;
 		srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
-		m_SRV = new ShaderResource(m_gpuMem, srvDesc);
+		if(table) {
+			m_SRV = new ShaderResource(m_gpuMem, srvDesc, *table, tableIndex);
+		} else {
+			m_SRV = new ShaderResource(m_gpuMem, srvDesc);
+		}
 	}
 
-	void Texture2D::CreateUAV() {
+	void Texture2D::CreateUAV(DescriptorTable* table, UINT tableIndex)  {
 		assert(FALSE && "Not implemented!");
 	}
 
-	void Texture2D::CreateDSV() {
+	void Texture2D::CreateDSV(DescriptorTable* table, UINT tableIndex) {
 		D3D12_DEPTH_STENCIL_VIEW_DESC  dsvDesc = {};
 		// dsvDesc.Format = m_textureDesc.Format;
 		dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -177,7 +188,7 @@ namespace Graphic {
 		m_DSV = new DepthStencil(m_gpuMem, dsvDesc, Engine::GetDSVHeap());
 	}
 
-	void Texture2D::CreateRTV() {
+	void Texture2D::CreateRTV(DescriptorTable* table, UINT tableIndex)  {
 		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 		rtvDesc.Format = m_textureDesc.Format;
 		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;

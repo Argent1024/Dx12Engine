@@ -9,6 +9,7 @@ namespace Game {
 
 		m_depthBuffer.Initialize(Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV);
 		m_SwapChain.Initialize(GraphicsCommandManager.GetCommadnQueue());
+		m_Renderpass.Initialize();
 		// TODO fix camera
 		m_Camera.CreateCBV();
 	}
@@ -27,7 +28,11 @@ namespace Game {
 		
 		// Main Render Pass
 		ThreadCommandList.SetSwapChain(m_SwapChain, m_depthBuffer);
-		// ThreadCommandList.SetSwapChain(m_SwapChain);
+		m_Renderpass.SetCamera(&m_Camera);
+		ThreadCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		m_Renderpass.Render(ThreadCommandList, m_ObjList);
+		ThreadCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		/*// ThreadCommandList.SetSwapChain(m_SwapChain);
 		for (auto const& g_obj : m_ObjList)
 		{
 			g_obj->RecordCommand(ThreadCommandList);
@@ -38,7 +43,7 @@ namespace Game {
 			ThreadCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 			g_obj->Draw(ThreadCommandList);
 			ThreadCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		}
+		}*/
 		GraphicsCommandManager.ExecuteCommandList(&ThreadCommandList);
 		
 

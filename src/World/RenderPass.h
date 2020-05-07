@@ -2,6 +2,7 @@
 #include "PipelineState.h"
 #include "RootSignature.h"
 #include "CommandList.h"
+#include "Camera.h"
 #include "GObject.h"
 
 namespace Game {
@@ -9,55 +10,56 @@ namespace Game {
 	class RenderPass {
 	public:
 		virtual void Initialize() = 0;
-		virtual void Render(Graphic::CommandList& commandList) = 0;
 
-	private:
-		ptrPSO m_pipeline;
+		// Record Commands
+		// Who implement this class need to implement at least one of this
+		virtual void Render(Graphic::CommandList& commandList) {
+			throw std::runtime_error("Using wrong render function");
+		}
+
+		virtual void Render(Graphic::CommandList& commandList, GObject* obj) {
+			throw std::runtime_error("Using wrong render function");
+		}
+
+		virtual void Render(Graphic::CommandList& commandList, std::vector<GObject*>& objList) {
+			throw std::runtime_error("Using wrong render function");
+		}
+		
+	protected:
+		ptrPSO m_PSO;
 		ptrRootSignature m_rootSignature;
 	};
-
-	// Combine some texture and output
-	class MixturePSO : public Graphic::GraphicsPSO 
-	{
+	
+	class DefaultRenderPass : public RenderPass {
 	public:
-		MixturePSO(const UINT num) : m_TextureNum(num) {}
+		void Initialize() override;
 
-		void Initialize() override
-		{
-			assert(m_rootSignature != nullptr);
-			m_psoDesc.pRootSignature = m_rootSignature;
+		void Render(Graphic::CommandList& commandList, std::vector<GObject*>& objList) override;
+		
+		inline void SetCamera(Camera* camera) { m_Camera = camera; }
 
-			ComPtr<ID3DBlob> VS;
-			ComPtr<ID3DBlob> PS;
-			const std::wstring path = L"D:\\work\\tEngine\\Shaders\\MixtureShader.hlsl";
-			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", CompileFlags, 0, &VS, nullptr));
-			ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", CompileFlags, 0, &PS, nullptr));
-
-			D3D12_INPUT_ELEMENT_DESC  inputElementDescs[] =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "NORMAL",	  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-			};
-
-			this->SetVertexShader(CD3DX12_SHADER_BYTECODE(VS.Get()));
-			this->SetPixelShader(CD3DX12_SHADER_BYTECODE(PS.Get()));
-			this->SetTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-			this->SetInoutLayout(_countof(inputElementDescs), inputElementDescs);
-
-			// configrations
-			CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(D3D12_DEFAULT);
-			depthStencilDesc.DepthEnable = FALSE;
-			depthStencilDesc.StencilEnable = FALSE;
-			this->SetDepthStencilState(depthStencilDesc);
-			this->SetBlendState();
-			this->SetRasterState();
-			this->SetStuffThatIdontKnowYet();
-			this->CreatePSO();
-		}
 	private:
-		UINT m_TextureNum;
+		Camera* m_Camera;
+
 	};
 
+	class MixtureRenderPass : public RenderPass {
+
+	public:
+		MixtureRenderPass(std::shared_ptr<SimpleMaterial> textureMaterial);
+
+		inline UINT size() { return m_MixtureTextures->size(); }
+
+		inline Graphic::DescriptorTable* GetDescriptorTable() 
+		{ return m_MixtureTextures->GetDescriptorTable(); }
+
+		void Initialize() override;
+	
+		void Render(Graphic::CommandList& commandList) override;
+
+	private:
+		std::shared_ptr<SimpleMaterial> m_MixtureTextures;
+		GObject* m_RenderScreen;
+	};
 
 }

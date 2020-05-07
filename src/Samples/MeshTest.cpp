@@ -7,13 +7,12 @@ namespace Samples {
 	{
 		Engine::InitializeEngine();
 
-		m_MixGraphicPSO = std::make_shared<MixturePSO>();
-
-		m_rootSignature = std::make_shared<RootSignature>();
+		/*m_rootSignature = std::make_shared<RootSignature>();
+		m_rootSignature->Initialize();
 
 		m_GraphicPSO = std::make_shared<MeshTestPSO>();
 		m_GraphicPSO->SetRootSigature(m_rootSignature->GetRootSignature());
-		m_GraphicPSO->Initialize();
+		m_GraphicPSO->Initialize();*/
 
 		// m_Camera.CreateCBV();
 		// Create Scene
@@ -32,7 +31,7 @@ namespace Samples {
 		std::vector<UINT>& index = reader.m_index;
 
 		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
-		m_Material = std::make_shared<NoMaterial>(m_GraphicPSO, m_rootSignature);
+		m_Material = std::make_shared<Material>();
 		
 		// TODO!! error C2338 aligin?
 		GObject* obj0 = new Game::GObject();

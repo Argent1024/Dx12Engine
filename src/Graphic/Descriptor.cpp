@@ -58,25 +58,52 @@ namespace Graphic {
 	ShaderResource::ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) 
 		: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0)
 	{
-		ID3D12Device* device = Engine::GetDevice();
 		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_HeapIndex = descriptorHeap->MallocHeap();
-		device->CreateShaderResourceView(m_Buffer->GetResource(), &m_srvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUHandle(m_HeapIndex);
+		Initialize(gpubuffer, handle);
 	}
 
+	ShaderResource::ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc,
+		DescriptorTable& table, UINT tableIndex) 
+		: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0)
+	{
+		m_HeapIndex = table.GetHeapIndex(tableIndex);
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = table.GetSlot(tableIndex);
+		Initialize(gpubuffer, handle);
+	}
 	
+	void ShaderResource::Initialize(ptrGPUMem gpubuffer, D3D12_CPU_DESCRIPTOR_HANDLE handle) 
+	{
+		ID3D12Device* device = Engine::GetDevice();
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		device->CreateShaderResourceView(m_Buffer->GetResource(), &m_srvDesc, handle);
+	}
+
 	UnorderedAccess::UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc)
 		: m_uavDesc(desc), HeapDescriptor(gpubuffer, 0) 
 	{
-		ID3D12Device* device = Engine::GetDevice();
 		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_HeapIndex = descriptorHeap->MallocHeap();
-		// TODO what's the parameter
-		device->CreateUnorderedAccessView(m_Buffer->GetResource(), nullptr, &m_uavDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUHandle(m_HeapIndex);
+		Initialize(gpubuffer, handle);
 	}
 
+	UnorderedAccess::UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc,
+		DescriptorTable& table, UINT tableIndex)
+		: m_uavDesc(desc), HeapDescriptor(gpubuffer, 0)
+	{
+		m_HeapIndex = table.GetHeapIndex(tableIndex);
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = table.GetSlot(tableIndex);
+		Initialize(gpubuffer, handle);
+	}
+
+	void UnorderedAccess::Initialize(ptrGPUMem gpubuffer, D3D12_CPU_DESCRIPTOR_HANDLE handle) 
+	{
+		ID3D12Device* device = Engine::GetDevice();
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		device->CreateUnorderedAccessView(m_Buffer->GetResource(), nullptr, &m_uavDesc, handle);
+	}
 
 	RenderTarget::RenderTarget(ptrGPUMem gpubuffer, const D3D12_RENDER_TARGET_VIEW_DESC& desc, DescriptorHeap* descriptorHeap) 
 		: m_rtvDesc(desc), HeapDescriptor(gpubuffer, 0) 

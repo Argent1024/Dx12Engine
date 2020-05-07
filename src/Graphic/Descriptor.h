@@ -68,6 +68,7 @@ namespace Graphic {
 		}
 
 	protected:
+		// TODO seem useless if we required every Heap Descriptor is used through DescriptorTable
 		UINT m_HeapIndex;
 	};
 
@@ -79,27 +80,39 @@ namespace Graphic {
 
 	public:
 		DescriptorTable(UINT size, DescriptorHeap* heap) 
-			: m_size(size)
+			: m_size(size), m_heap(heap)
 		{
-			m_heapIndexStart = heap->MallocHeap(size);
+			m_heapIndexStart = m_heap->MallocHeap(size);
 		}
 
-		inline void BindDescriptorTable() const {
+		// Only Bind SRV & UAV & CBV
+		inline CD3DX12_GPU_DESCRIPTOR_HANDLE BindDescriptorTable() const {
 			DescriptorHeap* InUseHeap = Engine::GetInUseHeap();
 			UINT destHeapIndex = InUseHeap->MallocHeap(m_size);
 			BindMultiDescriptor(m_heapIndexStart, m_size, destHeapIndex);
+			return InUseHeap->GetGPUHandle(destHeapIndex);
 		}
 
-		inline UINT GetSlot(UINT index) const 
+		inline D3D12_CPU_DESCRIPTOR_HANDLE GetSlot(UINT index) const 
+		{
+			assert(index < m_size && "Accessing index out of bound");
+			return m_heap->GetCPUHandle(m_heapIndexStart + index);
+		}
+
+		inline UINT GetHeapIndex(UINT index) const 
 		{
 			assert(index < m_size && "Accessing index out of bound");
 			return m_heapIndexStart + index;
 		}
 
+		inline UINT size() { return m_size; }
+
 	private:
+		DescriptorHeap* m_heap;
 		UINT m_heapIndexStart;
 		const UINT m_size;
 	};
+
 
 /*****************************************************************
 
@@ -111,7 +124,7 @@ namespace Graphic {
 	class VertexBuffer : public Descriptor {
 	public:
 		VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize);
-
+		
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
 
 		inline UINT GetStrideSize() const { return m_strideSize; }
@@ -162,10 +175,13 @@ namespace Graphic {
 	class ShaderResource : public HeapDescriptor {
 	public:
 		ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc);
+		// Create the SRV in descriptor table's tableIndex slot
+		ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc, 
+						DescriptorTable& table, UINT tableIndex);
 
 	private:
 		// Create SRV on the init descriptor heap
-		//void Initialize() override;
+		void Initialize(ptrGPUMem gpubuffer, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC m_srvDesc;
 	};
@@ -175,19 +191,20 @@ namespace Graphic {
 	class UnorderedAccess : public HeapDescriptor {
 	public:
 		UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc);
-
+		UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc,
+						DescriptorTable& table, UINT tableIndex);
 	private:
 		// Create UAV on the init descriptor heap
-		//void Initialize() override;
+		void Initialize(ptrGPUMem gpubuffer, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 
 		D3D12_UNORDERED_ACCESS_VIEW_DESC m_uavDesc;
 	};
 
-
+	// TODO add Decriptor table constructor
 	class RenderTarget : public HeapDescriptor {
 	public:
 		RenderTarget(ptrGPUMem gpubuffer, const D3D12_RENDER_TARGET_VIEW_DESC& desc, DescriptorHeap* descriptorHeap);
-
+		
 	private:
 		D3D12_RENDER_TARGET_VIEW_DESC m_rtvDesc;
 	};

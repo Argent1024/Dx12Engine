@@ -7,73 +7,28 @@
 #include "Texture.h"
 
 namespace Game {
-	// Class store rendering data
-	// Store pipeline state obj &
-	//       root signature &
-	//       texture (maybe)&
-	//		 other View or parameter that are needed when rendering
+	
 	class Material {
 	public:
-		Material() {}
-
-		Material(ptrPSO pso, ptrRootSignature rootSignature)
-			: m_pso(pso), m_RootSignature(rootSignature) {}
-
-		inline void SetGPUStuff(ptrPSO pso, ptrRootSignature rootSignature) 
-		{
-			m_pso = pso;
-			m_RootSignature = rootSignature;
-		}
-
-		inline void UseMaterial(Graphic::CommandList& commandList)
-		{
-			LoadMaterial();
-			commandList.SetPipelineState(m_pso);
-			commandList.SetGraphicsRootSignature(m_RootSignature);
-			_UseMaterial(commandList);
-		}
-
-	protected:
 		
-		// Bind descriptor table when rendering
-		virtual void _UseMaterial(Graphic::CommandList& commandList) const = 0;
+		// Do nothing
+		virtual void UseMaterial(Graphic::CommandList& commandList) { }
 
-		// Test if the descriptor table still one the heap (TODO)
-		// if not
-		//	 Allocate place from descriptor heap (Create a new descriptor table)
-		//	 Copy descriptors required when rendering
-		virtual void LoadMaterial() = 0;
-
-		ptrPSO m_pso;
-		ptrRootSignature m_RootSignature;
 	};
 
 
-	class NoMaterial : public Material 
-	{	
+	class SimpleMaterial : public Material {
 	public:
-		NoMaterial(ptrPSO pso, ptrRootSignature rootSignature)
-			: Material(pso, rootSignature) {}
+		SimpleMaterial(UINT numTexture) : m_table(numTexture, Engine::GetInitHeap()) {}
 
-		void _UseMaterial(Graphic::CommandList& commandList) const override {}
-		void LoadMaterial() override {}
-	};
+		inline Graphic::DescriptorTable* GetDescriptorTable() { return &m_table; }
 
+		inline UINT size() { return m_table.size(); }
 
-	class TextureMaterial : public Material 
-	{
-	public:
-		TextureMaterial(ptrPSO pso, ptrRootSignature rootSignature, ptrTexture texture);
-
-		void _UseMaterial(Graphic::CommandList& commandList) const override;
-		void LoadMaterial() override;
+		void UseMaterial(Graphic::CommandList& commandList) override;
 
 	private:
-		// Bing texture to a descriptor table, save the index for table start
-		UINT m_HeapIndex;
-
-		ptrTexture m_texture;
-
+		Graphic::DescriptorTable m_table;
 	};
 
 }
