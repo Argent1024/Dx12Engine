@@ -34,6 +34,7 @@ namespace Game
 		virtual void EndRender();
 		
 		DefaultRenderPass m_Renderpass;
+		MixtureRenderPass m_MixturePass;
 
 		// TODO need change
 		ProjectiveCamera m_Camera;

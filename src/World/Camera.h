@@ -48,7 +48,7 @@ namespace Game {
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
 			Matrix4 view(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp));			
-			Matrix4 proj(DirectX::XMMatrixPerspectiveFovRH(3.14f / 1.5f, m_aspectRatio, 1.0f, 1000.0f));
+			Matrix4 proj(DirectX::XMMatrixPerspectiveFovRH(3.14f / 3.0f, m_aspectRatio, 1.0f, 1000.0f));
 			m_ViewProjective = Transform(view * proj);
 			
 		}

@@ -32,15 +32,16 @@ namespace Game {
 		
 	}
 
-	MixtureRenderPass::MixtureRenderPass(std::shared_ptr<SimpleMaterial> textureMaterial)
+	MixtureRenderPass::MixtureRenderPass(UINT num_texture)
 	{
-		m_MixtureTextures = textureMaterial; 
-		m_PSO = std::make_shared<Graphic::MixturePSO>();
-		m_rootSignature = std::make_shared<Graphic::MixRootSignature>(textureMaterial->size());
+		m_MixtureTextures = std::make_shared<SimpleMaterial>(num_texture);
 	}
 
 	void MixtureRenderPass::Initialize() 
 	{
+		m_PSO = std::make_shared<Graphic::MixturePSO>();
+		m_rootSignature = std::make_shared<Graphic::MixRootSignature>(m_MixtureTextures->size());
+
 		m_rootSignature->Initialize();
 
 		m_PSO->SetRootSigature(m_rootSignature->GetRootSignature());
@@ -50,9 +51,9 @@ namespace Game {
 		std::vector<DefaultVertex> triangleVertices =
 		{
 			{ { 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f  } },
-			{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, -1.0f } },
-			{ { -1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { -1.0f, 1.0f } },
-			{ { -1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { -1.0f, -1.0f } }
+			{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
+			{ { -1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
+			{ { -1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f } }
 		};
 		std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
 		ptrMesh screenMesh = std::make_shared<TriangleMesh>(triangleVertices, index_list);
@@ -64,9 +65,11 @@ namespace Game {
 
 	void MixtureRenderPass::Render(Graphic::CommandList& commandList) 
 	{
+		
 		commandList.SetPipelineState(m_PSO);
 		commandList.SetGraphicsRootSignature(m_rootSignature);
-
+		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
+		m_RenderScreen->RecordCommand(commandList);
 		m_RenderScreen->Draw(commandList);
 	}
 }

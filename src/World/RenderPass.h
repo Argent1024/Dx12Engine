@@ -46,7 +46,7 @@ namespace Game {
 	class MixtureRenderPass : public RenderPass {
 
 	public:
-		MixtureRenderPass(std::shared_ptr<SimpleMaterial> textureMaterial);
+		MixtureRenderPass(UINT num_texture);
 
 		inline UINT size() { return m_MixtureTextures->size(); }
 

@@ -19,7 +19,7 @@ namespace Game {
 
 	class SimpleMaterial : public Material {
 	public:
-		SimpleMaterial(UINT numTexture) : m_table(numTexture, Engine::GetInitHeap()) {}
+		SimpleMaterial(UINT numTexture, Graphic::DescriptorHeap* heap=Engine::GetInitHeap()) : m_table(numTexture, heap) {}
 
 		inline Graphic::DescriptorTable* GetDescriptorTable() { return &m_table; }
 

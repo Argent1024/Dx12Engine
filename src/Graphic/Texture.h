@@ -29,6 +29,7 @@ namespace Graphic {
 			assert(type != 0 && " At least one type is needed Are you using && instead of || when creating type?");
 		}
 
+		inline UINT GetType() { return m_Type; }
 		/*// Copy (one)view to in use descriptor heap
 		inline void BindTexture(UINT index, TextureType type=TEXTURE_SRV) const
 		{

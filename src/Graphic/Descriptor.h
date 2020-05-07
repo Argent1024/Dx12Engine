@@ -99,6 +99,10 @@ namespace Graphic {
 			return m_heap->GetCPUHandle(m_heapIndexStart + index);
 		}
 
+		inline DescriptorHeap* GetHeap() const {
+			return m_heap;
+		}
+
 		inline UINT GetHeapIndex(UINT index) const 
 		{
 			assert(index < m_size && "Accessing index out of bound");
