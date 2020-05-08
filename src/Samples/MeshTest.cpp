@@ -25,7 +25,7 @@ namespace Samples {
 	void MeshTest::LoadAssert() 
 	{
 		MeshReader reader;
-		reader.ReadOBJ("D:\\work\\tEngine\\airboat.obj");
+		reader.ReadOBJ("D:\\work\\tEngine\\tyra.obj");
 
 		std::vector<DefaultVertex>& vertex = reader.m_vertex;
 		std::vector<UINT>& index = reader.m_index;

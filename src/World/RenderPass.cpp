@@ -23,16 +23,14 @@ namespace Game {
 			g_obj->RecordCommand(commandList);
 
 			m_Camera->UseCamera(commandList, g_obj->GetTransform());
-
-			// Barrier here since we are going to modify SwapChain
-			//commandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 			g_obj->Draw(commandList);
-			// commandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		}
 		
 	}
 
-	MixtureRenderPass::MixtureRenderPass(UINT num_texture)
+	MixtureRenderPass::MixtureRenderPass(UINT num_texture, const UINT width, const UINT height)
+		: m_Viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)),
+		  m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 	{
 		m_MixtureTextures = std::make_shared<SimpleMaterial>(num_texture);
 	}
@@ -65,7 +63,8 @@ namespace Game {
 
 	void MixtureRenderPass::Render(Graphic::CommandList& commandList) 
 	{
-		
+		commandList.SetViewPorts(&m_Viewport);
+		commandList.SetScissorRects(&m_ScissorRect);
 		commandList.SetPipelineState(m_PSO);
 		commandList.SetGraphicsRootSignature(m_rootSignature);
 		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());

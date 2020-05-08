@@ -46,7 +46,7 @@ namespace Game {
 	class MixtureRenderPass : public RenderPass {
 
 	public:
-		MixtureRenderPass(UINT num_texture);
+		MixtureRenderPass(UINT num_texture, const UINT width, const UINT height);
 
 		inline UINT size() { return m_MixtureTextures->size(); }
 
@@ -58,6 +58,8 @@ namespace Game {
 		void Render(Graphic::CommandList& commandList) override;
 
 	private:
+		CD3DX12_VIEWPORT m_Viewport;
+		CD3DX12_RECT m_ScissorRect;
 		std::shared_ptr<SimpleMaterial> m_MixtureTextures;
 		GObject* m_RenderScreen;
 	};

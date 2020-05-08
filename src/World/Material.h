@@ -16,7 +16,7 @@ namespace Game {
 
 	};
 
-
+	// Texture should be created else where and bind to the DescriptorTable here
 	class SimpleMaterial : public Material {
 	public:
 		SimpleMaterial(UINT numTexture, Graphic::DescriptorHeap* heap=Engine::GetInitHeap()) : m_table(numTexture, heap) {}

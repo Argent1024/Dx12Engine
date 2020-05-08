@@ -43,7 +43,7 @@ namespace Graphic {
 
 		ComPtr<ID3DBlob> VS;
 		ComPtr<ID3DBlob> PS;
-		const std::wstring path = L"D:\\work\\tEngine\\Shaders\\MixTexture.hlsl";
+		const std::wstring path =  L"D:\\work\\tEngine\\Shaders\\MixTexture.hlsl";
 		ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", CompileFlags, 0, &VS, nullptr));
 		ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", CompileFlags, 0, &PS, nullptr));
 
