@@ -74,6 +74,10 @@ namespace Graphic {
 		inline void SetSwapChain(const SwapChain& swapChain, const DepthBuffer& depthBuffer)
 		{ m_commandList->OMSetRenderTargets(1, &(swapChain.GetBackBufferCPUHandle()), FALSE, &(depthBuffer.GetDepthBufferCPUHandle())); }
 		
+		// Set only the depth buffer
+		inline void SetDepthBuffer(const DepthBuffer& depthBuffer)
+		{ m_commandList->OMSetRenderTargets(0, nullptr,FALSE, &(depthBuffer.GetDepthBufferCPUHandle())); }
+
 		inline void ClearSwapChain(const SwapChain& swapChain, const float color[4]) const { m_commandList->ClearRenderTargetView(swapChain.GetBackBufferCPUHandle(), color, 0, nullptr);}
 		
 		inline void ResourceBarrier(const SwapChain& swapChain, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) { m_commandList->ResourceBarrier(1, &(swapChain.Barrier(before, after))); }

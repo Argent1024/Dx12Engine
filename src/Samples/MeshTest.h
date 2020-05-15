@@ -31,7 +31,7 @@ namespace Samples {
 		ptrPSO m_GraphicPSO;		// Main Render Pass
 
 		std::shared_ptr<TriangleMesh> m_Mesh;
-		ptrMaterial m_Material;
+		// ptrMaterial m_Material;
 	};
 
 }

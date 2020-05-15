@@ -18,8 +18,8 @@ namespace Game {
 		Graphic::DescriptorTable* table = m_MixturePass.GetDescriptorTable();
 		depthTexture->CreateView(Graphic::TEXTURE_SRV, table, 0);
 
-		// TODO fix camera
-		m_Camera.CreateCBV();
+		// Init camera
+		m_Camera.Initialize();
 	}
 
 	Scene::Scene(const HWND m_appHwnd, const UINT width, const UINT height, ProjectiveCamera& camera)

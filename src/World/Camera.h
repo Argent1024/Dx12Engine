@@ -19,11 +19,14 @@ namespace Game {
 			 m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 		{ }
 
-		virtual void UseCamera(Graphic::CommandList& commandList, Transform ModelTransformation = Transform())
+		virtual void UseCamera(Graphic::CommandList& commandList)
 		{
 			commandList.SetViewPorts(&m_Viewport);
 			commandList.SetScissorRects(&m_ScissorRect);
 		}
+
+		// Do nothing
+		virtual void Initialize() {}
 
 		void SetViewPort(CD3DX12_VIEWPORT newViewPort) { m_Viewport = newViewPort; }
 		void SetScissorRect(CD3DX12_RECT newScissorRect) { m_ScissorRect = newScissorRect; } 
@@ -34,7 +37,7 @@ namespace Game {
 		CD3DX12_RECT m_ScissorRect;
 	};
 
-
+	// TODO Move CBV to else where
 	class ProjectiveCamera : public Camera { 
 	public:
 		ProjectiveCamera(const UINT width, const UINT height)
@@ -53,9 +56,9 @@ namespace Game {
 			
 		}
 
-		void UseCamera(Graphic::CommandList& commmandList, Transform model=Transform()) override;
+		void UseCamera(Graphic::CommandList& commmandList) override;
 
-		void CreateCBV();
+		void Initialize() override;
 	private:
 
 		// CBV where transformations are stored
@@ -84,9 +87,9 @@ namespace Game {
 			
 		}
 		
-		void UseCamera(Graphic::CommandList& commmandList, Transform model=Transform()) override;
+		void UseCamera(Graphic::CommandList& commmandList) override;
 
-		void CreateCBV();
+		void Initialize() override;
 	
 	private:	
 		// CBV where transformations are stored

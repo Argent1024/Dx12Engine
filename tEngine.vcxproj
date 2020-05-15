@@ -217,6 +217,7 @@
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\WinApp.cpp" />
     <ClCompile Include="src\Graphic\SwapChain.cpp" />
+    <ClCompile Include="src\World\Light.cpp" />
     <ClCompile Include="src\World\Material.cpp" />
     <ClCompile Include="src\World\Mesh.cpp" />
     <ClCompile Include="src\World\RenderPass.cpp" />

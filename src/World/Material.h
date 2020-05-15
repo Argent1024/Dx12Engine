@@ -8,11 +8,11 @@
 
 namespace Game {
 	
-	class Material {
+	/*class Material {
 	public:
 		
 		// Do nothing
-		virtual void UseMaterial(Graphic::CommandList& commandList) { }
+		virtual void UseMaterial(Graphic::CommandList& commandList, UINT slot) { }
 
 	};
 
@@ -25,10 +25,10 @@ namespace Game {
 
 		inline UINT size() { return m_table.size(); }
 
-		void UseMaterial(Graphic::CommandList& commandList) override;
+		void UseMaterial(Graphic::CommandList& commandList, UINT slot) override;
 
 	private:
 		Graphic::DescriptorTable m_table;
-	};
+	};*/
 
 }

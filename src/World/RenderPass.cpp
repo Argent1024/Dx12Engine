@@ -18,11 +18,10 @@ namespace Game {
 		assert(m_Camera != nullptr);
 		commandList.SetPipelineState(m_PSO);
 		commandList.SetGraphicsRootSignature(m_rootSignature);
+		m_Camera->UseCamera(commandList);
 		for (auto const& g_obj : objList)
 		{
 			g_obj->RecordCommand(commandList);
-
-			m_Camera->UseCamera(commandList, g_obj->GetTransform());
 			g_obj->Draw(commandList);
 		}
 		
@@ -30,18 +29,17 @@ namespace Game {
 
 	MixtureRenderPass::MixtureRenderPass(UINT num_texture, const UINT width, const UINT height)
 		: m_Viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)),
-		  m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
-	{
-		m_MixtureTextures = std::make_shared<SimpleMaterial>(num_texture);
-	}
+		  m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height)),
+		  m_Table(num_texture) { }
 
 	void MixtureRenderPass::Initialize() 
 	{
-		m_PSO = std::make_shared<Graphic::MixturePSO>();
-		m_rootSignature = std::make_shared<Graphic::MixRootSignature>(m_MixtureTextures->size());
+		m_Table.Initialize(Engine::GetInitHeap());
 
+		m_rootSignature = std::make_shared<Graphic::MixRootSignature>(m_Table.size());
 		m_rootSignature->Initialize();
 
+		m_PSO = std::make_shared<Graphic::MixturePSO>();
 		m_PSO->SetRootSigature(m_rootSignature->GetRootSignature());
 		m_PSO->Initialize();
 
@@ -57,8 +55,9 @@ namespace Game {
 		ptrMesh screenMesh = std::make_shared<TriangleMesh>(triangleVertices, index_list);
 
 		m_RenderScreen = new GObject();
-		m_RenderScreen->SetMaterial(m_MixtureTextures);
+		// m_RenderScreen->SetMaterial(m_MixtureTextures);
 		m_RenderScreen->SetMesh(screenMesh);
+		m_RenderScreen->Initialize();
 	}
 
 	void MixtureRenderPass::Render(Graphic::CommandList& commandList) 

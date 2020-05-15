@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 namespace Game {
-	void ProjectiveCamera::CreateCBV() 
+	void ProjectiveCamera::Initialize() 
 	{
 		const UINT cbSize = CalculateConstantBufferByteSize(sizeof(DirectX::XMMATRIX));
 
@@ -9,7 +9,7 @@ namespace Game {
 		m_RootCBV = std::make_shared<Graphic::ConstantBuffer>(gpumem, cbSize, true); // We are creating a root descriptor
 	}
 
-	void ProjectiveCamera::UseCamera(Graphic::CommandList& commandList, Transform model) 
+	void ProjectiveCamera::UseCamera(Graphic::CommandList& commandList) 
 	{
 		assert(m_RootCBV != nullptr && "Should create cbv before use it");
 		
@@ -21,14 +21,14 @@ namespace Game {
 		commandList.SetScissorRects(&m_ScissorRect);
 
 		// Calculate & set model_view_projective matrix
-		Transform mvp( (Matrix4)model * (Matrix4)m_ViewProjective);
-		m_RootCBV->copyData(&(DirectX::XMMATRIX)mvp);
+		// Transform mvp( (Matrix4)model * (Matrix4)m_ViewProjective);
+		m_RootCBV->copyData(&(DirectX::XMMATRIX)m_ViewProjective);
 
 		// TODO set to b0, however this knowledge should only be known by the RootSignature
 		commandList.SetGraphicRootCBV(m_RootCBV, 0);
 	}
 
-	void OrthonormalCamera::CreateCBV() 
+	void OrthonormalCamera::Initialize() 
 	{
 		const UINT cbSize = CalculateConstantBufferByteSize(sizeof(DirectX::XMMATRIX));
 
@@ -36,7 +36,7 @@ namespace Game {
 		m_RootCBV = std::make_shared<Graphic::ConstantBuffer>(gpumem, cbSize, true); // We are creating a root descriptor
 	}
 
-	void OrthonormalCamera::UseCamera(Graphic::CommandList& commandList, Transform model) 
+	void OrthonormalCamera::UseCamera(Graphic::CommandList& commandList) 
 	{
 		assert(m_RootCBV != nullptr && "Should Create cbv before use it");
 		
@@ -48,10 +48,10 @@ namespace Game {
 		commandList.SetScissorRects(&m_ScissorRect);
 
 		// Calculate & set model_view_projective matrix
-		Transform mvp( (Matrix4)model * (Matrix4)m_ViewOrthormal);
-		m_RootCBV->copyData(&(DirectX::XMMATRIX)mvp);
+		//Transform mvp( (Matrix4)model * (Matrix4)m_ViewOrthormal);
+		m_RootCBV->copyData(&(DirectX::XMMATRIX)m_ViewOrthormal);
 
-		// TODO set to b0, however this knowledge should only be known by the RootSignature
+		// TODO set to slot 0, however this knowledge should only be known by the RootSignature
 		commandList.SetGraphicRootCBV(m_RootCBV, 0);
 	}
 }

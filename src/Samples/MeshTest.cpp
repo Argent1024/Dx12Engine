@@ -31,13 +31,13 @@ namespace Samples {
 		std::vector<UINT>& index = reader.m_index;
 
 		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
-		m_Material = std::make_shared<Material>();
+		//m_Material = std::make_shared<Material>();
 		
 		// TODO!! error C2338 aligin?
 		GObject* obj0 = new Game::GObject();
 		obj0->SetMesh(m_Mesh);
-		obj0->SetMaterial(m_Material);
-
+		// obj0->SetMaterial(m_Material);
+		obj0->Initialize();
 		m_Scene->AddGameObj(obj0);
 	}
 

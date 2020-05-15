@@ -127,7 +127,7 @@ namespace Graphic {
 
 		if (m_Type & TEXTURE_DSV) {
 			
-			m_textureDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+			m_textureDesc.Format = DXGI_FORMAT_D32_FLOAT;
 			m_textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 			D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
@@ -139,6 +139,8 @@ namespace Graphic {
 			clearValue.DepthStencil.Stencil = 0;
 
 			m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc, clearValue, D3D12_HEAP_TYPE_DEFAULT, initState);
+			// Emmmmm TODO Format
+			m_textureDesc.Format = DXGI_FORMAT_R32_FLOAT;
 		} else if (m_Type & TEXTURE_RTV) {
 
 			throw std::runtime_error("Not Implemented!");
@@ -163,8 +165,9 @@ namespace Graphic {
 	void Texture2D::CreateSRV(DescriptorTable* table, UINT tableIndex)  {
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		// srvDesc.Format = m_textureDesc.Format;
-		srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+		srvDesc.Format = m_textureDesc.Format;
+		// TODO add different format
+		// srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
 		if(table) {

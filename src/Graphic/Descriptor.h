@@ -10,10 +10,10 @@
 #define ptrUAV std::shared_ptr<Graphic::UnorderedAccess>
 
 namespace Graphic {
-	// TODO: only srv_uav_cbv for now
+	// Only bind srv_uav_cbv
 	// Copy descriptors from init heap to inuse heap
 	// Make sure that in init heap, srcIndex .. srcIndex + size - 1 should be those we want to bind
-	inline void BindMultiDescriptor(UINT srcIndex, UINT size, UINT destIndex, D3D12_DESCRIPTOR_HEAP_TYPE heapType=D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) 
+	inline void BindMultiDescriptor(UINT srcIndex, UINT size, UINT destIndex) 
 	{
 		DescriptorHeap* InitHeap = Engine::GetInUseHeap();
 		CD3DX12_CPU_DESCRIPTOR_HANDLE destCPUHandle = InitHeap->GetCPUHandle(srcIndex);
@@ -24,7 +24,7 @@ namespace Graphic {
 
 		ID3D12Device* device = Engine::GetDevice();
 		// Free threaded as long as different threads don't write to a same place
-		device->CopyDescriptorsSimple(size, destCPUHandle, srcCPUHandle, heapType);
+		device->CopyDescriptorsSimple(size, destCPUHandle, srcCPUHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 
@@ -56,10 +56,9 @@ namespace Graphic {
 
 		// Simple Bind function, just bind one descriptor to InUse heap (Use Graphics::BindMultiDescriptor instead)
 		// Copy this descriptor to the in use descriptor heap for rendering
-		inline void BindDescriptor(UINT destIndex, 
-			D3D12_DESCRIPTOR_HEAP_TYPE heapType=D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) const
+		inline void BindDescriptor(UINT destIndex) const
 		{
-			BindMultiDescriptor(m_HeapIndex, 1, destIndex, heapType);
+			BindMultiDescriptor(m_HeapIndex, 1, destIndex);
 		}
 
 		inline void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData)
@@ -79,14 +78,18 @@ namespace Graphic {
 	class DescriptorTable {
 
 	public:
-		DescriptorTable(UINT size, DescriptorHeap* heap) 
-			: m_size(size), m_heap(heap)
+		DescriptorTable(UINT size)  : m_size(size) { }
+
+		void Initialize(DescriptorHeap* heap) 
 		{
-			m_heapIndexStart = m_heap->MallocHeap(size);
+			m_heap = heap;
+			m_heapIndexStart = m_heap->MallocHeap(m_size);
 		}
 
 		// Only Bind SRV & UAV & CBV
-		inline CD3DX12_GPU_DESCRIPTOR_HANDLE BindDescriptorTable() const {
+		inline CD3DX12_GPU_DESCRIPTOR_HANDLE BindDescriptorTable() const
+		{
+			assert(m_heap && "Descriptor Table havn't initialized");
 			DescriptorHeap* InUseHeap = Engine::GetInUseHeap();
 			UINT destHeapIndex = InUseHeap->MallocHeap(m_size);
 			BindMultiDescriptor(m_heapIndexStart, m_size, destHeapIndex);
@@ -163,7 +166,7 @@ namespace Graphic {
 		// Create a CBV, descriptor Heap is nullptr if we are creating a normal cbv, 
 		// if provide decriptorHeap, we are creaing a root CBV
 		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, bool isRoot=false);
-
+		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorTable& table, UINT tableIndex);
 		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const 
 		{
 			assert(m_isRootCBV && "CBV should be a root CBV to call this function");

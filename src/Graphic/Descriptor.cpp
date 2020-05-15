@@ -54,6 +54,19 @@ namespace Graphic {
 		device->CreateConstantBufferView(&m_cbvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
 	}	
 
+	ConstantBuffer::ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorTable& table, UINT tableIndex)
+		: HeapDescriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)), m_isRootCBV(false)
+	{
+		assert(m_BufferSize % 256 == 0 && "Constant buffer size not aligned");
+		ID3D12Device* device = Engine::GetDevice();
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		m_cbvDesc.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
+		m_cbvDesc.SizeInBytes = m_BufferSize; 
+
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = table.GetSlot(tableIndex);
+		device->CreateConstantBufferView(&m_cbvDesc, handle);
+	}
+
 	// TODO fix buffer size
 	ShaderResource::ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) 
 		: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0)

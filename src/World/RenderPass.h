@@ -48,10 +48,10 @@ namespace Game {
 	public:
 		MixtureRenderPass(UINT num_texture, const UINT width, const UINT height);
 
-		inline UINT size() { return m_MixtureTextures->size(); }
+		inline UINT size() { return m_Table.size(); }
 
 		inline Graphic::DescriptorTable* GetDescriptorTable() 
-		{ return m_MixtureTextures->GetDescriptorTable(); }
+		{ return &m_Table; }
 
 		void Initialize() override;
 	
@@ -60,7 +60,8 @@ namespace Game {
 	private:
 		CD3DX12_VIEWPORT m_Viewport;
 		CD3DX12_RECT m_ScissorRect;
-		std::shared_ptr<SimpleMaterial> m_MixtureTextures;
+		// std::shared_ptr<SimpleMaterial> m_MixtureTextures;
+		Graphic::DescriptorTable m_Table;
 		GObject* m_RenderScreen;
 	};
 

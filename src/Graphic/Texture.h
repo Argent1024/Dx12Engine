@@ -27,6 +27,7 @@ namespace Graphic {
 	public:
 		Texture(UINT type) : m_Type(type) {
 			assert(type != 0 && " At least one type is needed Are you using && instead of || when creating type?");
+			assert(!((type & TEXTURE_RTV) && (type & TEXTURE_DSV)) && "Creating RTV & DSV same time");
 		}
 
 		inline UINT GetType() { return m_Type; }
