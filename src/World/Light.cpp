@@ -34,6 +34,9 @@ namespace Game {
 	void DirectionLight::UseLight(Graphic::CommandList& commandList, UINT slot)
 	{
 		// Write constant buffer
+		XMVECTOR data[] = {(XMVECTOR)m_dir, (XMVECTOR)m_Radiance};
+		const UINT size = 2 * sizeof(XMVECTOR);
+		m_CBV->copyData(data, size);
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE tableHandle = m_Table.BindDescriptorTable();
 		commandList.SetGraphicsRootDescriptorTable(slot, tableHandle);
@@ -43,7 +46,6 @@ namespace Game {
 	{
 		// Set Root CBV (Transformation)
 		m_Camera.UseCamera(commandList);
-
 		commandList.SetDepthBuffer(m_DepthBuffer);
 	}
 }

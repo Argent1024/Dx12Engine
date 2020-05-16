@@ -24,6 +24,8 @@ namespace Game {
 
 		// Shadow Pass
 		virtual void UseDepth(Graphic::CommandList& commandList) = 0;
+
+		virtual Graphic::Texture* GetDepthTexture() = 0;
 	};
 
 
@@ -40,6 +42,8 @@ namespace Game {
 
 		void UseDepth(Graphic::CommandList& commandList) override;
 
+		inline Graphic::Texture* GetDepthTexture() { return m_DepthBuffer.GetTexture(); }
+
 	private:
 
 		OrthonormalCamera m_Camera;
@@ -50,6 +54,6 @@ namespace Game {
 
 		Vector3 m_dir;
 		Vector3 m_Radiance;
-	};
+	};	
 
 }

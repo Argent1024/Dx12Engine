@@ -36,8 +36,8 @@ namespace Graphic {
 	}
 
 
-	TextureBuffer::TextureBuffer(UINT elementSize, UINT stride, UINT type) 
-		:Texture(type), m_size(elementSize), m_stride(stride)
+	TextureBuffer::TextureBuffer(UINT elementNum, UINT stride, UINT type) 
+		:Texture(type), m_elementNum(elementNum), m_stride(stride), m_totalSize(m_elementNum * m_stride)
 	{
 		// TODO consider flags
 		D3D12_RESOURCE_FLAGS flag;
@@ -62,9 +62,26 @@ namespace Graphic {
 			break;
 		}
 
-		m_textureDesc =  CD3DX12_RESOURCE_DESC::Buffer(elementSize * m_stride, flag);
+		m_textureDesc =  CD3DX12_RESOURCE_DESC::Buffer(m_totalSize, flag);
 		m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
 		// CreateViews();
+	}
+
+	TextureBuffer::TextureBuffer(UINT totalSize) : 
+		Texture(TEXTURE_CBV), m_totalSize(totalSize)
+	{
+		D3D12_RESOURCE_FLAGS flag = D3D12_RESOURCE_FLAG_NONE;
+		m_textureDesc =  CD3DX12_RESOURCE_DESC::Buffer(m_totalSize, flag);
+		m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
+	}
+
+	void TextureBuffer::CreateCBV(DescriptorTable* table, UINT tableIndex) 
+	{
+		if (table) {
+			m_CBV = new ConstantBuffer(m_gpuMem, m_totalSize, *table, tableIndex);
+		} else {
+			m_CBV = new ConstantBuffer(m_gpuMem, m_totalSize);
+		}
 	}
 
 	void TextureBuffer::CreateSRV(DescriptorTable* table, UINT tableIndex) 
@@ -74,7 +91,7 @@ namespace Graphic {
         srvDesc.Format = DXGI_FORMAT_UNKNOWN;
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
         srvDesc.Buffer.FirstElement = 0;
-        srvDesc.Buffer.NumElements = m_size;
+        srvDesc.Buffer.NumElements = m_elementNum;
         srvDesc.Buffer.StructureByteStride = m_stride;
         srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 		if (table) {
@@ -90,7 +107,7 @@ namespace Graphic {
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 		uavDesc.Buffer.FirstElement = 0;
-		uavDesc.Buffer.NumElements = m_size;
+		uavDesc.Buffer.NumElements = m_elementNum;
 		uavDesc.Buffer.StructureByteStride = m_stride;
 		uavDesc.Buffer.CounterOffsetInBytes = 0;
 		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
@@ -162,6 +179,9 @@ namespace Graphic {
 		UploadTexture(textureData);*/
 	}
 	
+	void Texture2D::CreateCBV(DescriptorTable* table, UINT tableIndex) {
+		assert(FALSE && "Why Creating 2d CBV? ");
+	}
 	void Texture2D::CreateSRV(DescriptorTable* table, UINT tableIndex)  {
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;

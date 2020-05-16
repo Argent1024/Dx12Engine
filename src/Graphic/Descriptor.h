@@ -35,7 +35,8 @@ namespace Graphic {
 		Descriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
 			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
 
-		inline void copyData(const void* data) { Engine::MemoryAllocator.UploadData(*m_Buffer, data, m_BufferSize, m_Offset); }
+		inline void copyData(const void* data, UINT size) { Engine::MemoryAllocator.UploadData(*m_Buffer, data, size, m_Offset); }
+		inline void copyData(const void* data) { copyData(data, m_BufferSize); }
 
 		inline UINT GetSize() { return m_BufferSize; }
 

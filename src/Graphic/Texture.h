@@ -59,6 +59,7 @@ namespace Graphic {
 
 		// Giving a slot, create the view on that slot
 		inline void CreateView(TextureType type, DescriptorTable* table=nullptr, UINT index=0) {
+			assert(type & m_Type && "Creating type not mentioned in constructor");
 			switch (type)
 			{
 			case Graphic::TEXTURE_SRV:
@@ -68,7 +69,7 @@ namespace Graphic {
 				CreateUAV(table, index);
 				break;
 			case Graphic::TEXTURE_CBV:
-				// CreateCBV(table, index);
+				CreateCBV(table, index);
 				break;
 			case Graphic::TEXTURE_DSV:
 				CreateDSV(table, index);
@@ -137,11 +138,11 @@ namespace Graphic {
 
 	protected:
 		// Create the SRV & UAV at the table at tableIndex
+		virtual void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
 		virtual void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
 		virtual void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
 		virtual void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
 		virtual void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
-		// TODO CBV
 
 		ptrGPUMem m_gpuMem;
 
@@ -150,6 +151,7 @@ namespace Graphic {
 		const UINT m_Type;
 
 		// TODO Use clever way
+		ConstantBuffer* m_CBV;
 		ShaderResource* m_SRV;
 		UnorderedAccess* m_UAV;
 		DepthStencil* m_DSV;
@@ -163,14 +165,20 @@ namespace Graphic {
 	class TextureBuffer : public Texture {
 	public:
 		// TODO better way to express type?
-		TextureBuffer(UINT elementSize, UINT stride, UINT type=TEXTURE_SRV);
+		TextureBuffer(UINT elementNum, UINT stride, UINT type=TEXTURE_SRV);
+
+		// Just Create a simple CBV
+		TextureBuffer(UINT totalSize);
+
 	private:
+		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		UINT m_size;
+		UINT m_elementNum;
 		UINT m_stride;
+		UINT m_totalSize;
 	};
 
 
@@ -179,6 +187,7 @@ namespace Graphic {
 		// TODO better way to express type?
 		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV, const std::wstring& textureFile=L"");
 	private:
+		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
