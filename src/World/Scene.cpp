@@ -4,7 +4,7 @@ namespace Game {
 	
 	Scene::Scene(const HWND AppHwnd, const UINT width, const UINT height)
 		: m_SwapChain(AppHwnd, width, height), m_depthBuffer(width, height),
-		  m_Camera(width, height, Vector3(0.0f, 1.0f, -5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)),
+		  m_Camera(width, height, Vector3(0.0f, 0.0f, 6.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)),
 		  m_MixturePass(1, width, height) // one Texture to mix in the mixture stage
 	{
 
@@ -44,7 +44,7 @@ namespace Game {
 		ThreadCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		GraphicsCommandManager.ExecuteCommandList(&ThreadCommandList);
 		
-		// Mix Render Pass
+		/*// Mix Render Pass
 		
 		Graphic::CommandList MixCommandList;
 		GraphicsCommandManager.InitCommandList(&MixCommandList);
@@ -57,7 +57,7 @@ namespace Game {
 		MixCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		GraphicsCommandManager.ExecuteCommandList(&MixCommandList);
 		
-		
+		*/
 		// Multithreading join here
 
 		EndRender();

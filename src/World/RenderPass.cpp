@@ -44,12 +44,14 @@ namespace Game {
 		m_PSO->Initialize();
 
 		// Create Mesh
+		// Normal are useless here
+		// Tex Coor map Top left to (0, 0), Top right to (1, 0), Bottom left to (0, 1)
 		std::vector<DefaultVertex> triangleVertices =
 		{
-			{ { 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f  } },
-			{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f } },
-			{ { -1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 1.0f } },
-			{ { -1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f } }
+			{ { 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f  } },
+			{ { 1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f } },
+			{ { -1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
+			{ { -1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 1.0f } }
 		};
 		std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
 		ptrMesh screenMesh = std::make_shared<TriangleMesh>(triangleVertices, index_list);

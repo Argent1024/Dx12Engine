@@ -22,7 +22,7 @@ namespace Game {
 
 		// Calculate & set model_view_projective matrix
 		// Transform mvp( (Matrix4)model * (Matrix4)m_ViewProjective);
-		m_RootCBV->copyData(&(DirectX::XMMATRIX)m_ViewProjective);
+		m_RootCBV->copyData(&(DirectX::XMMATRIX)m_ViewProjective, sizeof(DirectX::XMMATRIX));
 
 		// TODO set to b0, however this knowledge should only be known by the RootSignature
 		commandList.SetGraphicRootCBV(m_RootCBV, 0);
@@ -49,7 +49,7 @@ namespace Game {
 
 		// Calculate & set model_view_projective matrix
 		//Transform mvp( (Matrix4)model * (Matrix4)m_ViewOrthormal);
-		m_RootCBV->copyData(&(DirectX::XMMATRIX)m_ViewOrthormal);
+		m_RootCBV->copyData(&(DirectX::XMMATRIX)m_ViewOrthormal, sizeof(DirectX::XMMATRIX));
 
 		// TODO set to slot 0, however this knowledge should only be known by the RootSignature
 		commandList.SetGraphicRootCBV(m_RootCBV, 0);
