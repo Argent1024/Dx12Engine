@@ -37,6 +37,6 @@ float4 PSMain(PSInput input) : SV_TARGET
 
 	// return float4(input.normal, 1);
 	
-	float4 lightDir = {1, 0, 0, 0};
-	return abs(dot(input.normal, lightDir));
+	float4 lightDir = {1, 1, 0, 0};
+	return dot(input.normal, lightDir) * 0.9 + 0.05;
 }
