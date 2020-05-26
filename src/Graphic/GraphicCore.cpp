@@ -100,7 +100,7 @@ namespace Engine
 	ComPtr<IDXGIFactory4> dxFactory;
 	UINT dxgiFactoryFlags;
 	// TODO read config file
-	UINT NumDescriptors = 10;
+	UINT NumDescriptors = 64;
 	UINT NumDSV = 10;
 	UINT NumRTV = 10;
 

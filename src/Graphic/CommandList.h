@@ -60,7 +60,7 @@ namespace Graphic {
 
 		inline void SetVertexBuffer(const VertexBuffer& vb) const {m_commandList->IASetVertexBuffers(0, 1, vb.GetBufferView());}
 
-		inline void SetGraphicRootCBV(ptrCBV cbv, UINT rootParaIndex) const {
+		inline void SetGraphicRootCBV(ConstantBuffer* cbv, UINT rootParaIndex) const {
 			m_commandList->SetGraphicsRootConstantBufferView(rootParaIndex, cbv->GetRootCBVGPUAdder()); 
 		}
 
@@ -103,7 +103,10 @@ namespace Graphic {
 		inline void SetDescriptorHeap(DescriptorHeap& descriptorHeap) 
 		{
 			ID3D12DescriptorHeap* heap = descriptorHeap.GetDescriptorHeap();
-			m_commandList->SetDescriptorHeaps(1, &heap);
+			if (heap != InUseHeap) {
+				InUseHeap = heap;
+				m_commandList->SetDescriptorHeaps(1, &heap);
+			}
 		}
 
 		inline void SetGraphicsRootDescriptorTable(UINT rootSlot, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
@@ -122,7 +125,7 @@ namespace Graphic {
 	private:
 		// TODO diff between these commandlist?
 		ComPtr<ID3D12GraphicsCommandList> m_commandList;
-
+		ID3D12DescriptorHeap* InUseHeap;
 		ptrPSO m_CurPipelineState;
 		ptrRootSignature m_CurRootSignature;
 	};

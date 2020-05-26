@@ -16,8 +16,12 @@ namespace Game {
 
 	void DefaultRenderPass::Render(Graphic::CommandList& commandList, std::vector<GObject*>& objList) {
 		assert(m_Camera != nullptr);
+		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
 		commandList.SetPipelineState(m_PSO);
 		commandList.SetGraphicsRootSignature(m_rootSignature);
+		
+
+		commandList.SetGraphicRootCBV(m_SceneCBV, 0);
 		m_Camera->UseCamera(commandList);
 		for (auto const& g_obj : objList)
 		{

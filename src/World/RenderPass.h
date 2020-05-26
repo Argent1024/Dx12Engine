@@ -38,9 +38,12 @@ namespace Game {
 		
 		inline void SetCamera(Camera* camera) { m_Camera = camera; }
 
+		inline void SetSceneCBV(Graphic::ConstantBuffer* cbv) { m_SceneCBV = cbv; }
+
 	private:
 		Camera* m_Camera;
-
+		Graphic::ConstantBuffer* m_SceneCBV;
+		//Graphic::DescriptorTable* m_SceneData;
 	};
 
 	class MixtureRenderPass : public RenderPass {
