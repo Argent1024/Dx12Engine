@@ -25,19 +25,25 @@ namespace Game {
 			commandList.SetScissorRects(&m_ScissorRect);
 		}
 
-		// Do nothing
-		virtual void Initialize() {}
+		virtual void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp) = 0;
+
+		inline const Transform& GetView() const { return m_View; }
+		inline const Transform& GetToScreen() const { return m_ToScreen; }
+	
 
 		void SetViewPort(CD3DX12_VIEWPORT newViewPort) { m_Viewport = newViewPort; }
 		void SetScissorRect(CD3DX12_RECT newScissorRect) { m_ScissorRect = newScissorRect; } 
 
 	protected:
+		Transform m_View;
+		Transform m_ToScreen; // Projective or Orthnomal
+
 		float m_aspectRatio;
 		CD3DX12_VIEWPORT m_Viewport;
 		CD3DX12_RECT m_ScissorRect;
 	};
 
-	// TODO Move CBV to else where
+	
 	class ProjectiveCamera : public Camera { 
 	public:
 		ProjectiveCamera(const UINT width, const UINT height)
@@ -50,23 +56,9 @@ namespace Game {
 
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
-			Matrix4 view(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp));			
-			Matrix4 proj(DirectX::XMMatrixPerspectiveFovRH(3.14f / 3.0f, m_aspectRatio, 1.0f, 1000.0f));
-			m_ViewProjective = Transform(view * proj);
-			
+			m_View = Transform(Matrix4(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp)));		
+			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixPerspectiveFovRH(3.14f / 1.5f, m_aspectRatio, 1.0f, 1000.0f)));			
 		}
-
-		void UseCamera(Graphic::CommandList& commmandList) override;
-
-		void Initialize() override;
-	private:
-
-		// CBV where transformations are stored
-		std::shared_ptr<Graphic::ConstantBuffer> m_RootCBV;
-
-		// world to view & projective
-		Transform m_ViewProjective;
-		//Transform m_InvTransform;
 	};
 
 	class OrthonormalCamera : public Camera {
@@ -81,23 +73,9 @@ namespace Game {
 
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
-			Matrix4 view(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp));			
-			Matrix4 orthonormal(DirectX::XMMatrixOrthographicRH(3.14f / 1.5f, m_aspectRatio, 1.0f, 1000.0f));
-			m_ViewOrthormal = Transform(view * orthonormal);
-			
+			m_View = Transform(Matrix4(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp)));		
+			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixOrthographicRH(3.14f / 1.5f, m_aspectRatio, 1.0f, 1000.0f)));
 		}
-		
-		void UseCamera(Graphic::CommandList& commmandList) override;
-
-		void Initialize() override;
-	
-	private:	
-		// CBV where transformations are stored
-		std::shared_ptr<Graphic::ConstantBuffer> m_RootCBV;
-
-		// world to view & orthonormal 
-		Transform m_ViewOrthormal;
-		// Transform m_InvTransform;
 	};
 }
 

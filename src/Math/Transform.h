@@ -18,8 +18,8 @@ namespace Math {
 		// Apply transformation to Vector3
 		INLINE Vector3 operator*(const Vector3& v) const { return m_mat * v; }
 
-		INLINE operator XMMATRIX() { return m_mat; }
-		INLINE operator Matrix4() { return m_mat; }
+		INLINE operator XMMATRIX() const { return m_mat; }
+		INLINE operator Matrix4() const { return m_mat; }
 
 	private:
 		Matrix4 m_mat;

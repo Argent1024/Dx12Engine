@@ -1,7 +1,7 @@
 #include "Scene.h"
 
 namespace Game {
-	
+
 	Scene::Scene(const HWND AppHwnd, const UINT width, const UINT height)
 		: m_SwapChain(AppHwnd, width, height), m_depthBuffer(width, height),
 		  m_Camera(width, height, Vector3(0.0f, 0.0f, 6.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)),
@@ -17,15 +17,32 @@ namespace Game {
 		Graphic::Texture* depthTexture = m_depthBuffer.GetTexture();
 		Graphic::DescriptorTable* table = m_MixturePass.GetDescriptorTable();
 		depthTexture->CreateView(Graphic::TEXTURE_SRV, table, 0);
+		
+		// Create Scene Descriptor Table
+		const UINT tableSize = 10;
+		m_SceneTable = new Graphic::DescriptorTable(10);
 
-		// Init camera
-		m_Camera.Initialize();
+		// Create Scene const buffer
+		// TODO calculate size
+		const UINT cbvSize = CalculateConstantBufferByteSize(1024);
+		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
+		m_SceneCBV = new Graphic::ConstantBuffer(gpumem, cbvSize, *m_SceneTable, 0); // Bind at slot 0
 	}
 
 	Scene::Scene(const HWND m_appHwnd, const UINT width, const UINT height, ProjectiveCamera& camera)
 		: m_SwapChain(m_appHwnd, width, height), m_depthBuffer(width, height), m_Camera(camera), 
 		  m_MixturePass(1, width, height) // one Texture to mix in the mixture stage
 	{}
+
+	void Scene::SetCameraTransformation(Camera& camera) 
+	{
+		const Transform& view = camera.GetView();
+		const Transform& proj = camera.GetToScreen();
+		
+		// Need to transpose
+		XMStoreFloat4x4(&m_SceneData.projection, XMMatrixTranspose((XMMATRIX)proj));
+		XMStoreFloat4x4(&m_SceneData.view, XMMatrixTranspose((XMMATRIX)view));
+	}
 
 	void Scene::Render()
 	{

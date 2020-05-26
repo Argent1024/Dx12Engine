@@ -4,8 +4,6 @@
 #include "DepthBuffer.h"
 #include "Camera.h"
 
-#define ptrLight std::shared_ptr<Game::Light>
-
 namespace Game {
 
 	enum LightType {
@@ -15,45 +13,51 @@ namespace Game {
 
 	using namespace Math;
 
+	template<class LightState>
 	class Light {
 
 	public:
-		// Use light when rendering object
-		// (Bind Shadow texture & Light Texture into root signature)
-		virtual void UseLight(Graphic::CommandList& commandList, UINT slot) = 0;
+		Light() {}
 
-		// Shadow Pass
-		virtual void UseDepth(Graphic::CommandList& commandList) = 0;
+		Light(LightState state) : m_state(state) {}
+
+		inline void SetState(LightState state) { m_state = state; }
+
+		inline LightState& GetLightState() const { return m_state; }
+
+		virtual Graphic::DepthBuffer& GetDepthBuffer() = 0;
 
 		virtual Graphic::Texture* GetDepthTexture() = 0;
+
+		virtual Camera& GetCamera() = 0;
+
+	private:
+		LightState m_state;
 	};
 
 
-	class DirectionLight : public Light
+	struct DirectionLightState
+	{
+		XMFLOAT4 direction;
+		XMFLOAT4 radiance;
+		XMFLOAT4X4 view;
+		XMFLOAT4X4 orthnormal;
+	};
+
+	class DirectionLight : public Light<DirectionLightState> 
 	{
 	public:
-		// TextureNum  2 + n, 2 : CBV for constant, SRV for depth. n : other texture needed 
-		DirectionLight(Vector3 dir, Vector3 radiance, UINT shadowMapW=256, UINT shadowMapH=256, UINT textureNum=2);
-		
-		// Create Depth buffer, bind stuff to descriptor tbl
-		void Initialize();
+		DirectionLight(DirectionLightState state, UINT width=256, UINT height=256);
 
-		void UseLight(Graphic::CommandList& commandList, UINT slot) override;
+		inline Graphic::Texture* GetDepthTexture() override { return m_DepthBuffer.GetTexture(); }
 
-		void UseDepth(Graphic::CommandList& commandList) override;
+		inline Camera& GetCamera() override { return m_Camera; }
 
-		inline Graphic::Texture* GetDepthTexture() { return m_DepthBuffer.GetTexture(); }
+		Graphic::DepthBuffer& GetDepthBuffer() override { return m_DepthBuffer; }
 
 	private:
-
+		Graphic::DepthBuffer m_DepthBuffer;
 		OrthonormalCamera m_Camera;
-		Graphic::ConstantBuffer* m_CBV; // store constant
-		Graphic::DepthBuffer m_DepthBuffer; // For Shadow Pass
-
-		Graphic::DescriptorTable m_Table;
-
-		Vector3 m_dir;
-		Vector3 m_Radiance;
-	};	
+	};
 
 }

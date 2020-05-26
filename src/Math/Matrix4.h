@@ -49,7 +49,7 @@ namespace Math {
 		// NOTICE! XMVector3Transform ignore w in the result! w maybe not equal to 1.0
 		INLINE Vector3 operator* (const Vector3& vec) const { return Vector3(XMVector3Transform(vec, m_mat)); } 
 		
-		INLINE operator XMMATRIX() { return m_mat; }
+		INLINE operator XMMATRIX() const { return m_mat; }
 	protected:
 		XMMATRIX m_mat;
 	};

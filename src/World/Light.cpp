@@ -4,52 +4,11 @@
 
 namespace Game {
 	
-	DirectionLight::DirectionLight(Vector3 dir, Vector3 radiance,
-		UINT shadowMapW, UINT shadowMapH, UINT textureNum)
-		: Light(), m_Camera(shadowMapW, shadowMapH), 
-		  m_dir(dir), m_Radiance(radiance),
-		  m_DepthBuffer(shadowMapW, shadowMapH),
-		  m_Table(textureNum)
-	{ }
-	     
-	void DirectionLight::Initialize() 
+	DirectionLight::DirectionLight(DirectionLightState state, UINT width=256, UINT height=256)
+		: Light(state), m_DepthBuffer(width, height), m_Camera(width, height)
 	{
-		m_Table.Initialize(Engine::GetInitHeap());
-
-		m_DepthBuffer.Initialize(Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV);
-		m_Camera.Initialize();
-
-		// cbv for constant at slot 0
-		UINT cbv_size = 1024;
-		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbv_size);
-		m_CBV = new Graphic::ConstantBuffer(gpumem, cbv_size, m_Table, 0);
-
-		// depth texture at slot 1
-		Graphic::Texture* depthTexture = m_DepthBuffer.GetTexture();
-		depthTexture->CreateView(Graphic::TEXTURE_SRV, &m_Table, 1);
-
-		// TODO Other Texture
-	}
-
-	void DirectionLight::UseLight(Graphic::CommandList& commandList, UINT slot)
-	{
-		// Write constant buffer
-		XMFLOAT3 dir, radiance;
-		XMStoreFloat3(&dir, m_dir);
-		XMStoreFloat3(&radiance, m_Radiance);
-
-		const XMFLOAT3 data[] = { dir, radiance };
-		const UINT size = 2 * sizeof(XMFLOAT3);
-		m_CBV->copyData(data, size);
-
-		CD3DX12_GPU_DESCRIPTOR_HANDLE tableHandle = m_Table.BindDescriptorTable();
-		commandList.SetGraphicsRootDescriptorTable(slot, tableHandle);
-	}
-
-	void DirectionLight::UseDepth(Graphic::CommandList& commandList)
-	{
-		// Set Root CBV (Transformation)
-		m_Camera.UseCamera(commandList);
-		commandList.SetDepthBuffer(m_DepthBuffer);
+		// Initialize dsv
+		// Should create srv else where
+		m_DepthBuffer.Initialize(Graphic::TEXTURE_DSV & Graphic::TEXTURE_SRV);
 	}
 }

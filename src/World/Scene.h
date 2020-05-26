@@ -10,6 +10,11 @@
 
 namespace Game 
 {
+	struct SceneConstantBuffer 
+	{
+		XMFLOAT4X4 projection;
+		XMFLOAT4X4 view;
+	};
 
 	class Scene
 	{
@@ -33,13 +38,18 @@ namespace Game
 		virtual void BeginRender();
 		virtual void EndRender();
 		
+		void SetCameraTransformation(Camera& camera);
+
 		DefaultRenderPass m_Renderpass;
 		MixtureRenderPass m_MixturePass;
 
-		// TODO need change
 		ProjectiveCamera m_Camera;
 
-		std::vector<ptrLight> m_LightList;
+		// Bind Stuff
+		SceneConstantBuffer m_SceneData;
+		Graphic::ConstantBuffer* m_SceneCBV; 
+		Graphic::DescriptorTable* m_SceneTable;
+
 		std::vector<GObject*> m_ObjList;
 
 		Graphic::DepthBuffer m_depthBuffer;

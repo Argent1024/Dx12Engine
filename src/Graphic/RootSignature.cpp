@@ -21,6 +21,8 @@ namespace Graphic {
 		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0-t1
 		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE);
 
+		// TODO FIX ROOT SIGNATURE
+		
 		// A Root CBV (b0) Store Transformations
 		rootParameters[0].InitAsConstantBufferView(0, 0);
 		// Descriptor table 1: t0-t1, u0-u1

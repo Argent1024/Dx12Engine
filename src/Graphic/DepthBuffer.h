@@ -11,6 +11,7 @@ namespace Graphic
 		DepthBuffer(const UINT width, const UINT height);
 
 		void Initialize(UINT type=TEXTURE_DSV);
+
 		// DSV don't use the same structure as SRV&UAV&CBV 
 		// Looks like don't need to bind
 		//inline void BindDepthBuffer() {}
