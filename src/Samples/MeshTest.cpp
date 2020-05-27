@@ -25,7 +25,7 @@ namespace Samples {
 	void MeshTest::LoadAssert() 
 	{
 		MeshReader reader;
-		reader.ReadOBJ("D:\\work\\tEngine\\elephant.obj");
+		reader.ReadOBJ("D:\\work\\tEngine\\bunny.obj");
 
 		std::vector<DefaultVertex>& vertex = reader.m_vertex;
 		std::vector<UINT>& index = reader.m_index;
@@ -38,6 +38,7 @@ namespace Samples {
 		obj0->SetMesh(m_Mesh);
 		// obj0->SetMaterial(m_Material);
 		obj0->Initialize();
+		obj0->SetTransform(Transform({ 2, 0, 0 }, { 0, 2, 0 }, { 0, 0, 2 }, {0, 0, 0}));
 		m_Scene->AddGameObj(obj0);
 	}
 

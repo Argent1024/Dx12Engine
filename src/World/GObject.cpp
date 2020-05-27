@@ -20,6 +20,9 @@ namespace Game {
 		m_CBV->copyData((&(DirectX::XMMATRIX)m_Transform));
 
 		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
+
+
+		Graphic::DescriptorHeap* heap = Engine::GetInUseHeap();
 		CD3DX12_GPU_DESCRIPTOR_HANDLE tableHandle = m_table.BindDescriptorTable();
 		commandList.SetGraphicsRootDescriptorTable(1, tableHandle);  //  slot 1  in root signature is reversed for object
 			

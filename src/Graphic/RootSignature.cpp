@@ -18,7 +18,7 @@ namespace Graphic {
 		
 		// Descriptor table for the Scene
 		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b0
-		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, -1, 0, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0-tInf space1
+		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0-tInf space1
 
 		// Descriptor Table for the object
 		ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b1
@@ -27,7 +27,7 @@ namespace Graphic {
 
 		// Descriptor table (Scene) : b0, t0-tInf Space1
 		//rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
-		rootParameters[0].InitAsConstantBufferView(0);
+		rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
 
 		// Descriptor table (Object): b1, t0-t4, u0-u4
 		rootParameters[1].InitAsDescriptorTable(3, &ranges[2], D3D12_SHADER_VISIBILITY_ALL);

@@ -4,7 +4,7 @@ namespace Game {
 
 	Scene::Scene(const HWND AppHwnd, const UINT width, const UINT height)
 		: m_SwapChain(AppHwnd, width, height), m_depthBuffer(width, height),
-		  m_Camera(width, height, Vector3(0.0f, 0.0f, 6.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)),
+		  m_Camera(width, height, Vector3(-3.0f, -1.0f, -12.f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)),
 		  m_MixturePass(1, width, height) // one Texture to mix in the mixture stage
 	{
 
@@ -20,7 +20,7 @@ namespace Game {
 		
 		// Create Scene Descriptor Table
 		// TODO determine how large the table should be
-		const UINT tableSize = 1;
+		const UINT tableSize = 4;
 		m_SceneTable = new Graphic::DescriptorTable(tableSize);
 		m_SceneTable->Initialize(Engine::GetInitHeap());
 
@@ -28,8 +28,7 @@ namespace Game {
 		// TODO calculate size
 		const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneConstantBuffer));
 		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
-		 m_SceneCBV = new Graphic::ConstantBuffer(gpumem, cbvSize, TRUE);
-		// m_SceneCBV = new Graphic::ConstantBuffer(gpumem, cbvSize, *m_SceneTable, 0); // Bind at slot 0
+		m_SceneCBV = new Graphic::ConstantBuffer(gpumem, cbvSize, *m_SceneTable, 0); // Bind at slot 0
 	}
 
 	Scene::Scene(const HWND m_appHwnd, const UINT width, const UINT height, ProjectiveCamera& camera)
@@ -51,30 +50,29 @@ namespace Game {
 	{
 		BeginRender();
 
-		// Set Default Pass data
+		// Set Scene Data
 		SetCameraTransformation(m_Camera);
 		m_SceneCBV->copyData(&m_SceneData);
 
+		m_Renderpass.SetCamera(&m_Camera);
+		m_Renderpass.SetSceneTable(m_SceneTable);
+
 		// TODO multi threading here
+
 		Graphic::CommandList ThreadCommandList;
 		GraphicsCommandManager.InitCommandList(&ThreadCommandList);
 		
 		// Main Render Pass
-		// Need Scene Constant data
-		
 		ThreadCommandList.SetSwapChain(m_SwapChain, m_depthBuffer);
-		m_Renderpass.SetCamera(&m_Camera);
-		m_Renderpass.SetSceneCBV(m_SceneCBV);
-
 		ThreadCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		m_Renderpass.Render(ThreadCommandList, m_ObjList);
 		ThreadCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		
 		GraphicsCommandManager.ExecuteCommandList(&ThreadCommandList);
 		
-		/*// Mix Render Pass
+		// Mix Render Pass
 		
-		Graphic::CommandList MixCommandList;
+		/*Graphic::CommandList MixCommandList;
 		GraphicsCommandManager.InitCommandList(&MixCommandList);
 		MixCommandList.SetSwapChain(m_SwapChain);
 		const float ClearColor[] = {0.0, 0.0, 0.0, 0.0};
@@ -84,8 +82,8 @@ namespace Game {
 		m_MixturePass.Render(MixCommandList);
 		MixCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		GraphicsCommandManager.ExecuteCommandList(&MixCommandList);
-		
 		*/
+		
 		// Multithreading join here
 
 		EndRender();

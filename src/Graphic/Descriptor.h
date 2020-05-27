@@ -15,11 +15,11 @@ namespace Graphic {
 	// Make sure that in init heap, srcIndex .. srcIndex + size - 1 should be those we want to bind
 	inline void BindMultiDescriptor(UINT srcIndex, UINT size, UINT destIndex) 
 	{
-		DescriptorHeap* InitHeap = Engine::GetInUseHeap();
-		CD3DX12_CPU_DESCRIPTOR_HANDLE destCPUHandle = InitHeap->GetCPUHandle(srcIndex);
+		DescriptorHeap* InUseHeap = Engine::GetInUseHeap();
+		CD3DX12_CPU_DESCRIPTOR_HANDLE destCPUHandle = InUseHeap->GetCPUHandle(destIndex);
 
-		DescriptorHeap* InUseHeap = Engine::GetInitHeap();
-		CD3DX12_CPU_DESCRIPTOR_HANDLE srcCPUHandle = InUseHeap->GetCPUHandle(destIndex);
+		DescriptorHeap* InitHeap = Engine::GetInitHeap();
+		CD3DX12_CPU_DESCRIPTOR_HANDLE srcCPUHandle = InitHeap->GetCPUHandle(srcIndex);
 
 
 		ID3D12Device* device = Engine::GetDevice();

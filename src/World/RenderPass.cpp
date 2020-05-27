@@ -20,8 +20,10 @@ namespace Game {
 		commandList.SetPipelineState(m_PSO);
 		commandList.SetGraphicsRootSignature(m_rootSignature);
 		
+		// TODO Scene Data should be bind outside
+		CD3DX12_GPU_DESCRIPTOR_HANDLE sceneTableHandle = m_SceneData->BindDescriptorTable();
+		commandList.SetGraphicsRootDescriptorTable(0, sceneTableHandle);
 
-		commandList.SetGraphicRootCBV(m_SceneCBV, 0);
 		m_Camera->UseCamera(commandList);
 		for (auto const& g_obj : objList)
 		{
@@ -73,6 +75,10 @@ namespace Game {
 		commandList.SetPipelineState(m_PSO);
 		commandList.SetGraphicsRootSignature(m_rootSignature);
 		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
+
+		CD3DX12_GPU_DESCRIPTOR_HANDLE handle = m_Table.BindDescriptorTable();
+		commandList.SetGraphicsRootDescriptorTable(1, handle);
+
 		m_RenderScreen->RecordCommand(commandList);
 		m_RenderScreen->Draw(commandList);
 	}
