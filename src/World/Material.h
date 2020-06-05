@@ -8,27 +8,10 @@
 
 namespace Game {
 	
-	/*class Material {
-	public:
+	template<class MatData>
+	class Material 
+	{
 		
-		// Do nothing
-		virtual void UseMaterial(Graphic::CommandList& commandList, UINT slot) { }
 
 	};
-
-	// Texture should be created else where and bind to the DescriptorTable here
-	class SimpleMaterial : public Material {
-	public:
-		SimpleMaterial(UINT numTexture, Graphic::DescriptorHeap* heap=Engine::GetInitHeap()) : m_table(numTexture, heap) {}
-
-		inline Graphic::DescriptorTable* GetDescriptorTable() { return &m_table; }
-
-		inline UINT size() { return m_table.size(); }
-
-		void UseMaterial(Graphic::CommandList& commandList, UINT slot) override;
-
-	private:
-		Graphic::DescriptorTable m_table;
-	};*/
-
 }

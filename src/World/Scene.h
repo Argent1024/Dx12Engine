@@ -44,6 +44,7 @@ namespace Game
 		MixtureRenderPass m_MixturePass;
 
 		ProjectiveCamera m_Camera;
+		DirectionLight* m_DirectionLight;
 
 		// Bind Stuff
 		SceneConstantBuffer m_SceneData;

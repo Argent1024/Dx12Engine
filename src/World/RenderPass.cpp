@@ -4,12 +4,11 @@
 namespace Game {
 
 	void DefaultRenderPass::Initialize() {
-		m_PSO = std::make_shared<Graphic::DefaultPSO>();
+		// TODO Use only one root signature
 		m_rootSignature = std::make_shared<Graphic::RootSignature>();
-
-
 		m_rootSignature->Initialize();
 
+		m_PSO = std::make_shared<Graphic::DefaultPSO>();
 		m_PSO->SetRootSigature(m_rootSignature->GetRootSignature());
 		m_PSO->Initialize();
 	}
@@ -42,6 +41,7 @@ namespace Game {
 	{
 		m_Table.Initialize(Engine::GetInitHeap());
 
+		// TODO Use only one root signature
 		m_rootSignature = std::make_shared<Graphic::MixRootSignature>(m_Table.size());
 		m_rootSignature->Initialize();
 

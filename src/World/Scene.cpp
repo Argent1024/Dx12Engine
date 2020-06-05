@@ -29,6 +29,9 @@ namespace Game {
 		const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneConstantBuffer));
 		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
 		m_SceneCBV = new Graphic::ConstantBuffer(gpumem, cbvSize, *m_SceneTable, 0); // Bind at slot 0
+		
+		Graphic::Texture* depthTexture = m_DirectionLight->GetDepthTexture();
+		depthTexture->CreateView(Graphic::TEXTURE_SRV, m_SceneTable, 1); // Bind DirectionLight's depth
 	}
 
 	Scene::Scene(const HWND m_appHwnd, const UINT width, const UINT height, ProjectiveCamera& camera)
