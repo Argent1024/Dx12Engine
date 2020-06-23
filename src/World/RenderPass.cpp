@@ -3,7 +3,8 @@
 
 namespace Game {
 
-	void DefaultRenderPass::Initialize() {
+	void DefaultRenderPass::Initialize() 
+	{
 		// TODO Use only one root signature
 		m_rootSignature = std::make_shared<Graphic::RootSignature>();
 		m_rootSignature->Initialize();
@@ -11,19 +12,38 @@ namespace Game {
 		m_PSO = std::make_shared<Graphic::DefaultPSO>();
 		m_PSO->SetRootSigature(m_rootSignature->GetRootSignature());
 		m_PSO->Initialize();
+
+		
+		// Create Descriptor Table
+		// TODO determine how large the table should be
+		const UINT tableSize = 4;
+		m_DescriptorTable = new Graphic::DescriptorTable(tableSize);
+		m_DescriptorTable->Initialize(Engine::GetInitHeap());
+
+		// Create Scene const buffer
+		// TODO calculate size
+		//const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneData));
+		//ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
+		//Graphic::ConstantBuffer* sceneCBV = new Graphic::ConstantBuffer(gpumem, cbvSize, *m_DescriptorTable, 0); // Bind at slot 0
+		
+		// Graphic::Texture* depthTexture = m_DirectionLight->GetDepthTexture();
+		// depthTexture->CreateView(Graphic::TEXTURE_SRV, m_SceneTable, 1); // Bind DirectionLight's depth
 	}
 
-	void DefaultRenderPass::Render(Graphic::CommandList& commandList, std::vector<GObject*>& objList) {
-		assert(m_Camera != nullptr);
+	void DefaultRenderPass::Render(Graphic::CommandList& commandList, Scene& scene) {
+		
 		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
 		commandList.SetPipelineState(m_PSO);
 		commandList.SetGraphicsRootSignature(m_rootSignature);
 		
-		// TODO Scene Data should be bind outside
-		CD3DX12_GPU_DESCRIPTOR_HANDLE sceneTableHandle = m_SceneData->BindDescriptorTable();
-		commandList.SetGraphicsRootDescriptorTable(0, sceneTableHandle);
 
-		m_Camera->UseCamera(commandList);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE sceneTableHandle = m_DescriptorTable->BindDescriptorTable();
+		commandList.SetGraphicsRootDescriptorTable(0, sceneTableHandle);
+		
+		Camera& camera = scene.GetMainCamera();
+		camera.UseCamera(commandList);
+
+		const std::vector<GObject*> objList = scene.GetGameObjects(m_ObjRenderType);
 		for (auto const& g_obj : objList)
 		{
 			g_obj->RecordCommand(commandList);
@@ -34,15 +54,16 @@ namespace Game {
 
 	MixtureRenderPass::MixtureRenderPass(UINT num_texture, const UINT width, const UINT height)
 		: m_Viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)),
-		  m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height)),
-		  m_Table(num_texture) { }
+		  m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
+		 { m_DescriptorTable = new Graphic::DescriptorTable(num_texture); }
 
 	void MixtureRenderPass::Initialize() 
 	{
-		m_Table.Initialize(Engine::GetInitHeap());
+		//m_DescriptorTable = new Graphic::DescriptorTable();
+		m_DescriptorTable->Initialize(Engine::GetInitHeap());
 
 		// TODO Use only one root signature
-		m_rootSignature = std::make_shared<Graphic::MixRootSignature>(m_Table.size());
+		m_rootSignature = std::make_shared<Graphic::MixRootSignature>(m_DescriptorTable->size());
 		m_rootSignature->Initialize();
 
 		m_PSO = std::make_shared<Graphic::MixturePSO>();
@@ -68,7 +89,7 @@ namespace Game {
 		m_RenderScreen->Initialize();
 	}
 
-	void MixtureRenderPass::Render(Graphic::CommandList& commandList) 
+	void MixtureRenderPass::Render(Graphic::CommandList& commandList, Scene& scene) 
 	{
 		commandList.SetViewPorts(&m_Viewport);
 		commandList.SetScissorRects(&m_ScissorRect);
@@ -76,7 +97,7 @@ namespace Game {
 		commandList.SetGraphicsRootSignature(m_rootSignature);
 		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
 
-		CD3DX12_GPU_DESCRIPTOR_HANDLE handle = m_Table.BindDescriptorTable();
+		CD3DX12_GPU_DESCRIPTOR_HANDLE handle = m_DescriptorTable->BindDescriptorTable();
 		commandList.SetGraphicsRootDescriptorTable(1, handle);
 
 		m_RenderScreen->RecordCommand(commandList);

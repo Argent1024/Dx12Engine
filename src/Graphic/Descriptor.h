@@ -215,6 +215,7 @@ namespace Graphic {
 		
 	private:
 		D3D12_RENDER_TARGET_VIEW_DESC m_rtvDesc;
+
 	};
 
 

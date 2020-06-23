@@ -16,6 +16,7 @@ namespace Game
 		XMFLOAT4X4 view;
 	};
 
+
 	class Scene
 	{
 	public:
@@ -23,25 +24,19 @@ namespace Game
 
 		Scene(const HWND m_appHwnd, const UINT width, const UINT height, ProjectiveCamera& camera);
 
-		virtual void Render();
+		// TODO const camera, edit Camera class
+		Camera& GetMainCamera() { return m_Camera; }
 
-		virtual void Update();
+		//TODO
+		const std::vector<GObject*> GetGameObjects(UINT index) { return m_ObjList; }
 
 		// TODO accel structure
 		virtual void AddGameObj(GObject* obj);
-
-		// TODO
 		virtual void DeleteGameObj(GObject* obj) {}
 
 	protected:
 
-		virtual void BeginRender();
-		virtual void EndRender();
-		
 		void SetCameraTransformation(Camera& camera);
-
-		DefaultRenderPass m_Renderpass;
-		MixtureRenderPass m_MixturePass;
 
 		ProjectiveCamera m_Camera;
 		DirectionLight* m_DirectionLight;
@@ -52,9 +47,6 @@ namespace Game
 		Graphic::DescriptorTable* m_SceneTable;
 
 		std::vector<GObject*> m_ObjList;
-
-		Graphic::DepthBuffer m_depthBuffer;
-		Graphic::SwapChain m_SwapChain;
 	};
 
 }

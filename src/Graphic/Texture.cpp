@@ -156,7 +156,8 @@ namespace Graphic {
 			clearValue.DepthStencil.Stencil = 0;
 
 			m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc, clearValue, D3D12_HEAP_TYPE_DEFAULT, initState);
-			// Emmmmm TODO Format
+			// Emmmmm Hack here TODO Format
+			// Since SRV only use R32 not D32
 			m_textureDesc.Format = DXGI_FORMAT_R32_FLOAT;
 		} else if (m_Type & TEXTURE_RTV) {
 

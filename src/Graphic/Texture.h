@@ -81,7 +81,7 @@ namespace Graphic {
 				break;
 			}
 		}
-
+		
 		inline ShaderResource* GetShaderResourceView() const 
 		{ 
 			assert(m_Type & TEXTURE_SRV && "SRV not created for this texture");

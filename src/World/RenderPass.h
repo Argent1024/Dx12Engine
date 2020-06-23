@@ -2,70 +2,74 @@
 #include "PipelineState.h"
 #include "RootSignature.h"
 #include "CommandList.h"
-#include "Camera.h"
-#include "GObject.h"
+
+#include "Scene.h"
 
 namespace Game {
 	
+	// Implement one explict render pass 
+	// e.x. default render pass, screen space method, transpancy ... 
 	class RenderPass {
 	public:
+		RenderPass();
+
 		virtual void Initialize() = 0;
 
-		// Record Commands
-		// Who implement this class need to implement at least one of this
-		virtual void Render(Graphic::CommandList& commandList) {
-			throw std::runtime_error("Using wrong render function");
-		}
+		// Record Commands for rendering
+		virtual void Render(Graphic::CommandList& commandList, Scene& scene) = 0;
 
-		virtual void Render(Graphic::CommandList& commandList, GObject* obj) {
-			throw std::runtime_error("Using wrong render function");
-		}
-
-		virtual void Render(Graphic::CommandList& commandList, std::vector<GObject*>& objList) {
-			throw std::runtime_error("Using wrong render function");
-		}
-		
 	protected:
-		ptrPSO m_PSO;
 		ptrRootSignature m_rootSignature;
+		ptrPSO m_PSO;
+
+		Graphic::DescriptorTable* m_DescriptorTable;
+
+		UINT m_ObjRenderType; // Record the render needed game objects' position in the scene class
 	};
 	
+
+	/*************************************************************************************
+			             Render pass implementation below
+	*************************************************************************************/
+
+
+	// Default render pass:
+	//		Render simple material (no special effect, no reflection)
+	//		Use Scene's camera & lighting.
+	//		Required a shadow pass for light before this
 	class DefaultRenderPass : public RenderPass {
 	public:
+
 		void Initialize() override;
 
-		void Render(Graphic::CommandList& commandList, std::vector<GObject*>& objList) override;
-		
-		inline void SetCamera(Camera* camera) { m_Camera = camera; }
+		void Render(Graphic::CommandList& commandList, Scene& scene) override;
 
-		inline void SetSceneTable(Graphic::DescriptorTable* table) { m_SceneData = table; }
-
-	private:
-		Camera* m_Camera;
-		
-		Graphic::DescriptorTable* m_SceneData;
 	};
+
 
 	class MixtureRenderPass : public RenderPass {
 
 	public:
 		MixtureRenderPass(UINT num_texture, const UINT width, const UINT height);
 
-		inline UINT size() { return m_Table.size(); }
+		inline UINT size() { return m_DescriptorTable->size(); }
 
 		inline Graphic::DescriptorTable* GetDescriptorTable() 
-		{ return &m_Table; }
+		{ return m_DescriptorTable; }
 
 		void Initialize() override;
 	
-		void Render(Graphic::CommandList& commandList) override;
+		void Render(Graphic::CommandList& commandList, Scene& scene) override;
 
 	private:
 		CD3DX12_VIEWPORT m_Viewport;
 		CD3DX12_RECT m_ScissorRect;
 		// std::shared_ptr<SimpleMaterial> m_MixtureTextures;
-		Graphic::DescriptorTable m_Table;
+	
 		GObject* m_RenderScreen;
 	};
 
+	/*************************************************************************************
+			             Render pass implementation End
+	*************************************************************************************/
 }
