@@ -5,14 +5,11 @@
 namespace Game {
 	
 	DirectionLight::DirectionLight(UINT width, UINT height)
-		: m_DepthBuffer(width, height), m_Camera(width, height)
+		:  m_DepthBuffer(width, height), m_Camera(width, height)
 	{
 		// Initialize dsv
 		// Should create srv else where
 		m_DepthBuffer.Initialize(Graphic::TEXTURE_DSV & Graphic::TEXTURE_SRV);
-
-		// Default Camera Location
-		m_Camera.LookAt(Vector3(0.f, 1.f, -1.f), Vector3(0.f,0.f,0.f), Vector3(0.f, 1.f, 0.f));
 	}
 
 	void DirectionLight::UseLight()
@@ -21,21 +18,43 @@ namespace Game {
 
 	}
 
+	void DirectionLight::SetLightData(const LightData& data) 
+	{
+			
+		XMStoreFloat4(&m_state->strength, data.strength);
+		XMStoreFloat4(&m_state->direction, data.direction);
 
-	SpotLight::SpotLight(Vector3 pos, Vector3 dir, UINT width, UINT height)
+		m_Camera.LookAt(data.pos, data.pos + data.direction, Vector3(0.0f, 1.0f, 0.0f));
+
+		const Transform& view = m_Camera.GetView();
+		const Transform& orth = m_Camera.GetToScreen();
+
+		XMStoreFloat4x4(&m_state->view, view);
+		XMStoreFloat4x4(&m_state->proj, orth);
+	}
+
+
+	SpotLight::SpotLight(UINT width=256, UINT height=256)
 		: m_DepthBuffer(width, height), m_Camera(width, height)
 	{
 		// Initialize dsv
 		// Should create srv else where
 		m_DepthBuffer.Initialize(Graphic::TEXTURE_DSV & Graphic::TEXTURE_SRV);
 		
-		m_Camera.LookAt(pos, pos + dir, Vector3(0.f, 1.f, 0.f));
+		
 	}
+
 
 	void SpotLight::UseLight()
 	{
 		const Transform& view = m_Camera.GetView();
 		const Transform& proj = m_Camera.GetToScreen();
+
+	}
+
+	void SpotLight::SetLightData(const LightData& data) 
+	{
+		
 
 	}
 }

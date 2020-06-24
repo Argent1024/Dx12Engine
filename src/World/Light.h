@@ -27,15 +27,15 @@ namespace Game {
 		XMFLOAT4 pos;		// Point / Spot light
 		XMFLOAT4 direction;	// Dir / Spot light
 		XMFLOAT4X4 view;	
-		XMFLOAT4X4 proj;	// Projective // orthnormal matrix
+		XMFLOAT4X4 proj;	// Store Projective/orthnormal matrix
 	};
 
-	class Light {
 
+	// True data of the light is stored in the Scene Class(make it easier to pass to GPU),
+	// Here we just use a pointer of light state and a Camera to represent an abstract light
+	class Light
+	{
 	public:
-		Light() {}
-
-		inline void SetState(LightState* state) { m_state = state; }
 
 		inline LightState* GetLightState() { return m_state; }
 
@@ -43,14 +43,14 @@ namespace Game {
 
 		virtual Graphic::Texture* GetDepthTexture() = 0;
 		
-		//virtual void SetLightData(const LightData& data) = 0;
+		virtual void SetLightData(const LightData& data) = 0;
 
-		// Put Data into m_state
+		// Record command, create shadow map
 		virtual void UseLight() = 0;
 
 		virtual Camera& GetCamera() = 0;
 
-	private:
+	protected:
 		LightState* m_state;
 	};
 
@@ -64,7 +64,7 @@ namespace Game {
 
 		Graphic::DepthBuffer& GetDepthBuffer() override { return m_DepthBuffer; }
 
-		//void SetLightData(const LightData& data) override;
+		void SetLightData(const LightData& data) override;
 
 		inline Camera& GetCamera() override { return m_Camera; }
 
@@ -79,13 +79,13 @@ namespace Game {
 	class SpotLight : public Light
 	{
 	public:
-		SpotLight(Vector3 pos, Vector3 dir, UINT width=256, UINT height=256);
+		SpotLight(UINT width=256, UINT height=256);
 
 		inline Graphic::Texture* GetDepthTexture() override { return m_DepthBuffer.GetTexture(); }
 
 		Graphic::DepthBuffer& GetDepthBuffer() override { return m_DepthBuffer; }
 
-		//void SetLightData(const LightData& data) override;
+		void SetLightData(const LightData& data) override;
 
 		inline Camera& GetCamera() override { return m_Camera; }
 

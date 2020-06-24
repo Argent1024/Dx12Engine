@@ -2,27 +2,36 @@
 
 namespace Game {
 
-	Scene::Scene(const HWND AppHwnd, const UINT width, const UINT height)
-		:
-		  m_Camera(width, height, 
+	Scene::Scene(const UINT width, const UINT height)
+		:    m_Camera(width, height, 
 			  Vector3(-3.0f, -1.0f, -12.f), 
 			  Vector3(0.0f, 0.0f, 0.0f),
 			  Vector3(0.0f, 1.0f, 0.0f))
 	{ }
 
-	Scene::Scene(const HWND m_appHwnd, const UINT width, const UINT height, ProjectiveCamera& camera)
+	Scene::Scene(ProjectiveCamera& camera)
 		:  m_Camera(camera)
 	{ }
 
 	
 	void Scene::Initialize() 
 	{
-		// m_Camera.
-		m_LightTable = new Graphic::DescriptorTable(LightTableSize);
-		m_LightTable->Initialize(Engine::GetInitHeap());
+		m_LightsTable = new Graphic::DescriptorTable(LightTableSize);
+		m_LightsTable->Initialize(Engine::GetInitHeap());
+
+		UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneLightsInfo));
+		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
+		// Create CBV at slot 0 of the lightTable
+		m_LightsCBV = new Graphic::ConstantBuffer(gpumem, cbvSize, *m_LightsTable, 0);
+		
+		// Other Textures should be bind outside
 	}
 
-	
+	void Scene::PrepareLights() 
+	{
+		
+	}
+
 	void Scene::AddGameObj(GObject* obj) 
 	{
 		m_ObjList.push_back(obj);
