@@ -38,7 +38,7 @@ namespace Game {
 		XMStoreFloat4x4(&m_CBVData.projection, XMMatrixTranspose((XMMATRIX)proj));
 		XMStoreFloat4x4(&m_CBVData.view, XMMatrixTranspose((XMMATRIX)view));
 		
-		m_CBV->copyData(&m_CBVData, sizeof(CameraBufferData));
+		m_CBV->copyData(&m_CBVData);//, sizeof(CameraBufferData));
 	}
 
 	void DefaultRenderPass::Render(Graphic::CommandList& commandList, Scene& scene) {
@@ -48,8 +48,9 @@ namespace Game {
 		commandList.SetGraphicsRootSignature(m_rootSignature);
 		
 
-		CD3DX12_GPU_DESCRIPTOR_HANDLE sceneTableHandle = m_DescriptorTable->BindDescriptorTable();
-		commandList.SetGraphicsRootDescriptorTable(0, sceneTableHandle);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE cameraTableHandle = m_DescriptorTable->BindDescriptorTable();
+		// Slot 0 in root signature is for camera
+		commandList.SetGraphicsRootDescriptorTable(0, cameraTableHandle);
 		
 		Camera& camera = scene.GetMainCamera();
 		camera.UseCamera(commandList);

@@ -24,7 +24,7 @@ namespace Game {
 
 		Graphic::DescriptorHeap* heap = Engine::GetInUseHeap();
 		CD3DX12_GPU_DESCRIPTOR_HANDLE tableHandle = m_table.BindDescriptorTable();
-		commandList.SetGraphicsRootDescriptorTable(1, tableHandle);  //  slot 1  in root signature is reversed for object
+		commandList.SetGraphicsRootDescriptorTable(2, tableHandle);  //  slot 2  in root signature is reversed for object
 			
 		m_Mesh->UseMesh(commandList);
 	}

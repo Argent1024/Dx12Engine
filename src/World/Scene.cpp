@@ -17,6 +17,7 @@ namespace Game {
 	
 	void Scene::Initialize() 
 	{
+		// m_Camera.
 		m_LightTable = new Graphic::DescriptorTable(LightTableSize);
 		m_LightTable->Initialize(Engine::GetInitHeap());
 	}

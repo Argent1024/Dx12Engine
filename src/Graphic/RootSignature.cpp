@@ -33,7 +33,7 @@ namespace Graphic {
 
 		// Descriptor table (Camera/Renderpass) : b0, t0 - t7 [Space 1]
 		//rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
-		rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
+		rootParameters[0].InitAsDescriptorTable(2, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
 
 		// Descriptor table (Lights) : b1, t8 - t24 [Space 1]
 		rootParameters[1].InitAsDescriptorTable(2, &ranges[2], D3D12_SHADER_VISIBILITY_ALL);

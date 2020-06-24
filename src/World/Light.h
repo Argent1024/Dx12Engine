@@ -43,7 +43,7 @@ namespace Game {
 
 		virtual Graphic::Texture* GetDepthTexture() = 0;
 		
-		virtual void SetLightData(const LightData& data) = 0;
+		//virtual void SetLightData(const LightData& data) = 0;
 
 		// Put Data into m_state
 		virtual void UseLight() = 0;
@@ -64,7 +64,7 @@ namespace Game {
 
 		Graphic::DepthBuffer& GetDepthBuffer() override { return m_DepthBuffer; }
 
-		void SetLightData(const LightData& data) override;
+		//void SetLightData(const LightData& data) override;
 
 		inline Camera& GetCamera() override { return m_Camera; }
 
@@ -85,7 +85,7 @@ namespace Game {
 
 		Graphic::DepthBuffer& GetDepthBuffer() override { return m_DepthBuffer; }
 
-		void SetLightData(const LightData& data) override;
+		//void SetLightData(const LightData& data) override;
 
 		inline Camera& GetCamera() override { return m_Camera; }
 
