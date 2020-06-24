@@ -12,9 +12,9 @@ namespace Graphic {
 		static const D3D12_DESCRIPTOR_HEAP_TYPE HeapType = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		static const UINT FrameCount = 2;
 
-		SwapChain(const HWND appHwnd, const UINT width, const UINT height);
+		SwapChain(const UINT width, const UINT height);
 
-		void Initialize(ID3D12CommandQueue* commandQueue);
+		void Initialize(ID3D12CommandQueue* commandQueue, const HWND appHwnd);
 		
 		// Return the handle of the back buffer
 		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetBackBufferCPUHandle() const { return m_rtvHeap.GetCPUHandle(m_BackBufferIndex); }
@@ -48,7 +48,7 @@ namespace Graphic {
 	private:
 		const UINT m_width;
 		const UINT m_height;
-		const HWND m_appHwnd;
+		HWND m_appHwnd;
 
 		ComPtr<IDXGISwapChain3> m_swapChain;
 		DXGI_SWAP_CHAIN_DESC1 m_swapChainDesc;

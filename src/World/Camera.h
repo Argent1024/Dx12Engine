@@ -8,6 +8,7 @@
 
 namespace Game {
 	using namespace Math;
+
 	// ***IMPORTANT***
 	// In DirectX's cpu code, vector's dimension is 1 * 4.
 	// So a matrix(transform) M mutiply(apply to) a vector v should be written as v * M
@@ -18,8 +19,7 @@ namespace Game {
 			 m_Viewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)),
 			 m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 		{ }
-
-		// TODO confusing name
+		
 		virtual void UseCamera(Graphic::CommandList& commandList)
 		{
 			commandList.SetViewPorts(&m_Viewport);

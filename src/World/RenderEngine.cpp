@@ -1,6 +1,24 @@
 #include "RenderEngine.h"
 
 namespace Game {
+	
+	RenderEngine::RenderEngine(const UINT width, const UINT height) 
+		: swapChain(width, height),
+		  depthBuffer(width, height)
+	{
+	
+	}
+
+
+	void RenderEngine::Initialize(const HWND appHwnd) 
+	{
+		defalutpass.Initialize();
+
+		swapChain.Initialize(GraphicsCommandManager.GetCommadnQueue(), appHwnd);
+		depthBuffer.Initialize(Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV);
+	
+			
+	}
 
 
 	void RenderEngine::Render(Scene& scene) 
@@ -8,11 +26,7 @@ namespace Game {
 		BeginRender();
 
 		// Set Scene Data for Default Render Pass
-		Camera& camera = scene.GetMainCamera();
-		SetCameraTransformation(camera);
-		m_SceneCBV->copyData(&m_SceneData);
-			
-		defalutpass.SetSceneTable(m_SceneTable);
+		defalutpass.PrepareData(scene);
 
 		// TODO multi threading here
 
@@ -63,7 +77,7 @@ namespace Game {
 		mainCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		mainCommandList.ClearSwapChain(swapChain, clearColor);
 		mainCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		
+		// Main Commanlist will go before other commandlist
 		GraphicsCommandManager.ExecuteCommandList(&mainCommandList);
 	}
 

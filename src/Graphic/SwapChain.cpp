@@ -1,14 +1,16 @@
 #include "SwapChain.h"
 
 namespace Graphic {
-	SwapChain::SwapChain(const HWND appHwnd, const UINT width, const UINT height) 
-		: m_appHwnd(appHwnd), m_width(width), m_height(height), 
+	SwapChain::SwapChain(const UINT width, const UINT height) 
+		: m_width(width), m_height(height), 
 		  m_rtvHeap(HeapType, FrameCount, D3D12_DESCRIPTOR_HEAP_FLAG_NONE)
 	{
 	
 	}
 
-	void SwapChain::Initialize(ID3D12CommandQueue* commandQueue) {
+	void SwapChain::Initialize(ID3D12CommandQueue* commandQueue, const HWND appHwnd) {
+		m_appHwnd = appHwnd;
+
 		IDXGIFactory4* factory = Engine::GetFactory();
 		ID3D12Device* device = Engine::GetDevice();
 		{

@@ -20,14 +20,25 @@ namespace Game {
 		m_DescriptorTable = new Graphic::DescriptorTable(tableSize);
 		m_DescriptorTable->Initialize(Engine::GetInitHeap());
 
-		// Create Scene const buffer
-		// TODO calculate size
-		//const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneData));
-		//ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
-		//Graphic::ConstantBuffer* sceneCBV = new Graphic::ConstantBuffer(gpumem, cbvSize, *m_DescriptorTable, 0); // Bind at slot 0
+		// Creata CBV 
+		const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(CameraBufferData));
+		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
+		m_CBV = new Graphic::ConstantBuffer(gpumem, cbvSize, *m_DescriptorTable, 0); // Bind at slot 0
 		
-		// Graphic::Texture* depthTexture = m_DirectionLight->GetDepthTexture();
-		// depthTexture->CreateView(Graphic::TEXTURE_SRV, m_SceneTable, 1); // Bind DirectionLight's depth
+		// The other textures needed is binded outside by render engine
+	}
+
+	void DefaultRenderPass::PrepareData(Scene& scene)
+	{
+		Camera& camera = scene.GetMainCamera();
+		const Transform& view = camera.GetView();
+		const Transform& proj = camera.GetToScreen();
+		
+		// Need to transpose
+		XMStoreFloat4x4(&m_CBVData.projection, XMMatrixTranspose((XMMATRIX)proj));
+		XMStoreFloat4x4(&m_CBVData.view, XMMatrixTranspose((XMMATRIX)view));
+		
+		m_CBV->copyData(&m_CBVData, sizeof(CameraBufferData));
 	}
 
 	void DefaultRenderPass::Render(Graphic::CommandList& commandList, Scene& scene) {

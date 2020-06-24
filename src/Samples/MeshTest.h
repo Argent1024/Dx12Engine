@@ -5,6 +5,8 @@
 #include "../World/Camera.h"
 #include "../World/GObject.h"
 #include "../World/Scene.h"
+#include "../World/RenderEngine.h"
+
 
 namespace Samples {
 	using namespace Graphic;
@@ -26,7 +28,8 @@ namespace Samples {
 		float t = 10.0;
 
 		Scene* m_Scene;
-		
+		RenderEngine* m_Render;
+	
 		ptrRootSignature m_rootSignature;
 		ptrPSO m_GraphicPSO;		// Main Render Pass
 

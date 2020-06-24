@@ -6,23 +6,21 @@
 #include "GObject.h"
 #include "Camera.h"
 #include "Light.h"
-#include "RenderPass.h"
+
 
 namespace Game 
 {
-	struct SceneConstantBuffer 
-	{
-		XMFLOAT4X4 projection;
-		XMFLOAT4X4 view;
-	};
-
 
 	class Scene
 	{
 	public:
+		
 		Scene(const HWND m_appHwnd, const UINT width, const UINT height);
 
 		Scene(const HWND m_appHwnd, const UINT width, const UINT height, ProjectiveCamera& camera);
+
+		// Create Descriptor table for lights and put srv( for shadow map) into it
+		virtual void Initialize();
 
 		// TODO const camera, edit Camera class
 		Camera& GetMainCamera() { return m_Camera; }
@@ -35,16 +33,14 @@ namespace Game
 		virtual void DeleteGameObj(GObject* obj) {}
 
 	protected:
-
-		void SetCameraTransformation(Camera& camera);
+		static const UINT LightTableSize = 4;
 
 		ProjectiveCamera m_Camera;
 		DirectionLight* m_DirectionLight;
 
-		// Bind Stuff
-		SceneConstantBuffer m_SceneData;
-		Graphic::ConstantBuffer* m_SceneCBV; 
-		Graphic::DescriptorTable* m_SceneTable;
+		// Bind Light Stuff
+		Graphic::ConstantBuffer* m_LightCBV; 
+		Graphic::DescriptorTable* m_LightTable;
 
 		std::vector<GObject*> m_ObjList;
 	};

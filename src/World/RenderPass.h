@@ -6,17 +6,22 @@
 #include "Scene.h"
 
 namespace Game {
-	
+
 	// Implement one explict render pass 
 	// e.x. default render pass, screen space method, transpancy ... 
 	class RenderPass {
 	public:
-		RenderPass();
-
 		virtual void Initialize() = 0;
 
+		//Prepare data for rendering(like put in the camera's data), 
+		// should be called in main thread
+		virtual void PrepareData(Scene& scene) = 0;
+
 		// Record Commands for rendering
+		// Should in worker thread
 		virtual void Render(Graphic::CommandList& commandList, Scene& scene) = 0;
+
+		Graphic::DescriptorTable* GetTable() { return m_DescriptorTable; }
 
 	protected:
 		ptrRootSignature m_rootSignature;
@@ -40,10 +45,20 @@ namespace Game {
 	class DefaultRenderPass : public RenderPass {
 	public:
 
+		struct CameraBufferData 
+		{
+			XMFLOAT4X4 projection;
+			XMFLOAT4X4 view;
+		};
+
 		void Initialize() override;
 
-		void Render(Graphic::CommandList& commandList, Scene& scene) override;
+		void PrepareData(Scene& scene) override;
 
+		void Render(Graphic::CommandList& commandList, Scene& scene) override;
+	private:
+		CameraBufferData m_CBVData;
+		Graphic::ConstantBuffer* m_CBV;
 	};
 
 
@@ -58,7 +73,9 @@ namespace Game {
 		{ return m_DescriptorTable; }
 
 		void Initialize() override;
-	
+		
+		void PrepareData(Scene& scene) override { } 
+
 		void Render(Graphic::CommandList& commandList, Scene& scene) override;
 
 	private:

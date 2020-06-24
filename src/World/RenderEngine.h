@@ -5,23 +5,22 @@
 namespace Game {
 	// The main renderer use(called) by the engine
 	// TODO hard code passes for now, make it configable
+	// Don't think a virtual class or any override is needed
 	class RenderEngine {
 
 	public:
-		virtual void Initialize();
+		RenderEngine(const UINT width, const UINT height);
 
-		virtual void Render(Scene& scene);
+		void Initialize(const HWND appHwnd);
+
+		void Render(Scene& scene);
 
 	private:
 
 		void BeginRender();
 		void EndRender();
-		
-
-		Graphic::ConstantBuffer* sceneData;
-
+	
 		DefaultRenderPass defalutpass;
-
 
 		// Main Swap Chain for the Engine
 		Graphic::SwapChain swapChain;

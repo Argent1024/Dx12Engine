@@ -13,24 +13,33 @@ namespace Graphic {
 			featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 		}
 
-		CD3DX12_DESCRIPTOR_RANGE1 ranges[5];
-		CD3DX12_ROOT_PARAMETER1 rootParameters[2];
+		CD3DX12_DESCRIPTOR_RANGE1 ranges[7];
+		CD3DX12_ROOT_PARAMETER1 rootParameters[3];
 		
-		// Descriptor table for the Scene
+	
+
+		// Descriptor table for Camera / Renderpass
 		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b0
-		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0-tInf space1
+		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t7 space 1
+
+		// Descriptor table for Lights
+		ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b1
+		ranges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 16, 8, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t8 - t24 space 1
 
 		// Descriptor Table for the object
-		ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b1
-		ranges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t4
-		ranges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 4, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // u0-u4
+		ranges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b2
+		ranges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t4
+		ranges[6].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 4, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // u0-u4
 
-		// Descriptor table (Scene) : b0, t0-tInf Space1
+		// Descriptor table (Camera/Renderpass) : b0, t0 - t7 [Space 1]
 		//rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
 		rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
 
-		// Descriptor table (Object): b1, t0-t4, u0-u4
-		rootParameters[1].InitAsDescriptorTable(3, &ranges[2], D3D12_SHADER_VISIBILITY_ALL);
+		// Descriptor table (Lights) : b1, t8 - t24 [Space 1]
+		rootParameters[1].InitAsDescriptorTable(2, &ranges[2], D3D12_SHADER_VISIBILITY_ALL);
+
+		// Descriptor table (Object): b2, t0-t4, u0-u4 [Space 0]
+		rootParameters[2].InitAsDescriptorTable(3, &ranges[4], D3D12_SHADER_VISIBILITY_ALL);
 
 		D3D12_STATIC_SAMPLER_DESC sampler = {};
         sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
