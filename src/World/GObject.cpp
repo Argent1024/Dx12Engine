@@ -10,7 +10,9 @@ namespace Game {
 		/*m_Texture = new Graphic::TextureBuffer(cbSize);
 		m_Texture->CreateView(Graphic::TEXTURE_CBV, &m_table, 0); */
 		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbSize, D3D12_HEAP_TYPE_UPLOAD);
-		m_CBV = new Graphic::ConstantBuffer(gpumem, cbSize, m_table, 0);
+		m_CBV = new Graphic::ConstantBuffer(gpumem, cbSize);
+		m_CBV->Initialize();
+		m_CBV->CreateView(m_table, 0);
 		// slot 0 in the table is for const data
 	}
 

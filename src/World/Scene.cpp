@@ -22,7 +22,9 @@ namespace Game {
 		UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneLightsInfo));
 		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
 		// Create CBV at slot 0 of the lightTable
-		m_LightsCBV = new Graphic::ConstantBuffer(gpumem, cbvSize, *m_LightsTable, 0);
+		m_LightsCBV = new Graphic::ConstantBuffer(gpumem, cbvSize);
+		m_LightsCBV->Initialize();
+		m_LightsCBV->CreateView(*m_LightsTable, 0);
 		
 		// Other Textures should be bind outside
 	}

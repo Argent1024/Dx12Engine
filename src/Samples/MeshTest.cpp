@@ -16,7 +16,7 @@ namespace Samples {
 
 		// m_Camera.CreateCBV();
 		// Create Scene
-		m_Scene = new Scene(m_appHwnd, m_width, m_height);
+		m_Scene = new Scene(m_width, m_height);
 		m_Render = new RenderEngine(m_width, m_height);
 		m_Render->Initialize(m_appHwnd);
 

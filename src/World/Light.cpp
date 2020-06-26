@@ -5,11 +5,12 @@
 namespace Game {
 	
 	DirectionLight::DirectionLight(UINT width, UINT height)
-		:  m_DepthBuffer(width, height), m_Camera(width, height)
+		:  m_DepthBuffer(width, height, Graphic::TEXTURE_DSV & Graphic::TEXTURE_SRV), 
+		   m_Camera(width, height)
 	{
 		// Initialize dsv
 		// Should create srv else where
-		m_DepthBuffer.Initialize(Graphic::TEXTURE_DSV & Graphic::TEXTURE_SRV);
+		m_DepthBuffer.Initialize();
 	}
 
 	void DirectionLight::UseLight()
@@ -34,12 +35,13 @@ namespace Game {
 	}
 
 
-	SpotLight::SpotLight(UINT width=256, UINT height=256)
-		: m_DepthBuffer(width, height), m_Camera(width, height)
+	SpotLight::SpotLight(UINT width, UINT height)
+		: m_DepthBuffer(width, height, Graphic::TEXTURE_DSV & Graphic::TEXTURE_SRV), 
+		  m_Camera(width, height)
 	{
 		// Initialize dsv
 		// Should create srv else where
-		m_DepthBuffer.Initialize(Graphic::TEXTURE_DSV & Graphic::TEXTURE_SRV);
+		m_DepthBuffer.Initialize();
 		
 		
 	}

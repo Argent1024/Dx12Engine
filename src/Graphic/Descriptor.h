@@ -27,52 +27,6 @@ namespace Graphic {
 		device->CopyDescriptorsSimple(size, destCPUHandle, srcCPUHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
-
-	// Most Descriptor here shouldn't be used directly, use Mesh & Material class instead
-	// Descriptors don't need to know about GPU Heap, GPU Buffer should handle all the memory stuff
-	class Descriptor {
-	public:
-		Descriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
-			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
-
-		inline void copyData(const void* data, UINT size) { Engine::MemoryAllocator.UploadData(*m_Buffer, data, size, m_Offset); }
-		inline void copyData(const void* data) { copyData(data, m_BufferSize); }
-
-		inline UINT GetSize() { return m_BufferSize; }
-
-	protected:
-		ptrGPUMem m_Buffer;
-		UINT m_BufferSize;
-		UINT m_Offset;
-	};
-
-	// TODO fix gpubuffer size
-	// Base class for those view who use descriptor heap to bind 
-	class HeapDescriptor : public Descriptor {
-	public:
-		HeapDescriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
-			: Descriptor(gpubuffer, bufferSize) {}
-
-		inline UINT GetHeapIndex() const { return m_HeapIndex; }
-
-		// Simple Bind function, just bind one descriptor to InUse heap (Use Graphics::BindMultiDescriptor instead)
-		// Copy this descriptor to the in use descriptor heap for rendering
-		inline void BindDescriptor(UINT destIndex) const
-		{
-			BindMultiDescriptor(m_HeapIndex, 1, destIndex);
-		}
-
-		inline void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData)
-		{
-			Engine::MemoryAllocator.UploadTexure(*m_Buffer, textureData);
-		}
-
-	protected:
-		// TODO seem useless if we required every Heap Descriptor is used through DescriptorTable
-		UINT m_HeapIndex;
-	};
-
-
 	// Manage a list of Heap descriptors
 	// This class malloc n slots from the descriptor heap
 	// Should only be used in one thread
@@ -122,6 +76,61 @@ namespace Graphic {
 	};
 
 
+
+	// Most Descriptor here shouldn't be used directly, use Mesh & Material & Texture class instead
+	// Descriptors don't need to know about GPU memory stuff
+	class Descriptor {
+	public:
+		Descriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
+			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
+
+		// Malloc space in m_Buffer, store the view desc
+		virtual void Initialize() = 0; 
+
+		inline void copyData(const void* data, UINT size) { Engine::MemoryAllocator.UploadData(*m_Buffer, data, size, m_Offset); }
+		inline void copyData(const void* data) { copyData(data, m_BufferSize); }
+
+		inline UINT GetSize() { return m_BufferSize; }
+
+	protected:
+		ptrGPUMem m_Buffer;
+		UINT m_BufferSize;
+		UINT m_Offset;
+	};
+
+	// TODO fix gpubuffer size
+	// Base class for those view who use descriptor heap to bind 
+	class HeapDescriptor : public Descriptor {
+	public:
+		HeapDescriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
+			: Descriptor(gpubuffer, bufferSize), m_RootHeapIndex(-1) {}
+
+		// Create view in the given descriptor table
+		virtual void CreateView(DescriptorTable& table, UINT slot) = 0;
+
+		// Create view simply in the heap, without using a table, should be called only once
+		virtual void CreateRootView() = 0;
+
+		inline void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData)
+		{
+			Engine::MemoryAllocator.UploadTexure(*m_Buffer, textureData);
+		}
+
+		
+		// Simple Bind function, just bind one descriptor to InUse heap (Use Graphics::BindMultiDescriptor instead)
+		// Copy this descriptor to the in use descriptor heap for rendering
+		// This function should be called only when we are using the descriptor as root descriptor
+		inline void BindDescriptor(UINT destIndex) const
+		{
+			BindMultiDescriptor(m_RootHeapIndex, 1, destIndex);
+		}
+
+	protected:
+		UINT m_RootHeapIndex; // If we are using this descriptor as root signature, store it's location in the init heap
+
+	};
+
+
 /*****************************************************************
 
 **		Implementation of different Descriptors below			**
@@ -132,6 +141,8 @@ namespace Graphic {
 	class VertexBuffer : public Descriptor {
 	public:
 		VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize);
+		
+		void Initialize() override;
 		
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
 
@@ -146,13 +157,15 @@ namespace Graphic {
 	class IndexBuffer : public Descriptor  {
 	public:
 		IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize);
-		
+
 		// Suballocate from a index buffer
 		// Example use:
 		//		1. Create an large index buffer store everything
 		//		2. Suballocate from the large one by calling this constructor
 		//      3. When rendering, we're going to use the m_start variable
-		IndexBuffer(IndexBuffer& buffer, const UINT start, const UINT end);
+		// IndexBuffer(IndexBuffer& buffer, const UINT start, const UINT end);
+
+		void Initialize() override;
 
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
 		
@@ -166,16 +179,21 @@ namespace Graphic {
 	public:
 		// Create a CBV, descriptor Heap is nullptr if we are creating a normal cbv, 
 		// if provide decriptorHeap, we are creaing a root CBV
-		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, bool isRoot=false);
-		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorTable& table, UINT tableIndex);
+		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize);
+		
+		void Initialize() override;
+
+		void CreateView(DescriptorTable& table, UINT slot) override;
+
+		void CreateRootView() override;
+		
+		// Method to use this CBV as a root CBV
 		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const 
 		{
-			assert(m_isRootCBV && "CBV should be a root CBV to call this function");
+			// assert(m_isRootCBV && "CBV should be a root CBV to call this function");
 			return m_cbvDesc.BufferLocation; 
 		}
-
 	private:
-		bool m_isRootCBV;
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
 	};
 
@@ -183,14 +201,14 @@ namespace Graphic {
 	class ShaderResource : public HeapDescriptor {
 	public:
 		ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc);
-		// Create the SRV in descriptor table's tableIndex slot
-		ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc, 
-						DescriptorTable& table, UINT tableIndex);
+		
+		void Initialize() override;
+
+		void CreateView(DescriptorTable& table, UINT slot) override;
+
+		void CreateRootView() override;
 
 	private:
-		// Create SRV on the init descriptor heap
-		void Initialize(ptrGPUMem gpubuffer, D3D12_CPU_DESCRIPTOR_HANDLE handle);
-
 		D3D12_SHADER_RESOURCE_VIEW_DESC m_srvDesc;
 	};
 
@@ -199,23 +217,33 @@ namespace Graphic {
 	class UnorderedAccess : public HeapDescriptor {
 	public:
 		UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc);
-		UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc,
-						DescriptorTable& table, UINT tableIndex);
-	private:
-		// Create UAV on the init descriptor heap
-		void Initialize(ptrGPUMem gpubuffer, D3D12_CPU_DESCRIPTOR_HANDLE handle);
+		
+	
+		void Initialize() override;
 
+		void CreateView(DescriptorTable& table, UINT slot) override;
+
+		void CreateRootView() override;
+
+	private:
 		D3D12_UNORDERED_ACCESS_VIEW_DESC m_uavDesc;
 	};
 
-	// TODO add Decriptor table constructor
+	
 	class RenderTarget : public HeapDescriptor {
 	public:
 		RenderTarget(ptrGPUMem gpubuffer, const D3D12_RENDER_TARGET_VIEW_DESC& desc, DescriptorHeap* descriptorHeap);
 		
+		void Initialize() override;
+
+		void CreateView(DescriptorTable& table, UINT slot) override 
+		{ assert(FALSE && "RTV should not call this function"); };
+
+		void CreateRootView() override;
+
 	private:
 		D3D12_RENDER_TARGET_VIEW_DESC m_rtvDesc;
-
+		DescriptorHeap* m_DescriptorHeap;
 	};
 
 
@@ -223,9 +251,21 @@ namespace Graphic {
 	public:
 		DepthStencil(ptrGPUMem gpubuffer, const D3D12_DEPTH_STENCIL_VIEW_DESC & desc, DescriptorHeap* descriptorHeap);
 
-		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetDSVCPUHandle() const { return m_dsvHandle; }
+		void Initialize() override;
+
+		void CreateView(DescriptorTable& table, UINT slot) override 
+		{ assert(FALSE && "DSV should not call this function"); };
+
+		void CreateRootView() override;
+
+		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetDSVCPUHandle() const 
+		{
+			assert(m_RootHeapIndex != -1 && "dsv not init yet");
+			return m_dsvHandle; 
+		}
 
 	private:
+		DescriptorHeap* m_DescriptorHeap;
 		D3D12_DEPTH_STENCIL_VIEW_DESC m_dsvDesc;
 		CD3DX12_CPU_DESCRIPTOR_HANDLE m_dsvHandle;
 	};

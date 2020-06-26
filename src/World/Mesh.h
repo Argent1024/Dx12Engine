@@ -26,29 +26,31 @@ namespace Game {
 			// Allocate memory from gpu to store vertex buffer and index buffer
 			ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(vertexBufferSize + indexBufferSize);
 			m_VertexBuffer = std::make_shared<Graphic::VertexBuffer>(gpumem, vertexBufferSize, sizeof(Vertex));
+			m_VertexBuffer->Initialize();
 			m_VertexBuffer->copyData(&vertex[0]);
 		
 			m_IndexBuffer = std::make_shared<Graphic::IndexBuffer>(gpumem, indexBufferSize);
+			m_IndexBuffer->Initialize();
 			m_IndexBuffer->copyData(&index[0]);
 		}
 
 		// Use this constructor when we already created the vertex and index buffer
 		// We only need to suballocate a index buffer from the large index buffer
-		TriangleMesh(ptrVertexBuffer vertex, ptrIndexBuffer index, 
+		/*TriangleMesh(ptrVertexBuffer vertex, ptrIndexBuffer index, 
 			         const UINT start, const UINT end) 
 		{
 			m_VertexBuffer = vertex;
 			m_IndexBuffer = std::make_shared<Graphic::IndexBuffer>(*index, start, end);
-		}
+		}*/
 
 		// Constructor simliar to the upper one
 		// Create a sub-mesh from a bigger one, I think the bigger one should be released after
 		// created all the sub-mesh.
-		TriangleMesh(TriangleMesh& mesh, const UINT start, const UINT end)
+		/*TriangleMesh(TriangleMesh& mesh, const UINT start, const UINT end)
 		{
 			m_VertexBuffer = mesh.m_VertexBuffer;
 			m_IndexBuffer = std::make_shared<Graphic::IndexBuffer>(*mesh.m_IndexBuffer, start, end);
-		}
+		}*/
 
 		void UseMesh(Graphic::CommandList& commandList) override;
 

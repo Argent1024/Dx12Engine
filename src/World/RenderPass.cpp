@@ -23,8 +23,10 @@ namespace Game {
 		// Creata CBV 
 		const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(CameraBufferData));
 		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
-		m_CBV = new Graphic::ConstantBuffer(gpumem, cbvSize, *m_DescriptorTable, 0); // Bind at slot 0
-		
+		m_CBV = new Graphic::ConstantBuffer(gpumem, cbvSize); // Bind at slot 0
+		m_CBV->Initialize();
+		m_CBV->CreateView(*m_DescriptorTable, 0);
+
 		// The other textures needed is binded outside by render engine
 	}
 

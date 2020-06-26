@@ -4,7 +4,7 @@ namespace Game {
 	
 	RenderEngine::RenderEngine(const UINT width, const UINT height) 
 		: swapChain(width, height),
-		  depthBuffer(width, height)
+		  depthBuffer(width, height, Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV)
 	{
 	
 	}
@@ -15,7 +15,7 @@ namespace Game {
 		defalutpass.Initialize();
 
 		swapChain.Initialize(GraphicsCommandManager.GetCommadnQueue(), appHwnd);
-		depthBuffer.Initialize(Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV);
+		depthBuffer.Initialize();
 	
 			
 	}

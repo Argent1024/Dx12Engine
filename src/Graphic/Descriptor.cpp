@@ -3,6 +3,9 @@
 namespace Graphic {
 	VertexBuffer::VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize) 
 		:Descriptor(gpubuffer, bufferSize), m_strideSize(strideSize) 
+	{ }
+
+	void VertexBuffer::Initialize() 
 	{
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
@@ -11,7 +14,9 @@ namespace Graphic {
 	}
 
 	IndexBuffer::IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
-		: Descriptor(gpubuffer, bufferSize), m_start(0)
+		: Descriptor(gpubuffer, bufferSize), m_start(0) { }
+
+	void IndexBuffer::Initialize() 
 	{
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
@@ -19,122 +24,139 @@ namespace Graphic {
 		m_view.SizeInBytes = m_BufferSize;
 	}
 
-	// TODO check whether buffersize & start is correct
+	/*// TODO check whether buffersize & start is correct
 	IndexBuffer::IndexBuffer(IndexBuffer& buffer, const UINT start, const UINT end)
-		: Descriptor(buffer.m_Buffer, (end - start) * sizeof(UINT)) // bufferSize = (end - start) * sizeof(UINT)
+		: Descriptor(buffer.m_Buffer, (end - start) * sizeof(UINT)), m_start(start) // bufferSize = (end - start) * sizeof(UINT)
 	{
 		assert(start + m_BufferSize <= buffer.m_BufferSize && "start position plus bufferSize too large");
 		m_Offset = buffer.m_Offset + start;
 		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
 		m_view.Format = DXGI_FORMAT_R32_UINT;
 		m_view.SizeInBytes = m_BufferSize;
-	}
+	}*/
 
-	ConstantBuffer::ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize,  bool isRoot)
-		: HeapDescriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)), m_isRootCBV(isRoot)
+	ConstantBuffer::ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
+		: HeapDescriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize))
+	{ assert(m_BufferSize % 256 == 0 && "Constant buffer size not aligned"); }	
+
+	void ConstantBuffer::Initialize() 
 	{
-		assert(m_BufferSize % 256 == 0 && "Constant buffer size not aligned");
-		ID3D12Device* device = Engine::GetDevice();
-
-		/*if (m_isRootCBV) {
-			D3D12_DESCRIPTOR_HEAP_TYPE  type = descriptorHeap->GetDescriptorHeapType();
-			D3D12_DESCRIPTOR_HEAP_FLAGS flags = descriptorHeap->GetDescriptorHeapFlags();
-			assert(type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV && "descriptor provide type dismatch!");
-			assert(flags == D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE && "Root CBV should be shader visible");
-		} else {
-			descriptorHeap = Engine::GetInitHeap();
-		}*/
-		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
-
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
-		m_HeapIndex = descriptorHeap->MallocHeap();
 
 		m_cbvDesc.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
 		m_cbvDesc.SizeInBytes = m_BufferSize;  
-		device->CreateConstantBufferView(&m_cbvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
-	}	
+	}
 
-	ConstantBuffer::ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, DescriptorTable& table, UINT tableIndex)
-		: HeapDescriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)), m_isRootCBV(false)
+	void ConstantBuffer::CreateView(DescriptorTable& table, UINT slot) 
 	{
-		assert(m_BufferSize % 256 == 0 && "Constant buffer size not aligned");
 		ID3D12Device* device = Engine::GetDevice();
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
-		m_cbvDesc.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
-		m_cbvDesc.SizeInBytes = m_BufferSize; 
-
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = table.GetSlot(tableIndex);
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = table.GetSlot(slot);
 		device->CreateConstantBufferView(&m_cbvDesc, handle);
 	}
 
+	void ConstantBuffer::CreateRootView() 
+	{
+		assert(m_RootHeapIndex==-1 && "Root View should be created only once");
+		ID3D12Device* device = Engine::GetDevice();
+		DescriptorHeap* initheap = Engine::GetInitHeap();
+		m_RootHeapIndex = initheap->MallocHeap();
+		device->CreateConstantBufferView(&m_cbvDesc, initheap->GetCPUHandle(m_RootHeapIndex));
+	}
+
+	/************************* Shader Resource Begin ******************************/
 	// TODO fix buffer size
 	ShaderResource::ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) 
 		: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0)
+	{ }
+	
+	void ShaderResource::Initialize() 
 	{
-		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
-		m_HeapIndex = descriptorHeap->MallocHeap();
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUHandle(m_HeapIndex);
-		Initialize(gpubuffer, handle);
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 	}
 
-	ShaderResource::ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc,
-		DescriptorTable& table, UINT tableIndex) 
-		: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0)
-	{
-		m_HeapIndex = table.GetHeapIndex(tableIndex);
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = table.GetSlot(tableIndex);
-		Initialize(gpubuffer, handle);
-	}
-	
-	void ShaderResource::Initialize(ptrGPUMem gpubuffer, D3D12_CPU_DESCRIPTOR_HANDLE handle) 
+	void ShaderResource::CreateView(DescriptorTable& table, UINT slot) 
 	{
 		ID3D12Device* device = Engine::GetDevice();
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = table.GetSlot(slot);
 		device->CreateShaderResourceView(m_Buffer->GetResource(), &m_srvDesc, handle);
 	}
 
+	void ShaderResource::CreateRootView() 
+	{
+		assert(m_RootHeapIndex==-1 && "Root View should be created only once");
+		ID3D12Device* device = Engine::GetDevice();
+		DescriptorHeap* initheap = Engine::GetInitHeap();
+		m_RootHeapIndex = initheap->MallocHeap();
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = initheap->GetCPUHandle(m_RootHeapIndex);
+		device->CreateShaderResourceView(m_Buffer->GetResource(), &m_srvDesc, handle);
+	}
+	/************************* Shader Resource End ******************************/
+
+
+	/*************************   UnorderedAccess Resource Begin ******************************/
 	UnorderedAccess::UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc)
 		: m_uavDesc(desc), HeapDescriptor(gpubuffer, 0) 
 	{
-		DescriptorHeap* descriptorHeap = Engine::GetInitHeap();
-		m_HeapIndex = descriptorHeap->MallocHeap();
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUHandle(m_HeapIndex);
-		Initialize(gpubuffer, handle);
 	}
 
-	UnorderedAccess::UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc,
-		DescriptorTable& table, UINT tableIndex)
-		: m_uavDesc(desc), HeapDescriptor(gpubuffer, 0)
+	void UnorderedAccess::Initialize() 
 	{
-		m_HeapIndex = table.GetHeapIndex(tableIndex);
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = table.GetSlot(tableIndex);
-		Initialize(gpubuffer, handle);
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 	}
 
-	void UnorderedAccess::Initialize(ptrGPUMem gpubuffer, D3D12_CPU_DESCRIPTOR_HANDLE handle) 
+	void UnorderedAccess::CreateView(DescriptorTable& table, UINT slot) 
 	{
 		ID3D12Device* device = Engine::GetDevice();
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = table.GetSlot(slot);
 		device->CreateUnorderedAccessView(m_Buffer->GetResource(), nullptr, &m_uavDesc, handle);
 	}
 
-	RenderTarget::RenderTarget(ptrGPUMem gpubuffer, const D3D12_RENDER_TARGET_VIEW_DESC& desc, DescriptorHeap* descriptorHeap) 
-		: m_rtvDesc(desc), HeapDescriptor(gpubuffer, 0) 
+	void UnorderedAccess::CreateRootView()
 	{
+		assert(m_RootHeapIndex==-1 && "Root View should be created only once");
 		ID3D12Device* device = Engine::GetDevice();
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
-		m_HeapIndex = descriptorHeap->MallocHeap();
-		device->CreateRenderTargetView(m_Buffer->GetResource(), &m_rtvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
+		DescriptorHeap* initheap = Engine::GetInitHeap();
+		m_RootHeapIndex = initheap->MallocHeap();
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = initheap->GetCPUHandle(m_RootHeapIndex);
+		device->CreateUnorderedAccessView(m_Buffer->GetResource(), nullptr, &m_uavDesc, handle);
 	}
+
+	/************************* UnorderedAccess Resource End ******************************/
+
+
+	RenderTarget::RenderTarget(ptrGPUMem gpubuffer, const D3D12_RENDER_TARGET_VIEW_DESC& desc, DescriptorHeap* descriptorHeap) 
+		: m_rtvDesc(desc), m_DescriptorHeap(descriptorHeap), HeapDescriptor(gpubuffer, 0) 
+	{ }
+
+	void RenderTarget::Initialize() 
+	{
+		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
+	}
+
+	void RenderTarget::CreateRootView() 
+	{
+		assert(m_RootHeapIndex==-1 && "Root View should be created only once");
+		ID3D12Device* device = Engine::GetDevice();
+		m_RootHeapIndex = m_DescriptorHeap->MallocHeap();
+		device->CreateRenderTargetView(m_Buffer->GetResource(), &m_rtvDesc, m_DescriptorHeap->GetCPUHandle(m_RootHeapIndex));
+	}
+
 
 	DepthStencil::DepthStencil(ptrGPUMem gpubuffer, const D3D12_DEPTH_STENCIL_VIEW_DESC & desc, DescriptorHeap* descriptorHeap)
-		: m_dsvDesc(desc), HeapDescriptor(gpubuffer, 0)
+		: m_dsvDesc(desc), m_DescriptorHeap(descriptorHeap), HeapDescriptor(gpubuffer, 0)
+	{ }
+
+	void DepthStencil::Initialize() 
 	{
-		ID3D12Device* device = Engine::GetDevice();
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
-		m_HeapIndex = descriptorHeap->MallocHeap();
-		device->CreateDepthStencilView(m_Buffer->GetResource(), &m_dsvDesc, descriptorHeap->GetCPUHandle(m_HeapIndex));
-		m_dsvHandle = descriptorHeap->GetCPUHandle(m_HeapIndex);
 	}
 
+	void DepthStencil::CreateRootView() 
+	{
+		assert(m_RootHeapIndex==-1 && "Root View should be created only once");
+		ID3D12Device* device = Engine::GetDevice();
+		m_RootHeapIndex = m_DescriptorHeap->MallocHeap();
+		device->CreateDepthStencilView(m_Buffer->GetResource(), &m_dsvDesc, m_DescriptorHeap->GetCPUHandle(m_RootHeapIndex));
+		m_dsvHandle = m_DescriptorHeap->GetCPUHandle(m_RootHeapIndex);
+	}
 }

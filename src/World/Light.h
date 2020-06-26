@@ -41,7 +41,7 @@ namespace Game {
 
 		virtual Graphic::DepthBuffer& GetDepthBuffer() = 0;
 
-		virtual Graphic::Texture* GetDepthTexture() = 0;
+		virtual Graphic::Texture& GetDepthTexture() = 0;
 		
 		virtual void SetLightData(const LightData& data) = 0;
 
@@ -60,7 +60,7 @@ namespace Game {
 	public:
 		DirectionLight(UINT width=256, UINT height=256);
 
-		inline Graphic::Texture* GetDepthTexture() override { return m_DepthBuffer.GetTexture(); }
+		inline Graphic::Texture& GetDepthTexture() override { return m_DepthBuffer.GetTexture(); }
 
 		Graphic::DepthBuffer& GetDepthBuffer() override { return m_DepthBuffer; }
 
@@ -81,7 +81,7 @@ namespace Game {
 	public:
 		SpotLight(UINT width=256, UINT height=256);
 
-		inline Graphic::Texture* GetDepthTexture() override { return m_DepthBuffer.GetTexture(); }
+		inline Graphic::Texture& GetDepthTexture() override { return m_DepthBuffer.GetTexture(); }
 
 		Graphic::DepthBuffer& GetDepthBuffer() override { return m_DepthBuffer; }
 
