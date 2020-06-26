@@ -54,6 +54,10 @@ namespace Game {
 		// Slot 0 in root signature is for camera
 		commandList.SetGraphicsRootDescriptorTable(0, cameraTableHandle);
 		
+		Graphic::DescriptorTable* lightTable = scene.GetLightsTable();
+		CD3DX12_GPU_DESCRIPTOR_HANDLE lightTableHandle = lightTable->BindDescriptorTable();
+		commandList.SetGraphicsRootDescriptorTable(1, lightTableHandle);
+
 		Camera& camera = scene.GetMainCamera();
 		camera.UseCamera(commandList);
 

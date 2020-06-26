@@ -6,7 +6,8 @@
 
 namespace Game {
 
-	enum LightType {
+	enum LightType 
+	{
 		DIRECTION_LIGHT,
 		POINT_LIGHT,
 		SPOT_LIGHT
@@ -36,6 +37,9 @@ namespace Game {
 	class Light
 	{
 	public:
+		virtual LightType Type() = 0;
+
+		virtual void Initialize(LightState* state) = 0;
 
 		inline LightState* GetLightState() { return m_state; }
 
@@ -60,6 +64,10 @@ namespace Game {
 	public:
 		DirectionLight(UINT width=256, UINT height=256);
 
+		LightType Type() { return DIRECTION_LIGHT; }
+
+		void Initialize(LightState* state) override;
+
 		inline Graphic::Texture& GetDepthTexture() override { return m_DepthBuffer.GetTexture(); }
 
 		Graphic::DepthBuffer& GetDepthBuffer() override { return m_DepthBuffer; }
@@ -80,6 +88,10 @@ namespace Game {
 	{
 	public:
 		SpotLight(UINT width=256, UINT height=256);
+
+		LightType Type() { return SPOT_LIGHT; }
+
+		virtual void Initialize(LightState* state) override;
 
 		inline Graphic::Texture& GetDepthTexture() override { return m_DepthBuffer.GetTexture(); }
 

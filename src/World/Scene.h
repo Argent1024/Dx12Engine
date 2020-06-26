@@ -36,10 +36,9 @@ namespace Game
 		// Create Descriptor table for lights and put srv( for shadow map) into it
 		virtual void Initialize();
 
-		Graphic::DescriptorTable* GetLightsTable() { return m_LightsTable; }
-
 		// TODO const camera, edit Camera class
-		Camera& GetMainCamera() { return m_Camera; }
+		inline Camera& GetMainCamera() { return m_Camera; }
+		// inline Graphic::ConstantBuffer* GetMainCameraCBV() { return m_MainCameraCBV; }
 
 		//TODO
 		const std::vector<GObject*> GetGameObjects(UINT index) { return m_ObjList; }
@@ -48,13 +47,11 @@ namespace Game
 		virtual void AddGameObj(GObject* obj);
 		virtual void DeleteGameObj(GObject* obj) {}
 
-		// TODO kind of stupid to creat light outside with this ptr
-		inline LightState* GetLightState(UINT index)
-		{
-			assert(index < SceneLightsInfo::maxLights);
-			return &m_LightInfo.Lights[index];
-		}
+		// Light Stuff
+		
+		inline Graphic::DescriptorTable* GetLightsTable() { return m_LightsTable; }
 
+		virtual void AddLight(Light& light);
 
 		inline void ConfigLight(UINT nDir, UINT nPoint, UINT nSpot)
 		{
@@ -62,6 +59,9 @@ namespace Game
 			m_LightInfo.numDir = nDir;
 			m_LightInfo.numPoint = nPoint;
 			m_LightInfo.numSpot = nSpot;
+			iDir = 0;
+			iPoint = nDir;
+			iSpot =  nDir + nPoint;
 		}
 
 		// Store Lights' data into CBV
@@ -71,13 +71,19 @@ namespace Game
 	protected:
 		static const UINT LightTableSize = 4;
 
+		// Main Camera Stuff
 		ProjectiveCamera m_Camera;
+		// Graphic::ConstantBuffer* m_MainCameraCBV;
 
 		// Bind Light Stuff
 		Graphic::ConstantBuffer* m_LightsCBV;
-		Graphic::DescriptorTable* m_LightsTable;
+		Graphic::DescriptorTable* m_LightsTable;  // Store Shadow map
 
 		SceneLightsInfo m_LightInfo;
+
+		UINT iDir;
+		UINT iPoint;
+		UINT iSpot;
 
 		std::vector<GObject*> m_ObjList;
 	};

@@ -17,9 +17,16 @@ namespace Samples {
 		// m_Camera.CreateCBV();
 		// Create Scene
 		m_Scene = new Scene(m_width, m_height);
+		m_Scene->Initialize();
+
 		m_Render = new RenderEngine(m_width, m_height);
 		m_Render->Initialize(m_appHwnd);
 
+		m_Scene->ConfigLight(1,0,0);
+		// Load light
+		m_Light = new DirectionLight();
+		m_Scene->AddLight(*m_Light);
+		m_Light->SetLightData({ {1,1,1}, {0,0,0}, {1,0,0} });
 		this->LoadAssert();
 
 	}

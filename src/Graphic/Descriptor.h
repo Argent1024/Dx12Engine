@@ -122,6 +122,7 @@ namespace Graphic {
 		// This function should be called only when we are using the descriptor as root descriptor
 		inline void BindDescriptor(UINT destIndex) const
 		{
+			assert(m_RootHeapIndex != -1 && "Descriptor not created");
 			BindMultiDescriptor(m_RootHeapIndex, 1, destIndex);
 		}
 

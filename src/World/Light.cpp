@@ -5,12 +5,17 @@
 namespace Game {
 	
 	DirectionLight::DirectionLight(UINT width, UINT height)
-		:  m_DepthBuffer(width, height, Graphic::TEXTURE_DSV & Graphic::TEXTURE_SRV), 
+		:  m_DepthBuffer(width, height, Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV), 
 		   m_Camera(width, height)
+	{ }
+
+	void DirectionLight::Initialize(LightState* state) 
 	{
+		m_state = state;
 		// Initialize dsv
 		// Should create srv else where
 		m_DepthBuffer.Initialize();
+
 	}
 
 	void DirectionLight::UseLight()
@@ -21,7 +26,7 @@ namespace Game {
 
 	void DirectionLight::SetLightData(const LightData& data) 
 	{
-			
+		assert(m_state != nullptr && "Haven't init yet");
 		XMStoreFloat4(&m_state->strength, data.strength);
 		XMStoreFloat4(&m_state->direction, data.direction);
 
@@ -36,16 +41,18 @@ namespace Game {
 
 
 	SpotLight::SpotLight(UINT width, UINT height)
-		: m_DepthBuffer(width, height, Graphic::TEXTURE_DSV & Graphic::TEXTURE_SRV), 
+		: m_DepthBuffer(width, height, Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV), 
 		  m_Camera(width, height)
+	{ }
+
+	void SpotLight::Initialize(LightState* state) 
 	{
+		m_state = state;
 		// Initialize dsv
 		// Should create srv else where
 		m_DepthBuffer.Initialize();
 		
-		
 	}
-
 
 	void SpotLight::UseLight()
 	{
@@ -56,7 +63,7 @@ namespace Game {
 
 	void SpotLight::SetLightData(const LightData& data) 
 	{
-		
+		assert(m_state != nullptr && "Haven't init yet");
 
 	}
 }

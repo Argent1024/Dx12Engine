@@ -16,8 +16,7 @@ namespace Game {
 
 		swapChain.Initialize(GraphicsCommandManager.GetCommadnQueue(), appHwnd);
 		depthBuffer.Initialize();
-	
-			
+		
 	}
 
 

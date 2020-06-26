@@ -18,15 +18,15 @@ namespace Graphic {
 		
 	
 
-		// Descriptor table for Camera / Renderpass
+		// Descriptor table 0 for Camera / Renderpass
 		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b0
 		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t7 space 1
 
-		// Descriptor table for Lights
+		// Descriptor table 1 for Lights
 		ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b1
 		ranges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 16, 8, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t8 - t24 space 1
 
-		// Descriptor Table for the object
+		// Descriptor Table 2 for the object
 		ranges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b2
 		ranges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t4
 		ranges[6].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 4, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // u0-u4

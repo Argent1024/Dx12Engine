@@ -35,6 +35,7 @@ namespace Samples {
 
 		std::shared_ptr<TriangleMesh> m_Mesh;
 		// ptrMaterial m_Material;
+		DirectionLight* m_Light; // TODO 
 	};
 
 }

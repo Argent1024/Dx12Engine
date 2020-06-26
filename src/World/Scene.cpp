@@ -29,9 +29,35 @@ namespace Game {
 		// Other Textures should be bind outside
 	}
 
+	void Scene::AddLight(Light& light) 
+	{
+		assert(iDir <= m_LightInfo.numDir && 
+			   iPoint <= m_LightInfo.numDir + m_LightInfo.numPoint &&
+			   iSpot <= m_LightInfo.numDir + m_LightInfo.numPoint + m_LightInfo.numSpot &&
+			   "Index out of ranged");
+		LightState* pos = &(m_LightInfo.Lights[iDir]);
+		LightType type = light.Type();
+		switch (type)
+		{
+		case Game::DIRECTION_LIGHT:
+			pos = &(m_LightInfo.Lights[iDir]);
+			iDir ++;
+			break;
+		case Game::POINT_LIGHT:
+			pos = &(m_LightInfo.Lights[iPoint]);
+			iPoint ++;
+			break;
+		case Game::SPOT_LIGHT:
+			pos = &(m_LightInfo.Lights[iSpot]);
+			iSpot ++;
+			break;
+		}
+		light.Initialize(pos);
+	}
+
 	void Scene::PrepareLights() 
 	{
-		
+		m_LightsCBV->copyData(&m_LightInfo, sizeof(m_LightInfo));
 	}
 
 	void Scene::AddGameObj(GObject* obj) 
