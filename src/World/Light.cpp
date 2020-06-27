@@ -27,16 +27,16 @@ namespace Game {
 	void DirectionLight::SetLightData(const LightData& data) 
 	{
 		assert(m_state != nullptr && "Haven't init yet");
-		XMStoreFloat4(&m_state->strength, data.strength);
-		XMStoreFloat4(&m_state->direction, data.direction);
+		XMStoreFloat4(&m_state->strength, (XMVECTOR)data.strength);
+		XMStoreFloat4(&m_state->direction, (XMVECTOR)data.direction);
 
 		m_Camera.LookAt(data.pos, data.pos + data.direction, Vector3(0.0f, 1.0f, 0.0f));
 
 		const Transform& view = m_Camera.GetView();
 		const Transform& orth = m_Camera.GetToScreen();
 
-		XMStoreFloat4x4(&m_state->view, view);
-		XMStoreFloat4x4(&m_state->proj, orth);
+		XMStoreFloat4x4(&m_state->view, XMMatrixTranspose((XMMATRIX)view));
+		XMStoreFloat4x4(&m_state->proj, XMMatrixTranspose((XMMATRIX)orth));
 	}
 
 

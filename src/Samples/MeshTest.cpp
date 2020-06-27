@@ -16,17 +16,17 @@ namespace Samples {
 
 		// m_Camera.CreateCBV();
 		// Create Scene
-		m_Scene = new Scene(m_width, m_height);
-		m_Scene->Initialize();
+		
+		m_Scene.Initialize();
 
 		m_Render = new RenderEngine(m_width, m_height);
 		m_Render->Initialize(m_appHwnd);
 
-		m_Scene->ConfigLight(1,0,0);
+		m_Scene.ConfigLight(1, 4, 4);
 		// Load light
 		m_Light = new DirectionLight();
-		m_Scene->AddLight(*m_Light);
-		m_Light->SetLightData({ {1,1,1}, {0,0,0}, {1,0,0} });
+		m_Scene.AddLight(*m_Light);
+		m_Light->SetLightData({ {1.0, 1.0, 1.0}, {1.0 , 1.0, 1.0}, {1.0, 1.0, 1.0} });
 		this->LoadAssert();
 
 	}
@@ -48,12 +48,12 @@ namespace Samples {
 		// obj0->SetMaterial(m_Material);
 		obj0->Initialize();
 		obj0->SetTransform(Transform({ 2, 0, 0 }, { 0, 2, 0 }, { 0, 0, 2 }, {0, 0, 0}));
-		m_Scene->AddGameObj(obj0);
+		m_Scene.AddGameObj(obj0);
 	}
 
 	void MeshTest::Render()
 	{
 		// m_Scene->Render();
-		m_Render->Render(*m_Scene);
+		m_Render->Render(m_Scene);
 	}
 }

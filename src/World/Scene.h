@@ -16,12 +16,12 @@ namespace Game
 		// TODO check memory?
 		static const UINT maxLights = 16;
 
-		// Store num of each light
-		UINT numDir;
-		UINT numPoint;
-		UINT numSpot;
-
 		LightState Lights[maxLights];
+
+		// Store num of each light
+		UINT maxDir;
+		UINT maxPoint;
+		UINT maxSpot;
 	};
 
 	class Scene
@@ -55,13 +55,16 @@ namespace Game
 
 		inline void ConfigLight(UINT nDir, UINT nPoint, UINT nSpot)
 		{
+			
 			assert(nDir + nPoint + nSpot <= SceneLightsInfo::maxLights);
-			m_LightInfo.numDir = nDir;
-			m_LightInfo.numPoint = nPoint;
-			m_LightInfo.numSpot = nSpot;
 			iDir = 0;
 			iPoint = nDir;
 			iSpot =  nDir + nPoint;
+
+			m_LightInfo.maxDir = iDir + nDir;
+			m_LightInfo.maxPoint = iPoint + nPoint;
+			m_LightInfo.maxSpot = iSpot + nSpot;
+			
 		}
 
 		// Store Lights' data into CBV
@@ -76,15 +79,22 @@ namespace Game
 		// Graphic::ConstantBuffer* m_MainCameraCBV;
 
 		// Bind Light Stuff
-		Graphic::ConstantBuffer* m_LightsCBV;
+		SceneLightsInfo m_LightInfo;
+		Graphic::ConstantBuffer* m_LightsCBV;	  // Store normal data of lights
+
 		Graphic::DescriptorTable* m_LightsTable;  // Store Shadow map
 
-		SceneLightsInfo m_LightInfo;
+		std::vector<int> m_ShadowLightsIndex;   // Render Shadow Map for these lights			
+		// std::vector<Light*> m_Lights;			// Store the lights (maybe)
 
+		// Counter of lights
 		UINT iDir;
 		UINT iPoint;
 		UINT iSpot;
 
+		
+
+		// Game Objects
 		std::vector<GObject*> m_ObjList;
 	};
 }

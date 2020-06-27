@@ -1,4 +1,4 @@
-struct Light 
+struct Light  // Equal to LightState Class
 {
 	float4 strength;
 	float4 pos;			// point / spot light
@@ -14,6 +14,15 @@ cbuffer CameraInfo : register(b0)
 	float4x4 projection;
 	float4x4 view;
 };
+
+//const uint maxSceneLight = 16;
+cbuffer LightInfo : register(b1)
+{
+	Light SceneLights[16];
+	uint maxDir;
+	uint maxPoint;
+	uint maxSpot;
+}
 
 // Store Object information
 //		Transformation
@@ -60,7 +69,8 @@ float4 PSMain(PSInput input) : SV_TARGET
 {
 	
 	// return float4(1.0, 0.0, 0.0, 0.0);
-
-	float4 lightDir = {1, 1, 0, 0};
-	return float4(input.normal, 1.0);
+	
+	float4 lightDir = SceneLights[0].strength;
+	return lightDir;
+	//return dot(lightDir.xyz, input.normal); //float4(input.normal, 1.0);
 }

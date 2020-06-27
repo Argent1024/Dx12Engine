@@ -31,10 +31,10 @@ namespace Game {
 
 	void Scene::AddLight(Light& light) 
 	{
-		assert(iDir <= m_LightInfo.numDir && 
-			   iPoint <= m_LightInfo.numDir + m_LightInfo.numPoint &&
-			   iSpot <= m_LightInfo.numDir + m_LightInfo.numPoint + m_LightInfo.numSpot &&
-			   "Index out of ranged");
+		assert(iDir <= m_LightInfo.maxDir && 
+			   iPoint <= m_LightInfo.maxPoint &&
+			   iSpot <=  m_LightInfo.maxSpot &&
+			   "Lights index out of ranged");
 		LightState* pos = &(m_LightInfo.Lights[iDir]);
 		LightType type = light.Type();
 		switch (type)
@@ -57,7 +57,9 @@ namespace Game {
 
 	void Scene::PrepareLights() 
 	{
-		m_LightsCBV->copyData(&m_LightInfo, sizeof(m_LightInfo));
+		// UINT size = sizeof(SceneLightsInfo);
+		//TODO ERROR when only copying with size
+		m_LightsCBV->copyData(&m_LightInfo);// , sizeof(SceneLightsInfo));
 	}
 
 	void Scene::AddGameObj(GObject* obj) 

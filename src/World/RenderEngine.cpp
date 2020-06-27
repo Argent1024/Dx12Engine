@@ -24,6 +24,8 @@ namespace Game {
 	{
 		BeginRender();
 
+		scene.PrepareLights();
+
 		// Set Scene Data for Default Render Pass
 		defalutpass.PrepareData(scene);
 
