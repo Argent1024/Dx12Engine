@@ -20,7 +20,7 @@ namespace Game {
 
 		inline Graphic::DescriptorTable& GetDescriptorTable() { return m_table; }
 
-		//inline void SetMaterial(ptrMaterial mat) { m_Material = mat; }
+		inline void SetMaterial(ptrMaterial mat) { m_Material = mat; }
 		inline void SetMesh(ptrMesh mesh) { m_Mesh = mesh; }
 		inline void SetTransform(const Math::Transform& T) { m_Transform = T; }
 
@@ -49,7 +49,8 @@ namespace Game {
 		Graphic::ConstantBuffer* m_CBV;
 
 		Graphic::DescriptorTable m_table;
-		// ptrMaterial m_Material;
+		
+		ptrMaterial m_Material;
 		ptrMesh m_Mesh;
 	};
 
