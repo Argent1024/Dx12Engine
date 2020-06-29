@@ -27,8 +27,10 @@ namespace Game {
 	void DirectionLight::SetLightData(const LightData& data) 
 	{
 		assert(m_state != nullptr && "Haven't init yet");
+		// TODO move elsewhere
+		Vector3 dir = Normalize(data.direction);
 		XMStoreFloat4(&m_state->strength, (XMVECTOR)data.strength);
-		XMStoreFloat4(&m_state->direction, (XMVECTOR)data.direction);
+		XMStoreFloat4(&m_state->direction, (XMVECTOR)dir);
 
 		m_Camera.LookAt(data.pos, data.pos + data.direction, Vector3(0.0f, 1.0f, 0.0f));
 

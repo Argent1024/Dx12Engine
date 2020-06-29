@@ -2,9 +2,10 @@
 
 namespace Game {
 
-	void GObject::Initialize() {
+	void GObject::Initialize() 
+	{
 		m_table.Initialize(Engine::GetInitHeap());
-		
+
 		// TODO temperate cbv
 		const UINT cbSize = CalculateConstantBufferByteSize(sizeof(DirectX::XMMATRIX));
 		/*m_Texture = new Graphic::TextureBuffer(cbSize);
@@ -14,12 +15,17 @@ namespace Game {
 		m_CBV->Initialize();
 		m_CBV->CreateView(m_table, 0);
 		// slot 0 in the table is for const data
+
+		// Init and Bind material to the descriptor tbl
+		m_Material->Initialize();
+		m_Material->BindMaterialAt(m_table);
 	}
 
 	void GObject::RecordCommand(Graphic::CommandList& commandList) {
 		assert(m_Mesh && "Not initialized GameObj");
-		// Upload data to the cbv
+		// (TODO may not need to do this every frame) Upload data to the cbv
 		m_CBV->copyData((&(DirectX::XMMATRIX)m_Transform));
+		m_Material->UploadCBV();
 
 		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
 		

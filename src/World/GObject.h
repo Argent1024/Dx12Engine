@@ -12,9 +12,9 @@ namespace Game {
 
 	class GObject {
 	public:
-		GObject(UINT textureNum=1) : m_table(textureNum) {}
+		GObject(UINT textureNum=2) : m_table(textureNum) {}
 		
-		GObject(ptrMesh mesh, const Math::Transform& T= Math::Transform(), UINT textureNum=1) 
+		GObject(ptrMesh mesh, const Math::Transform& T= Math::Transform(), UINT textureNum=2) 
 			: m_Mesh(mesh), m_Transform(T), m_table(textureNum) {}
 
 

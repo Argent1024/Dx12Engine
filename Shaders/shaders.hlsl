@@ -30,7 +30,11 @@ cbuffer LightInfo : register(b1)
 cbuffer ObjectInfo : register(b2)
 {
 	float4x4 modelTransformation;
-	float3 diffuseColor;
+}
+
+cbuffer MaterialInfo : register (b3) 
+{
+	float4 diffuseColor;
 }
 
 struct VSInput 
@@ -69,8 +73,10 @@ float4 PSMain(PSInput input) : SV_TARGET
 {
 	
 	// return float4(1.0, 0.0, 0.0, 0.0);
-	
-	float4 lightDir = SceneLights[0].strength;
-	return lightDir;
-	//return dot(lightDir.xyz, input.normal); //float4(input.normal, 1.0);
+	float3 lightDir = SceneLights[0].direction.xyz;
+	float4 strength = SceneLights[0].strength;
+	float3 normal = input.normal;
+
+	float cos_ln = max(dot(lightDir, normal), 0);
+	return cos_ln * strength * diffuseColor;
 }

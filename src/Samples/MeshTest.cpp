@@ -26,7 +26,7 @@ namespace Samples {
 		// Load light
 		m_Light = new DirectionLight();
 		m_Scene.AddLight(*m_Light);
-		m_Light->SetLightData({ {1.0, 1.0, 1.0}, {1.0 , 1.0, 1.0}, {1.0, 1.0, 1.0} });
+		m_Light->SetLightData({ {1.0, 1.0, 1.0}, {1.0 , 1.0, 1.0}, {0.0, 2.0, 1.0} });
 		this->LoadAssert();
 
 	}
@@ -40,12 +40,12 @@ namespace Samples {
 		std::vector<UINT>& index = reader.m_index;
 
 		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
-		//m_Material = std::make_shared<Material>();
-		
+		m_Material = std::make_shared<SimpleMaterial>();
+
 		// TODO!! error C2338 aligin?
 		GObject* obj0 = new Game::GObject();
 		obj0->SetMesh(m_Mesh);
-		// obj0->SetMaterial(m_Material);
+		obj0->SetMaterial(m_Material);
 		obj0->Initialize();
 		obj0->SetTransform(Transform({ 2, 0, 0 }, { 0, 2, 0 }, { 0, 0, 2 }, {0, 0, 0}));
 		m_Scene.AddGameObj(obj0);

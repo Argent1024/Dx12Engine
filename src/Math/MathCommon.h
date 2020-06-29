@@ -5,6 +5,9 @@
 #include "Matrix4.h"
 
 namespace Math {
+	
+	const Scalar PI = 3.1415926f;
+
 	INLINE Vector3 CrossProduct(const Vector3& a, const Vector3& b) 
 	{
 		return Vector3(DirectX::XMVector3Cross(a, b));
