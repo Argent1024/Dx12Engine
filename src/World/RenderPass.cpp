@@ -77,11 +77,10 @@ namespace Game {
 
 	void MixtureRenderPass::Initialize() 
 	{
-		//m_DescriptorTable = new Graphic::DescriptorTable();
 		m_DescriptorTable->Initialize(Engine::GetInitHeap());
 
 		// TODO Use only one root signature
-		m_rootSignature = std::make_shared<Graphic::MixRootSignature>(m_DescriptorTable->size());
+		m_rootSignature = std::make_shared<Graphic::RootSignature>();
 		m_rootSignature->Initialize();
 
 		m_PSO = std::make_shared<Graphic::MixturePSO>();
@@ -99,12 +98,8 @@ namespace Game {
 			{ { -1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 1.0f } }
 		};
 		std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
-		ptrMesh screenMesh = std::make_shared<TriangleMesh>(triangleVertices, index_list);
+		m_RenderScreen = std::make_shared<TriangleMesh>(triangleVertices, index_list);
 
-		m_RenderScreen = new GObject();
-		// m_RenderScreen->SetMaterial(m_MixtureTextures);
-		m_RenderScreen->SetMesh(screenMesh);
-		m_RenderScreen->Initialize();
 	}
 
 	void MixtureRenderPass::Render(Graphic::CommandList& commandList, Scene& scene) 
@@ -116,9 +111,9 @@ namespace Game {
 		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE handle = m_DescriptorTable->BindDescriptorTable();
-		commandList.SetGraphicsRootDescriptorTable(1, handle);
+		commandList.SetGraphicsRootDescriptorTable(2, handle);
 
-		m_RenderScreen->RecordCommand(commandList);
+		m_RenderScreen->UseMesh(commandList);
 		m_RenderScreen->Draw(commandList);
 	}
 }

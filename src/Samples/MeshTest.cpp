@@ -26,7 +26,7 @@ namespace Samples {
 		// Load light
 		m_Light = new DirectionLight();
 		m_Scene.AddLight(*m_Light);
-		m_Light->SetLightData({ {1.0, 1.0, 1.0}, {1.0 , 1.0, 1.0}, {0.0, 2.0, 1.0} });
+		m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {0.0, 3.0, 1.0} });
 		this->LoadAssert();
 
 	}
@@ -34,13 +34,14 @@ namespace Samples {
 	void MeshTest::LoadAssert() 
 	{
 		MeshReader reader;
-		reader.ReadOBJ("D:\\work\\tEngine\\bunny.obj");
+		reader.ReadOBJ("D:\\work\\tEngine\\test.obj");
 
 		std::vector<DefaultVertex>& vertex = reader.m_vertex;
 		std::vector<UINT>& index = reader.m_index;
 
 		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
 		m_Material = std::make_shared<SimpleMaterial>();
+		m_Material->Initialize();
 
 		// TODO!! error C2338 aligin?
 		GObject* obj0 = new Game::GObject();
@@ -48,7 +49,27 @@ namespace Samples {
 		obj0->SetMaterial(m_Material);
 		obj0->Initialize();
 		obj0->SetTransform(Transform({ 2, 0, 0 }, { 0, 2, 0 }, { 0, 0, 2 }, {0, 0, 0}));
+
+
+		// Test Depth buffer
+		ptrMesh plane = TriangleMesh::GetXYPlane();
+		GObject* obj1 = new Game::GObject();
+
+		obj1->SetMesh(plane);
+		obj1->SetMaterial(m_Material);
+		obj1->Initialize();
+		obj1->SetTransform(Transform({ 3, 0, 0 }, { 0, 4, 0 }, { 0, 0, 3 }, { 1, 0, -5.0}));
+		
+		GObject* obj2 = new Game::GObject();
+		obj2->SetMesh(plane);
+		obj2->SetMaterial(m_Material);
+		obj2->Initialize();
+		obj2->SetTransform(Transform({ 3, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }, {-2, 0, 5.0}));
+
+
 		m_Scene.AddGameObj(obj0);
+		//m_Scene.AddGameObj(obj1);
+		//m_Scene.AddGameObj(obj2);
 	}
 
 	void MeshTest::Render()

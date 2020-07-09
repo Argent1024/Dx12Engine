@@ -39,7 +39,7 @@ cbuffer MaterialInfo : register (b3)
 
 struct VSInput 
 {
-	float4 position : POSITION0;
+	float3 position : POSITION0;
 	float3 normal   : NORMAL0;
 	float2 uv		: TEXCOORD0;
 };
@@ -47,6 +47,7 @@ struct VSInput
 struct PSInput
 {
     float4 position : SV_POSITION;
+	float4 worldpos : POSITION0;
 	float3 normal   : COLOR0;
     float2 uv		: TEXCOORD0;
 };
@@ -58,11 +59,16 @@ PSInput VSMain(VSInput input)
 {
     PSInput result;
 	
-	result.position = input.position;
-	result.position = mul(result.position, modelTransformation);
-	result.position = mul(result.position, view);
-	result.position = mul(result.position, projection);
+	float4 pos = float4(input.position, 1.0f);
+	pos = mul(pos, modelTransformation);
 
+	result.worldpos = pos;
+	
+	pos = mul(pos, view);
+	pos = mul(pos, projection);
+
+	result.position = pos;
+	
 	result.normal = input.normal;
     result.uv = input.uv;
     return result;
@@ -71,8 +77,8 @@ PSInput VSMain(VSInput input)
 // Pixel Shader
 float4 PSMain(PSInput input) : SV_TARGET
 {
-	
-	// return float4(1.0, 0.0, 0.0, 0.0);
+	//return input.position.z / 2;
+
 	float3 lightDir = SceneLights[0].direction.xyz;
 	float4 strength = SceneLights[0].strength;
 	float3 normal = input.normal;

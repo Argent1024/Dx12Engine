@@ -4,7 +4,8 @@ namespace Game {
 	
 	RenderEngine::RenderEngine(const UINT width, const UINT height) 
 		: swapChain(width, height),
-		  depthBuffer(width, height, Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV)
+		  depthBuffer(width, height, Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV),
+		  mixPass(4, width, height)
 	{
 	
 	}
@@ -17,6 +18,12 @@ namespace Game {
 		swapChain.Initialize(GraphicsCommandManager.GetCommadnQueue(), appHwnd);
 		depthBuffer.Initialize();
 		
+		// If mix pass
+		mixPass.Initialize();
+		Graphic::DescriptorTable* mixTable = mixPass.GetTable();
+		Graphic::Texture& depthTex = depthBuffer.GetTexture();
+		// TODO avoid magic number
+		depthTex.CreateView(Graphic::TEXTURE_SRV, mixTable, 2);
 	}
 
 
@@ -44,17 +51,17 @@ namespace Game {
 		
 		// Mix Render Pass
 		
-		/*Graphic::CommandList MixCommandList;
+		Graphic::CommandList MixCommandList;
 		GraphicsCommandManager.InitCommandList(&MixCommandList);
-		MixCommandList.SetSwapChain(m_SwapChain);
-		const float ClearColor[] = {0.0, 0.0, 0.0, 0.0};
+		MixCommandList.SetSwapChain(swapChain);
 		
-		MixCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		//MixCommandList.ClearSwapChain(m_SwapChain, ClearColor);
-		m_MixturePass.Render(MixCommandList);
-		MixCommandList.ResourceBarrier(m_SwapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		MixCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		const float ClearColor[] = {0.0, 0.0, 0.0, 0.0};
+		MixCommandList.ClearSwapChain(swapChain, ClearColor);
+		mixPass.Render(MixCommandList, scene);
+		MixCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		GraphicsCommandManager.ExecuteCommandList(&MixCommandList);
-		*/
+		
 		
 		// Multithreading join here
 

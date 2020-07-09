@@ -44,6 +44,7 @@ struct OBJIndex {
 class MeshReader {
 
 public:
+
 	void ReadMaterial(const std::string& filePath);
 
 	void ReadOBJ(const std::string& filePath);

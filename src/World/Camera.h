@@ -8,11 +8,12 @@
 
 namespace Game {
 	using namespace Math;
-
+	
 	// ***IMPORTANT***
 	// In DirectX's cpu code, vector's dimension is 1 * 4.
 	// So a matrix(transform) M mutiply(apply to) a vector v should be written as v * M
 	class Camera {
+
 	public:
 		Camera(const UINT width, const UINT height) :
 			 m_aspectRatio(float(width) / (float)height),
@@ -38,7 +39,6 @@ namespace Game {
 	protected:
 		Transform m_View;
 		Transform m_ToScreen; // Projective or Orthnomal
-
 		float m_aspectRatio;
 		CD3DX12_VIEWPORT m_Viewport;
 		CD3DX12_RECT m_ScissorRect;
@@ -58,7 +58,7 @@ namespace Game {
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
 			m_View = Transform(Matrix4(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp)));		
-			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixPerspectiveFovRH(3.14f / 1.5f, m_aspectRatio, 0.5f, 1000.0f)));			
+			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixPerspectiveFovRH(3.14f / 2.0f, m_aspectRatio, 0.5f, 1000.0f)));
 		}
 	};
 
@@ -74,8 +74,8 @@ namespace Game {
 
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
-			m_View = Transform(Matrix4(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp)));		
-			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixOrthographicRH(3.14f / 1.5f, m_aspectRatio, 1.0f, 1000.0f)));
+			m_View = Transform(Matrix4(DirectX::XMMatrixLookAtLH(Position, Target, WorldUp)));		
+			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixOrthographicLH(10.0, 10.0, 1.0f, 1000.0f)));
 		}
 	};
 }

@@ -21,6 +21,7 @@ namespace Game {
 		void EndRender();
 	
 		DefaultRenderPass defalutpass;
+		MixtureRenderPass mixPass;
 
 		// Main Swap Chain for the Engine
 		Graphic::SwapChain swapChain;

@@ -59,6 +59,8 @@ namespace Game {
 		
 		static const D3D_PRIMITIVE_TOPOLOGY TopologyType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
+		static ptrMesh GetXYPlane();
+
 	protected:
 		ptrVertexBuffer m_VertexBuffer;
 		ptrIndexBuffer m_IndexBuffer;

@@ -16,16 +16,21 @@ namespace Game {
 		m_CBV->CreateView(m_table, 0);
 		// slot 0 in the table is for const data
 
-		// Init and Bind material to the descriptor tbl
-		m_Material->Initialize();
+		// Bind material to the descriptor tbl
 		m_Material->BindMaterialAt(m_table);
+		
 	}
 
 	void GObject::RecordCommand(Graphic::CommandList& commandList) {
 		assert(m_Mesh && "Not initialized GameObj");
-		// (TODO may not need to do this every frame) Upload data to the cbv
-		m_CBV->copyData((&(DirectX::XMMATRIX)m_Transform));
-		m_Material->UploadCBV();
+		// (TODO may not need to do this every frame & remove it to Physic) Upload data to the cbv
+		XMFLOAT4X4 modelTransform;
+		XMStoreFloat4x4(&modelTransform, XMMatrixTranspose(m_Transform));
+		m_CBV->copyData(&modelTransform);
+
+		if (m_Material) {
+			m_Material->UploadCBV();
+		}
 
 		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
 		

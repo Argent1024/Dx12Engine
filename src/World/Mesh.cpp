@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "Utility/MeshReader.h"
 
 namespace Game {
 
@@ -25,5 +26,18 @@ namespace Game {
 		// Need vertex buffer stride size to get num of vertex
 		UINT pointSize = m_VertexBuffer->GetSize() / m_VertexBuffer->GetStrideSize();
 		commandList.DrawInstanced(pointSize, 1, 0, 0);
+	}
+
+	ptrMesh TriangleMesh::GetXYPlane() 
+	{
+		std::vector<DefaultVertex> triangleVertices =
+		{
+			{ { 1.0f,  1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f  } },
+			{ { 1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
+			{ { -1.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
+			{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f}, { 0.0f, 1.0f } }
+		};
+		std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
+		return std::make_shared<TriangleMesh>(triangleVertices, index_list);
 	}
 }

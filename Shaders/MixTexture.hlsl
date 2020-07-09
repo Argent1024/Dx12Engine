@@ -1,11 +1,12 @@
 SamplerState g_sampler : register(s0);
 Texture2D g_texture : register(t0);
 
-cbuffer Transformation : register(b0) 
+// Store Camera Transformations
+cbuffer TextureInfo : register(b2) 
 {
-	float4x4 mvp;
+	
 };
-
+ 
 struct VSInput 
 {
 	float4 position : POSITION0;
@@ -36,6 +37,6 @@ PSInput VSMain(VSInput input)
 float4 PSMain(PSInput input) : SV_TARGET
 {
 	// return float4(1.0, 0.0, 0.0, 0.0);
-	return g_texture.Sample(g_sampler, input.uv).x;
+	return 5 * (g_texture.Sample(g_sampler, input.uv).x - 0.8);
 	// return float4(input.normal, 1);
 }

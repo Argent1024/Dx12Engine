@@ -69,9 +69,6 @@ namespace Game {
 
 		inline UINT size() { return m_DescriptorTable->size(); }
 
-		inline Graphic::DescriptorTable* GetDescriptorTable() 
-		{ return m_DescriptorTable; }
-
 		void Initialize() override;
 		
 		void PrepareData(Scene& scene) override { } 
@@ -83,7 +80,7 @@ namespace Game {
 		CD3DX12_RECT m_ScissorRect;
 		// std::shared_ptr<SimpleMaterial> m_MixtureTextures;
 	
-		GObject* m_RenderScreen;
+		ptrMesh m_RenderScreen;
 	};
 
 	/*************************************************************************************
