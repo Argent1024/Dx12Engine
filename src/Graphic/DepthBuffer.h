@@ -20,7 +20,8 @@ namespace Graphic
 		{	
 			return m_dsvHandle; 
 		}
-
+		
+		
 		// If we are going to create SRV in some place
 		inline Texture& GetTexture() { return m_depthTexture; }
 		

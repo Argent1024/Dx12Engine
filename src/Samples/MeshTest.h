@@ -26,10 +26,12 @@ namespace Samples {
 
 		float angle = 0.0;
 		float t = 10.0;
-
+		UINT frame = 0;
 		Scene m_Scene;
 		RenderEngine* m_Render;
-		
+		GObject* obj0;
+
+
 		ptrRootSignature m_rootSignature;
 		ptrPSO m_GraphicPSO;		// Main Render Pass
 

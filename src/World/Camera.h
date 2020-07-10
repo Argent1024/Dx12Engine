@@ -58,7 +58,7 @@ namespace Game {
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
 			m_View = Transform(Matrix4(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp)));		
-			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixPerspectiveFovRH(3.14f / 2.0f, m_aspectRatio, 0.5f, 1000.0f)));
+			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixPerspectiveFovRH(3.14f / 6.0f, m_aspectRatio, 0.01f, 50.0f)));
 		}
 	};
 

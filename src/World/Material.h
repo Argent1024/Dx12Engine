@@ -50,7 +50,7 @@ namespace Game {
 			bool UseTexture;
 		};
 
-		SimpleMaterial(Vector3 color = {0.75f, 0.75f, 0.9f}) : m_Tex(nullptr) { SetColor(color); }
+		SimpleMaterial(Vector3 color) : m_Tex(nullptr) { SetColor(color); }
 
 		void Initialize() override
 		{
