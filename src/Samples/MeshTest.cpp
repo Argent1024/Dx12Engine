@@ -88,20 +88,48 @@ namespace Samples {
 	}
 
 	void MeshTest::Update() {
-		const InputManager& input = Engine::GetInputManager();
+		InputManager& input = Engine::GetInputManager();
+
 		auto kb = input.GetKeyboardState();
-		if (kb.Up || kb.W) {
-			std::string msg = "Up pressed";
-			Logger::Log(msg);
+		auto mouse = input.GetMouseState();
+		auto tracker = input.GetTracker();
+		
+		// TODO move debug view into render engine later 
+		// Press f1 to show depth texture
+		if (tracker.IsKeyPressed(Keyboard::F1)) {
+			RenderEngine::Config& renderSetting = m_Render->GetRenderSetting();
+			renderSetting.mixpass = !renderSetting.mixpass;
+		}
+
+		// press f2 to show normal
+		if (tracker.IsKeyPressed(Keyboard::F2)) {
+
+			RenderEngine::Config& renderSetting = m_Render->GetRenderSetting();
+
+			DefaultRenderPass& pass = m_Render->GetDefaultPass();
+			DefaultRenderPass::ConstBufferData& data = pass.GetCBVData();
+			
+			// avoid conflict with depth
+			if (renderSetting.mixpass) {
+				renderSetting.mixpass = false;
+				data.debugnormal = true;
+			}
+			else {
+				data.debugnormal = !data.debugnormal;
+			}
 		}
 
 		frame ++;
-		if (frame % 40 == 0) {
+		if (kb.E) {
 			Matrix4 t = obj0->GetTransform();
-			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 0, 1, 0 }, 0.1));
+			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 0, 1, 0 }, 0.01));
 			t = t * r;
 			obj0->SetTransform(Transform(t));
 		}
+
+		
+
+		input.UpdateTracker();
 	}
 
 }

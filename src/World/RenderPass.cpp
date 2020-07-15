@@ -21,7 +21,7 @@ namespace Game {
 		m_DescriptorTable->Initialize(Engine::GetInitHeap());
 
 		// Creata CBV 
-		const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(CameraBufferData));
+		const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(DefaultRenderPass::ConstBufferData));
 		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
 		m_CBV = new Graphic::ConstantBuffer(gpumem, cbvSize); // Bind at slot 0
 		m_CBV->Initialize();

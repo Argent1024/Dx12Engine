@@ -44,11 +44,15 @@ namespace Game {
 	//		Required a shadow pass for light before this
 	class DefaultRenderPass : public RenderPass {
 	public:
-
-		struct CameraBufferData 
+		
+		struct ConstBufferData 
 		{
 			XMFLOAT4X4 projection;
 			XMFLOAT4X4 view;
+
+			BOOL debugnormal = FALSE;
+			BOOL padding0[3]; // Align
+
 		};
 
 		void Initialize() override;
@@ -56,8 +60,11 @@ namespace Game {
 		void PrepareData(Scene& scene) override;
 
 		void Render(Graphic::CommandList& commandList, Scene& scene) override;
+
+		ConstBufferData& GetCBVData() { return m_CBVData; }
+
 	private:
-		CameraBufferData m_CBVData;
+		ConstBufferData m_CBVData;
 		Graphic::ConstantBuffer* m_CBV;
 	};
 

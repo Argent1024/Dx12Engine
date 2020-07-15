@@ -21,9 +21,15 @@ public:
 		assert(m_Initialized && "Input manager not initialized");
 		return m_mouse->GetState(); 
 	}
+	
+	inline DirectX::Keyboard::KeyboardStateTracker GetTracker()
+	{ return m_traker; }
+
+	inline void UpdateTracker() { m_traker.Update(m_keyboard->GetState()); }
 
 private:
 	bool m_Initialized = FALSE;
+	DirectX::Keyboard::KeyboardStateTracker m_traker;
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 	std::unique_ptr<DirectX::Mouse> m_mouse;
 

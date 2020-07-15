@@ -29,6 +29,8 @@ namespace Game {
 
 		virtual void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp) = 0;
 
+		// helper for different input
+
 		inline const Transform& GetView() const { return m_View; }
 		inline const Transform& GetToScreen() const { return m_ToScreen; }
 		inline void SetNearZ(float z) { m_nearZ = z; }

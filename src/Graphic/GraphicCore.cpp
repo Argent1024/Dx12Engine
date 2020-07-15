@@ -96,6 +96,7 @@ void Engine::InitializeEngine() {
 	rtvHeap->Initialize();
 	// **** Graphic Stuff End ******//
 
+	// ***** Utility stuff start *******//
 	Logger::Initialize();
 }
 

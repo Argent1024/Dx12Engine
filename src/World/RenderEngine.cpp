@@ -50,18 +50,19 @@ namespace Game {
 		GraphicsCommandManager.ExecuteCommandList(&ThreadCommandList);
 		
 		// Mix Render Pass
-		
-		Graphic::CommandList MixCommandList;
-		GraphicsCommandManager.InitCommandList(&MixCommandList);
-		MixCommandList.SetSwapChain(swapChain);
-		
-		MixCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		const float ClearColor[] = {0.0, 0.0, 0.0, 0.0};
-		MixCommandList.ClearSwapChain(swapChain, ClearColor);
-		mixPass.Render(MixCommandList, scene);
-		MixCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		GraphicsCommandManager.ExecuteCommandList(&MixCommandList);
-		
+		if (Setting.mixpass) 
+		{
+			Graphic::CommandList MixCommandList;
+			GraphicsCommandManager.InitCommandList(&MixCommandList);
+			MixCommandList.SetSwapChain(swapChain);
+
+			MixCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			const float ClearColor[] = { 0.0, 0.0, 0.0, 0.0 };
+			MixCommandList.ClearSwapChain(swapChain, ClearColor);
+			mixPass.Render(MixCommandList, scene);
+			MixCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+			GraphicsCommandManager.ExecuteCommandList(&MixCommandList);
+		}
 		
 		// Multithreading join here
 
