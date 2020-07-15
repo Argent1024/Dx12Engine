@@ -2,6 +2,8 @@
 #include "GPUMemory.h"
 #include "DescriptorHeap.h"
 #include "CommandQueue.h"
+#include "Utility/Input.h"
+#include "Utility/Logger.h"
 
 // Helper function for acquiring the first available hardware adapter that supports Direct3D 12.
 // If no such adapter can be found, *ppAdapter will be set to nullptr.
@@ -75,6 +77,7 @@ Graphic::CommandManager CopyHelper(1);
 Graphic::CommandManager GraphicsCommandManager(2);
 
 void Engine::InitializeEngine() {
+	// **** Graphic Stuff ******//
 	EnableDebug();
 	CreateDevice();
 
@@ -91,6 +94,9 @@ void Engine::InitializeEngine() {
 
 	Graphic::DescriptorHeap* rtvHeap = Engine::GetRTVHeap();
 	rtvHeap->Initialize();
+	// **** Graphic Stuff End ******//
+
+	Logger::Initialize();
 }
 
 namespace Engine 

@@ -2,7 +2,7 @@
 
 #include "DXHelper.h"
 
-
+// TODO change name of this file
 
 namespace Graphic 
 {
@@ -19,7 +19,7 @@ namespace Graphic
 
 		virtual void Init(const HWND m_appHwnd)  = 0;
 		virtual void Render() = 0;
-
+		virtual void Update() { };
 	protected:
 
 		const UINT m_width;

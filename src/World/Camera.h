@@ -31,7 +31,8 @@ namespace Game {
 
 		inline const Transform& GetView() const { return m_View; }
 		inline const Transform& GetToScreen() const { return m_ToScreen; }
-	
+		inline void SetNearZ(float z) { m_nearZ = z; }
+		inline void SetFarZ(float z) { m_farZ = z; }
 
 		void SetViewPort(CD3DX12_VIEWPORT newViewPort) { m_Viewport = newViewPort; }
 		void SetScissorRect(CD3DX12_RECT newScissorRect) { m_ScissorRect = newScissorRect; } 
@@ -40,6 +41,8 @@ namespace Game {
 		Transform m_View;
 		Transform m_ToScreen; // Projective or Orthnomal
 		float m_aspectRatio;
+		float m_nearZ = 0.5f;
+		float m_farZ = 50.0f;
 		CD3DX12_VIEWPORT m_Viewport;
 		CD3DX12_RECT m_ScissorRect;
 	};
@@ -58,8 +61,13 @@ namespace Game {
 		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
 		{
 			m_View = Transform(Matrix4(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp)));		
-			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixPerspectiveFovRH(3.14f / 6.0f, m_aspectRatio, 0.01f, 50.0f)));
+			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixPerspectiveFovRH(m_FOVAngleY, m_aspectRatio, m_nearZ, m_farZ)));
 		}
+
+		inline void SetViewAngle(float angle) { m_FOVAngleY = angle; }
+
+	private:
+		float m_FOVAngleY = 3.14f / 6.0f;
 	};
 
 	class OrthonormalCamera : public Camera {

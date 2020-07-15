@@ -20,7 +20,7 @@ namespace Samples {
 
 		void Init(const HWND m_appHwnd) override;
 		void Render() override;
-
+		void Update() override;
 	private:
 		void LoadAssert();
 

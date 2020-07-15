@@ -51,7 +51,7 @@ namespace Game {
 		
 		// Mix Render Pass
 		
-		/*Graphic::CommandList MixCommandList;
+		Graphic::CommandList MixCommandList;
 		GraphicsCommandManager.InitCommandList(&MixCommandList);
 		MixCommandList.SetSwapChain(swapChain);
 		
@@ -61,7 +61,7 @@ namespace Game {
 		mixPass.Render(MixCommandList, scene);
 		MixCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		GraphicsCommandManager.ExecuteCommandList(&MixCommandList);
-		*/
+		
 		
 		// Multithreading join here
 

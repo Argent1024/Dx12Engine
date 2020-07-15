@@ -1,11 +1,14 @@
 #include"MeshTest.h"
 #include"../Utility/MeshReader.h"
+#include "Utility/input.h"
+#include "Utility/logger.h"
 
 namespace Samples {
 
 	void MeshTest::Init(const HWND m_appHwnd)
 	{
 		Engine::InitializeEngine();
+		Engine::InitializeInputManager(m_appHwnd);
 
 		/*m_rootSignature = std::make_shared<RootSignature>();
 		m_rootSignature->Initialize();
@@ -34,7 +37,7 @@ namespace Samples {
 	void MeshTest::LoadAssert() 
 	{
 		MeshReader reader;
-		reader.ReadOBJ("D:\\work\\tEngine\\bunny.obj");
+		reader.ReadOBJ("D:\\work\\tEngine\\test.obj");
 
 		std::vector<DefaultVertex>& vertex = reader.m_vertex;
 		std::vector<UINT>& index = reader.m_index;
@@ -82,6 +85,16 @@ namespace Samples {
 	{
 		// m_Scene->Render();
 		m_Render->Render(m_Scene);
+	}
+
+	void MeshTest::Update() {
+		const InputManager& input = Engine::GetInputManager();
+		auto kb = input.GetKeyboardState();
+		if (kb.Up || kb.W) {
+			std::string msg = "Up pressed";
+			Logger::Log(msg);
+		}
+
 		frame ++;
 		if (frame % 40 == 0) {
 			Matrix4 t = obj0->GetTransform();
@@ -90,4 +103,5 @@ namespace Samples {
 			obj0->SetTransform(Transform(t));
 		}
 	}
+
 }

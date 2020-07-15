@@ -1,9 +1,12 @@
 #include "WinApp.h"
 #include "stdafx.h"
 
+#include "Mouse.h"
+#include "Keyboard.h"
+
 HWND WinApp::m_hwnd = nullptr;
 
-
+using namespace DirectX;
 void WinApp::InitWindow(HINSTANCE hInst, Graphic::GraphicCore* t_core)
 {
 	//TODO Parse the command line parameters
@@ -56,7 +59,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	   return 0;
 
 	case WM_PAINT:
-		//TODO render here
+		t_core->Update();
 		t_core->Render();
 		return 0;
 
@@ -64,6 +67,28 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		PostQuitMessage(0);
 		return 0;
 
+	//************************** INPUT BELOW ***************************//
+	case WM_ACTIVATEAPP:
+
+		Keyboard::ProcessMessage(message, wParam, lParam);
+		Mouse::ProcessMessage(message, wParam, lParam);
+		break;
+
+	case WM_KEYDOWN:
+    case WM_KEYUP:
+	case WM_SYSKEYUP:	// Alt
+		Keyboard::ProcessMessage(message, wParam, lParam);
+		break;
+
+	case WM_SYSKEYDOWN:
+		Keyboard::ProcessMessage(message, wParam, lParam);
+    /*if (wParam == VK_RETURN && (lParam & 0x60000000) == 0x20000000)
+    {
+        ...
+    }*/
+		break;
+
+	// ************************* INPUT  END  ****************************//
 	}
 
 	// Handle any messages switch statement didn't
