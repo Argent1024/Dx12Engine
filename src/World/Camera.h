@@ -27,26 +27,73 @@ namespace Game {
 			commandList.SetScissorRects(&m_ScissorRect);
 		}
 
-		virtual void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp) = 0;
+		// Update view and ToScreen
+		virtual void Look() = 0;
 
-		// helper for different input
+		// helper for user input
+		inline void RotateYaw(float angle) 
+		{ 
+			Transform R(XMMatrixRotationAxis(m_WorldUp, angle));
+			m_Direction = Normalize(R * m_Direction);
+		}
 
+		inline void RotateRoll(float angle) 
+		{
+			Transform R(XMMatrixRotationAxis(m_Direction, angle));
+			m_WorldUp = Normalize(R * m_WorldUp);
+		}
+
+		inline void RotatePitch(float angle) 
+		{
+			Vector3 axis = CrossProduct(m_Direction, m_WorldUp);
+			Transform R(XMMatrixRotationAxis(axis, angle));
+			m_Direction = Normalize(R * m_Direction);
+			m_WorldUp = Normalize(R * m_WorldUp);
+		}
+
+		//********* Setting camera's data ***********//
 		inline const Transform& GetView() const { return m_View; }
 		inline const Transform& GetToScreen() const { return m_ToScreen; }
 		inline void SetNearZ(float z) { m_nearZ = z; }
 		inline void SetFarZ(float z) { m_farZ = z; }
+		inline void SetPosition(Vector3& pos) { m_Position = pos; }
+		inline void SetDirection(Vector3& dir) { m_Direction = dir; }
+		inline void SetWorldUp(Vector3& up) { m_WorldUp = up;}
+
+		void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp) 
+		{
+			m_Position = Position;
+			m_Direction = Target - m_Position;
+			m_WorldUp = WorldUp;
+			Look();
+		}
+
+		void LookTo(const Vector3& Position, const Vector3& Direction, const Vector3& WorldUp) 
+		{
+			m_Position = Position;
+			m_Direction = Direction;
+			m_WorldUp = WorldUp;
+			Look();
+		}
 
 		void SetViewPort(CD3DX12_VIEWPORT newViewPort) { m_Viewport = newViewPort; }
 		void SetScissorRect(CD3DX12_RECT newScissorRect) { m_ScissorRect = newScissorRect; } 
 
 	protected:
+		// Helper for gpu use
 		Transform m_View;
 		Transform m_ToScreen; // Projective or Orthnomal
+		
+		CD3DX12_VIEWPORT m_Viewport;
+		CD3DX12_RECT m_ScissorRect;
+
+		// Camera's data
 		float m_aspectRatio;
 		float m_nearZ = 0.01f;
 		float m_farZ = 50.0f;
-		CD3DX12_VIEWPORT m_Viewport;
-		CD3DX12_RECT m_ScissorRect;
+		Vector3 m_Position = Vector3(kZero);
+		Vector3 m_Direction = Vector3(kZUnitVec);
+		Vector3 m_WorldUp = Vector3(kYUnitVec);
 	};
 
 	
@@ -60,10 +107,9 @@ namespace Game {
 			: Camera(width, height)
 		{ LookAt(Position, Target, WorldUp); }
 
-		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
+		inline void Look() override
 		{
-			m_View = Transform(Matrix4(DirectX::XMMatrixLookAtRH(Position, Target, WorldUp)));
-			// m_ToScreen = Transform(Matrix4(DirectX::XMMatrixOrthographicRH(10.0, 10.0, m_nearZ, m_farZ)));
+			m_View = Transform(Matrix4(DirectX::XMMatrixLookToRH(m_Position, m_Direction, m_WorldUp)));
 			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixPerspectiveFovRH(m_FOVAngleY, m_aspectRatio, m_nearZ, m_farZ)));
 		}
 
@@ -83,9 +129,9 @@ namespace Game {
 			: Camera(width, height)
 		{ LookAt(Position, Target, WorldUp); }
 
-		inline void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
+		inline void Look() override
 		{
-			m_View = Transform(Matrix4(DirectX::XMMatrixLookAtLH(Position, Target, WorldUp)));		
+			m_View = Transform(Matrix4(DirectX::XMMatrixLookToLH(m_Position, m_Direction, m_WorldUp)));		
 			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixOrthographicLH(10.0, 10.0, m_nearZ, m_farZ)));
 		}
 	};

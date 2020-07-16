@@ -52,6 +52,7 @@ namespace Math
 		INLINE friend Vector3 operator/ (Scalar  v1, Vector3 v2) { return Vector3(v1) / v2; }
 		INLINE friend Vector3 operator* (float   v1, Vector3 v2) { return Scalar(v1) * v2; }
 		INLINE friend Vector3 operator/ (float   v1, Vector3 v2) { return Scalar(v1) / v2; }
+		
 		INLINE friend std::ostream& operator<<(std::ostream& os, const Vector3& v) 
 		{
 			os << v.GetX() << " " << v.GetY() << " " << " " << v.GetZ() << " ";

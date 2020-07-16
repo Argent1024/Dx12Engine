@@ -135,8 +135,23 @@ namespace Samples {
 			obj0->SetTransform(Transform(t));
 		}
 
+		Camera& camera = m_Scene.GetMainCamera();
+		float cameraSpeed = 0.01;
+		if (kb.Up) {
+			camera.RotatePitch(cameraSpeed);
+		} 
+		if (kb.Down) {
+			camera.RotatePitch(-cameraSpeed);
+		}
+		if (kb.Left) {
+			camera.RotateYaw(cameraSpeed);
+		}
+		if (kb.Right) {
+			camera.RotateYaw(-cameraSpeed);
+		}
+		camera.Look();
+
 		if (tracker.IsKeyPressed(Keyboard::L)) {
-			Camera& camera = m_Scene.GetMainCamera();
 			const Transform& T = obj0->GetTransform();
 			const Transform& view = camera.GetView();
 			const Transform& proj = camera.GetToScreen();

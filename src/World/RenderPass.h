@@ -62,6 +62,7 @@ namespace Game {
 
 		void Render(Graphic::CommandList& commandList, Scene& scene) override;
 
+		// Settings of the renderpass
 		ConstBufferData& GetCBVData() { return m_CBVData; }
 
 	private:
