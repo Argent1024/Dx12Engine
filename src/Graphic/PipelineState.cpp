@@ -26,11 +26,14 @@ namespace Graphic {
 
 		// configrations
 		CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(D3D12_DEFAULT);
-
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 		this->SetDepthStencilState(depthStencilDesc);
 
 		this->SetBlendState();
-		this->SetRasterState();
+
+		CD3DX12_RASTERIZER_DESC raseterDesc(D3D12_DEFAULT);
+		raseterDesc.CullMode = D3D12_CULL_MODE_NONE;
+		this->SetRasterState(raseterDesc);
 
 		this->SetStuffThatIdontKnowYet();
 		this->CreatePSO();

@@ -31,7 +31,6 @@ namespace Samples {
 		RenderEngine* m_Render;
 		GObject* obj0;
 
-
 		ptrRootSignature m_rootSignature;
 		ptrPSO m_GraphicPSO;		// Main Render Pass
 

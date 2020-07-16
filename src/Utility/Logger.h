@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "Math/Transform.h"
 
 class LogObject {
 
@@ -26,6 +27,15 @@ public:
 		freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 		freopen_s((FILE**)stderr, "CONOUT$", "w", stderr);  
 		Logger::Log("Logger Initialized");
+	}
+
+	static void Log(Math::Vector3& T, std::string str="") {
+		if (str.size() != 0) {
+			std::cout << str << " " << T << std::endl;
+		}
+		else {
+			std::cout << T << std::endl;
+		}
 	}
 
 	static void Log(const char* str) {

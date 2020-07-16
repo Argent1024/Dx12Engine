@@ -2,6 +2,7 @@
 
 #include <DirectXMath.h>
 #include <intrin.h>
+#include <ostream>
 
 #define INLINE __forceinline
 

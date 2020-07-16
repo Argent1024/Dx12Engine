@@ -37,7 +37,7 @@ namespace Samples {
 	void MeshTest::LoadAssert() 
 	{
 		MeshReader reader;
-		reader.ReadOBJ("D:\\work\\tEngine\\test.obj");
+		reader.ReadOBJ("D:\\work\\tEngine\\bunny.obj");
 
 		std::vector<DefaultVertex>& vertex = reader.m_vertex;
 		std::vector<UINT>& index = reader.m_index;
@@ -46,39 +46,16 @@ namespace Samples {
 		m_Material = std::make_shared<SimpleMaterial>(Vector3{0.75f, 0.75f, 0.9f});
 		m_Material->Initialize();
 
-		ptrMaterial mat1 = std::make_shared<SimpleMaterial>(Vector3{1.0, 0.0, 0.0});
-		mat1->Initialize();
-
-		ptrMaterial mat2 = std::make_shared<SimpleMaterial>(Vector3{0.0, 1.0, 0.0});
-		mat2->Initialize();
-
 		// TODO!! error C2338 aligin?
 		obj0 = new Game::GObject();
 		obj0->SetMesh(m_Mesh);
+		 //obj0->SetMesh(plane);
 		obj0->SetMaterial(m_Material);
 		obj0->Initialize();
-		obj0->SetTransform(Transform({ 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, 0, 1.0 }, {0.0, 0, 0}));
-
-
-		// Test Depth buffer
-		ptrMesh plane = TriangleMesh::GetXYPlane();
-		GObject* obj1 = new Game::GObject();
-
-		obj1->SetMesh(plane);
-		obj1->SetMaterial(mat1);
-		obj1->Initialize();
-		obj1->SetTransform(Transform({ 3, 0, 0 }, { 0, 4, 0 }, { 0, 0, 3 }, { 1, 0, 4.0}));
-		
-		GObject* obj2 = new Game::GObject();
-		obj2->SetMesh(plane);
-		obj2->SetMaterial(mat2);
-		obj2->Initialize();
-		obj2->SetTransform(Transform({ 3, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }, {-2, 0, 5.0}));
-
+		obj0->SetTransform(Transform({ 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, 0, 1.0 }, {0.0, 0.0, 0.0}));
 
 		m_Scene.AddGameObj(obj0);
-		//m_Scene.AddGameObj(obj1);
-		//m_Scene.AddGameObj(obj2);
+		
 	}
 
 	void MeshTest::Render()
@@ -109,14 +86,24 @@ namespace Samples {
 			DefaultRenderPass& pass = m_Render->GetDefaultPass();
 			DefaultRenderPass::ConstBufferData& data = pass.GetCBVData();
 			
-			// avoid conflict with depth
-			if (renderSetting.mixpass) {
-				renderSetting.mixpass = false;
-				data.debugnormal = true;
-			}
-			else {
-				data.debugnormal = !data.debugnormal;
-			}
+			renderSetting.mixpass = false;
+			data.debugnormal = true;
+			data.debugpos = false;
+			
+		}
+
+		// press f3 to show normal
+		if (tracker.IsKeyPressed(Keyboard::F3)) {
+
+			RenderEngine::Config& renderSetting = m_Render->GetRenderSetting();
+
+			DefaultRenderPass& pass = m_Render->GetDefaultPass();
+			DefaultRenderPass::ConstBufferData& data = pass.GetCBVData();
+			
+			
+			renderSetting.mixpass = false;
+			data.debugnormal = false;
+			data.debugpos = true;
 		}
 
 		frame ++;
@@ -127,8 +114,42 @@ namespace Samples {
 			obj0->SetTransform(Transform(t));
 		}
 
-		
+		if (kb.Q) {
+			Matrix4 t = obj0->GetTransform();
+			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 0, 1, 0 }, -0.01));
+			t = t * r;
+			obj0->SetTransform(Transform(t));
+		}
 
+		if (kb.W) {
+			Matrix4 t = obj0->GetTransform();
+			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 1, 0, 0 }, 0.01));
+			t = t * r;
+			obj0->SetTransform(Transform(t));
+		}
+
+		if (kb.S) {
+			Matrix4 t = obj0->GetTransform();
+			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 1, 0, 0 }, -0.01));
+			t = t * r;
+			obj0->SetTransform(Transform(t));
+		}
+
+		if (tracker.IsKeyPressed(Keyboard::L)) {
+			Camera& camera = m_Scene.GetMainCamera();
+			const Transform& T = obj0->GetTransform();
+			const Transform& view = camera.GetView();
+			const Transform& proj = camera.GetToScreen();
+			Vector3 test(-1.0, -1.0, 0.0);
+			test = T * test;
+			Logger::Log(test, "World Space");
+			test = view * test;
+			Logger::Log(test, " Camera Space:");
+			test = proj * test;
+			Logger::Log(test, " Screen Space:");
+			Logger::Log("");
+		}
+	
 		input.UpdateTracker();
 	}
 

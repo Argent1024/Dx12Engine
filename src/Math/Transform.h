@@ -21,7 +21,13 @@ namespace Math {
 		INLINE operator XMMATRIX() const { return m_mat; }
 		INLINE operator Matrix4() const { return m_mat; }
 
-	private:
+		friend std::ostream& operator<<(std::ostream& os, const Transform& dt)
+		{
+			os << "Not implmented log for Transform";
+			// os << m_mat;
+		}
+
+	protected:
 		Matrix4 m_mat;
 	};
 }

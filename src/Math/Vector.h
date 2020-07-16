@@ -23,10 +23,10 @@ namespace Math
 
 
 		INLINE operator XMVECTOR() const { return m_vec; }
-
-		INLINE Scalar GetX() const { return Scalar(XMVectorSplatX(m_vec)); }
-		INLINE Scalar GetY() const { return Scalar(XMVectorSplatY(m_vec)); }
-		INLINE Scalar GetZ() const { return Scalar(XMVectorSplatZ(m_vec)); }
+		// TODO emmmmmmm
+		INLINE Scalar GetX() const { return Scalar(XMVectorSplatX(m_vec)) / Scalar(XMVectorSplatW(m_vec)); }
+		INLINE Scalar GetY() const { return Scalar(XMVectorSplatY(m_vec)) / Scalar(XMVectorSplatW(m_vec)); }
+		INLINE Scalar GetZ() const { return Scalar(XMVectorSplatZ(m_vec)) / Scalar(XMVectorSplatW(m_vec)); }
 
 		INLINE void SetX(Scalar x) { m_vec = XMVectorPermute<4, 1, 2, 3>(m_vec, x); }
 		INLINE void SetY(Scalar y) { m_vec = XMVectorPermute<0, 5, 2, 3>(m_vec, y); }
@@ -52,6 +52,11 @@ namespace Math
 		INLINE friend Vector3 operator/ (Scalar  v1, Vector3 v2) { return Vector3(v1) / v2; }
 		INLINE friend Vector3 operator* (float   v1, Vector3 v2) { return Scalar(v1) * v2; }
 		INLINE friend Vector3 operator/ (float   v1, Vector3 v2) { return Scalar(v1) / v2; }
+		INLINE friend std::ostream& operator<<(std::ostream& os, const Vector3& v) 
+		{
+			os << v.GetX() << " " << v.GetY() << " " << " " << v.GetZ() << " ";
+			return os;
+		}
 	};
 
 	

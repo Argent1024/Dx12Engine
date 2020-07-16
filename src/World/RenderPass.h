@@ -51,7 +51,8 @@ namespace Game {
 			XMFLOAT4X4 view;
 
 			BOOL debugnormal = FALSE;
-			BOOL padding0[3]; // Align
+			BOOL debugpos = FALSE;
+			BOOL padding0[2]; // Align
 
 		};
 

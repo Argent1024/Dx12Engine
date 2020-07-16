@@ -1,6 +1,7 @@
 #pragma once
 #include "CommandList.h"
 #include "Descriptor.h"
+#include "utility/logger.h"
 
 #define ptrMesh std::shared_ptr<Game::Mesh>
 
@@ -51,7 +52,7 @@ namespace Game {
 			m_VertexBuffer = mesh.m_VertexBuffer;
 			m_IndexBuffer = std::make_shared<Graphic::IndexBuffer>(*mesh.m_IndexBuffer, start, end);
 		}*/
-
+		
 		void UseMesh(Graphic::CommandList& commandList) override;
 
 		// navie draw one instance
