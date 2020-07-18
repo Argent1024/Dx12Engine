@@ -8,6 +8,7 @@ namespace Math
 	class Vector3 {
 	protected:
 		XMVECTOR m_vec;
+
 	public:
 		Vector3() {}
 		
@@ -23,10 +24,12 @@ namespace Math
 
 
 		INLINE operator XMVECTOR() const { return m_vec; }
-		// TODO emmmmmmm
+		// TODO emmmmmmm homogeneous 
 		INLINE Scalar GetX() const { return Scalar(XMVectorSplatX(m_vec)) / Scalar(XMVectorSplatW(m_vec)); }
 		INLINE Scalar GetY() const { return Scalar(XMVectorSplatY(m_vec)) / Scalar(XMVectorSplatW(m_vec)); }
 		INLINE Scalar GetZ() const { return Scalar(XMVectorSplatZ(m_vec)) / Scalar(XMVectorSplatW(m_vec)); }
+		INLINE Scalar GetW() const { return Scalar(XMVectorSplatW(m_vec)); }
+
 
 		INLINE void SetX(Scalar x) { m_vec = XMVectorPermute<4, 1, 2, 3>(m_vec, x); }
 		INLINE void SetY(Scalar y) { m_vec = XMVectorPermute<0, 5, 2, 3>(m_vec, y); }

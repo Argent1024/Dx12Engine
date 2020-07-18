@@ -40,14 +40,19 @@ namespace Math {
 
 		INLINE const Matrix3& Get3x3() const { return (const Matrix3&)*this; }
 
-		INLINE const Vector3 GetX() { return Vector3(m_mat.r[0]); }
-		INLINE const Vector3 GetY() { return Vector3(m_mat.r[1]); }
-		INLINE const Vector3 GetZ() { return Vector3(m_mat.r[2]); }
-		INLINE const Vector3 GetW() { return Vector3(m_mat.r[3]); }
+		INLINE const Vector3 GetX() const { return Vector3(m_mat.r[0]); }
+		INLINE const Vector3 GetY() const { return Vector3(m_mat.r[1]); }
+		INLINE const Vector3 GetZ() const { return Vector3(m_mat.r[2]); }
+		INLINE const Vector3 GetW() const { return Vector3(m_mat.r[3]); }
 
 		INLINE Matrix4 operator* (const Matrix4& mat) const { return Matrix4(XMMatrixMultiply(m_mat, mat.m_mat)); }
 		// NOTICE! XMVector3Transform ignore w in the result! w maybe not equal to 1.0
-		INLINE Vector3 operator* (const Vector3& vec) const { return Vector3(XMVector3Transform(vec, m_mat)); } 
+		INLINE Vector3 operator* (const Vector3& vec) const 
+		{ 
+			Vector3 ans =  Vector3(XMVector3Transform(vec, m_mat));
+			// Make sure it's still homogeneous 
+			return ans / ans.GetW();; 
+		} 
 		
 		INLINE operator XMMATRIX() const { return m_mat; }
 	protected:

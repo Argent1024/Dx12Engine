@@ -17,4 +17,14 @@ namespace Math {
 	{
 		return Vector3(DirectX::XMVector3Normalize(v));
 	}
+
+	INLINE Scalar Dot(const Vector3& a, const Vector3& b) 
+	{
+		return Scalar(DirectX::XMVector3Dot(a, b));
+	}
+
+	INLINE Scalar Length2(const Vector3& v) 
+	{
+		return Scalar(DirectX::XMVector3LengthSq(v));
+	}
 }

@@ -13,7 +13,7 @@ namespace Math {
 		INLINE explicit Transform(const Matrix4& mat) : m_mat(mat) {}
 		INLINE explicit Transform(const XMMATRIX& mat) : m_mat(mat) {}
 		INLINE const Matrix3& GetRotation() { return m_mat.Get3x3(); }
-		INLINE Vector3 GetTranslation() { return m_mat.GetW(); }
+		INLINE Vector3 GetTranslation() const { return m_mat.GetW(); }
 		
 		// Apply transformation to Vector3
 		INLINE Vector3 operator*(const Vector3& v) const { return m_mat * v; }
