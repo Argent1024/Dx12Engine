@@ -2,6 +2,7 @@
 #include "../Utility/MeshReader.h"
 
 namespace Game {
+	using namespace Math;
 
 	void DefaultRenderPass::Initialize() 
 	{

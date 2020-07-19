@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GraphicCore.h"
-#include "CommandList.h"
-#include "CommandQueue.h"
+#include "Graphic/GraphicCore.h"
+#include "Graphic/CommandList.h"
+#include "Graphic/CommandQueue.h"
 #include "GObject.h"
 #include "Camera.h"
 #include "Light.h"

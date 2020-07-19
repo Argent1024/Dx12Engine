@@ -1,6 +1,6 @@
 #pragma once
-#include "CommandList.h"
-#include "Descriptor.h"
+#include "Graphic/CommandList.h"
+#include "Graphic/Descriptor.h"
 #include "utility/logger.h"
 
 #define ptrMesh std::shared_ptr<Game::Mesh>

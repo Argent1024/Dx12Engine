@@ -1,13 +1,11 @@
 #pragma once
 
-#include "MathCommon.h"
-#include "Transform.h"
-#include "Descriptor.h"
-
-#include "CommandList.h"
+#include "Math/MathCommon.h"
+#include "Math/Transform.h"
+#include "Graphic/Descriptor.h"
+#include "Graphic/CommandList.h"
 
 namespace Game {
-	using namespace Math;
 	
 	// ***IMPORTANT***
 	// In DirectX's cpu code, vector's dimension is 1 * 4.
@@ -33,34 +31,34 @@ namespace Game {
 		// helper for user input
 		inline void RotateYaw(float angle) 
 		{ 
-			Transform R(XMMatrixRotationAxis(m_WorldUp, angle));
+			Math::Transform R(DirectX::XMMatrixRotationAxis(m_WorldUp, angle));
 			m_Direction = Normalize(R * m_Direction);
 		}
 
 		inline void RotateRoll(float angle) 
 		{
-			Transform R(XMMatrixRotationAxis(m_Direction, angle));
+			Math::Transform R(DirectX::XMMatrixRotationAxis(m_Direction, angle));
 			m_WorldUp = Normalize(R * m_WorldUp);
 		}
 
 		inline void RotatePitch(float angle) 
 		{
-			Vector3 axis = CrossProduct(m_Direction, m_WorldUp);
-			Transform R(XMMatrixRotationAxis(axis, angle));
+			Math::Vector3 axis = CrossProduct(m_Direction, m_WorldUp);
+			Math::Transform R(DirectX::XMMatrixRotationAxis(axis, angle));
 			m_Direction = Normalize(R * m_Direction);
 			m_WorldUp = Normalize(R * m_WorldUp);
 		}
 
 		//********* Setting camera's data ***********//
-		inline const Transform& GetView() const { return m_View; }
-		inline const Transform& GetToScreen() const { return m_ToScreen; }
+		inline const Math::Transform& GetView() const { return m_View; }
+		inline const Math::Transform& GetToScreen() const { return m_ToScreen; }
 		inline void SetNearZ(float z) { m_nearZ = z; }
 		inline void SetFarZ(float z) { m_farZ = z; }
-		inline void SetPosition(Vector3& pos) { m_Position = pos; }
-		inline void SetDirection(Vector3& dir) { m_Direction = dir; }
-		inline void SetWorldUp(Vector3& up) { m_WorldUp = up;}
+		inline void SetPosition(Math::Vector3& pos) { m_Position = pos; }
+		inline void SetDirection(Math::Vector3& dir) { m_Direction = dir; }
+		inline void SetWorldUp(Math::Vector3& up) { m_WorldUp = up;}
 
-		void LookAt(const Vector3& Position, const Vector3& Target, const Vector3& WorldUp) 
+		void LookAt(const Math::Vector3& Position, const Math::Vector3& Target, const Math::Vector3& WorldUp) 
 		{
 			m_Position = Position;
 			m_Direction = Target - m_Position;
@@ -68,7 +66,7 @@ namespace Game {
 			Look();
 		}
 
-		void LookTo(const Vector3& Position, const Vector3& Direction, const Vector3& WorldUp) 
+		void LookTo(const Math::Vector3& Position, const Math::Vector3& Direction, const Math::Vector3& WorldUp) 
 		{
 			m_Position = Position;
 			m_Direction = Direction;
@@ -81,8 +79,8 @@ namespace Game {
 
 	protected:
 		// Helper for gpu use
-		Transform m_View;
-		Transform m_ToScreen; // Projective or Orthnomal
+		Math::Transform m_View;
+		Math::Transform m_ToScreen; // Projective or Orthnomal
 		
 		CD3DX12_VIEWPORT m_Viewport;
 		CD3DX12_RECT m_ScissorRect;
@@ -91,9 +89,9 @@ namespace Game {
 		float m_aspectRatio;
 		float m_nearZ = 0.01f;
 		float m_farZ = 50.0f;
-		Vector3 m_Position = Vector3(kZero);
-		Vector3 m_Direction = Vector3(kZUnitVec);
-		Vector3 m_WorldUp = Vector3(kYUnitVec);
+		Math::Vector3 m_Position = Math::Vector3(Math::kZero);
+		Math::Vector3 m_Direction = Math::Vector3(Math::kZUnitVec);
+		Math::Vector3 m_WorldUp = Math::Vector3(Math::kYUnitVec);
 	};
 
 	
@@ -103,14 +101,14 @@ namespace Game {
 			: Camera(width, height) {}
 
 		ProjectiveCamera(const UINT width, const UINT height, 
-			const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
+			const Math::Vector3& Position, const Math::Vector3& Target, const Math::Vector3& WorldUp)
 			: Camera(width, height)
 		{ LookAt(Position, Target, WorldUp); }
 
 		inline void Look() override
 		{
-			m_View = Transform(Matrix4(DirectX::XMMatrixLookToRH(m_Position, m_Direction, m_WorldUp)));
-			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixPerspectiveFovRH(m_FOVAngleY, m_aspectRatio, m_nearZ, m_farZ)));
+			m_View = Math::Transform(Math::Matrix4(DirectX::XMMatrixLookToRH(m_Position, m_Direction, m_WorldUp)));
+			m_ToScreen = Math::Transform(Math::Matrix4(DirectX::XMMatrixPerspectiveFovRH(m_FOVAngleY, m_aspectRatio, m_nearZ, m_farZ)));
 		}
 
 		inline void SetViewAngle(float angle) { m_FOVAngleY = angle; }
@@ -125,14 +123,14 @@ namespace Game {
 			: Camera(width, height) {}
 
 		OrthonormalCamera(const UINT width, const UINT height, 
-			const Vector3& Position, const Vector3& Target, const Vector3& WorldUp)
+			const Math::Vector3& Position, const Math::Vector3& Target, const Math::Vector3& WorldUp)
 			: Camera(width, height)
 		{ LookAt(Position, Target, WorldUp); }
 
 		inline void Look() override
 		{
-			m_View = Transform(Matrix4(DirectX::XMMatrixLookToLH(m_Position, m_Direction, m_WorldUp)));		
-			m_ToScreen = Transform(Matrix4(DirectX::XMMatrixOrthographicLH(10.0, 10.0, m_nearZ, m_farZ)));
+			m_View = Math::Transform(Math::Matrix4(DirectX::XMMatrixLookToLH(m_Position, m_Direction, m_WorldUp)));		
+			m_ToScreen = Math::Transform(Math::Matrix4(DirectX::XMMatrixOrthographicLH(10.0, 10.0, m_nearZ, m_farZ)));
 		}
 	};
 }

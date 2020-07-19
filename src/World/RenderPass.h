@@ -1,7 +1,7 @@
 #pragma once
-#include "PipelineState.h"
-#include "RootSignature.h"
-#include "CommandList.h"
+#include "Graphic/PipelineState.h"
+#include "Graphic/RootSignature.h"
+#include "Graphic/CommandList.h"
 
 #include "Scene.h"
 
@@ -47,8 +47,8 @@ namespace Game {
 		
 		struct ConstBufferData 
 		{
-			XMFLOAT4X4 projection;
-			XMFLOAT4X4 view;
+			DirectX::XMFLOAT4X4 projection;
+			DirectX::XMFLOAT4X4 view;
 
 			BOOL debugnormal = FALSE;
 			BOOL debugpos = FALSE;

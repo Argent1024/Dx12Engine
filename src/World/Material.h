@@ -1,13 +1,10 @@
 #pragma once
 
-#include "MathCommon.h"
-#include "GraphicCore.h"
-#include "Texture.h"
+#include "Math/MathCommon.h"
+#include "Graphic/Texture.h"
 
 namespace Game {
 		
-	using namespace Math;
-
 	class Material 
 	{
 	public:
@@ -46,11 +43,11 @@ namespace Game {
 		static const UINT texSlot = 2;
 		struct Data
 		{
-			XMFLOAT4 color;
+			DirectX::XMFLOAT4 color;
 			bool UseTexture;
 		};
 
-		SimpleMaterial(Vector3 color) : m_Tex(nullptr) { SetColor(color); }
+		SimpleMaterial(Math::Vector3 color) : m_Tex(nullptr) { SetColor(color); }
 
 		void Initialize() override
 		{
@@ -76,9 +73,9 @@ namespace Game {
 			m_Tex = texture;
 		}
 
-		inline void SetColor(Vector3 color) 
+		inline void SetColor(Math::Vector3 color) 
 		{
-			XMStoreFloat4(&m_Data.color, color);
+			DirectX::XMStoreFloat4(&m_Data.color, color);
 		}
 
 	private:
@@ -92,7 +89,7 @@ namespace Game {
 	public:
 		struct Data
 		{
-			XMFLOAT4 diffuse;
+			DirectX::XMFLOAT4 diffuse;
 		};
 
 		void Initialize(); 

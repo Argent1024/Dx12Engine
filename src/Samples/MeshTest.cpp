@@ -1,9 +1,12 @@
-#include"MeshTest.h"
-#include"../Utility/MeshReader.h"
+#include "MeshTest.h"
+#include "Utility/MeshReader.h"
 #include "Utility/input.h"
 #include "Utility/logger.h"
 
 namespace Samples {
+
+	using namespace Math;
+
 
 	void MeshTest::Init(const HWND m_appHwnd)
 	{
@@ -69,17 +72,16 @@ namespace Samples {
 
 		auto kb = input.GetKeyboardState();
 		auto mouse = input.GetMouseState();
-		auto tracker = input.GetTracker();
 		
 		// TODO move debug view into render engine later 
 		// Press f1 to show depth texture
-		if (tracker.IsKeyPressed(Keyboard::F1)) {
+		if (input.IsKeyPressed(Keyboard::F1)) {
 			RenderEngine::Config& renderSetting = m_Render->GetRenderSetting();
 			renderSetting.mixpass = !renderSetting.mixpass;
 		}
 
 		// press f2 to show normal
-		if (tracker.IsKeyPressed(Keyboard::F2)) {
+		if (input.IsKeyPressed(Keyboard::F2)) {
 
 			RenderEngine::Config& renderSetting = m_Render->GetRenderSetting();
 
@@ -93,7 +95,7 @@ namespace Samples {
 		}
 
 		// press f3 to show normal
-		if (tracker.IsKeyPressed(Keyboard::F3)) {
+		if (input.IsKeyPressed(Keyboard::F3)) {
 
 			RenderEngine::Config& renderSetting = m_Render->GetRenderSetting();
 
@@ -151,7 +153,7 @@ namespace Samples {
 		}
 		camera.Look();
 
-		if (tracker.IsKeyPressed(Keyboard::L)) {
+		if (input.IsKeyPressed(Keyboard::L)) {
 			const Transform& T = obj0->GetTransform();
 			const Transform& view = camera.GetView();
 			const Transform& proj = camera.GetToScreen();
@@ -165,7 +167,7 @@ namespace Samples {
 			Logger::Log("");
 		}
 	
-		input.UpdateTracker();
+		input.Update();
 	}
 
 }

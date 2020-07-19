@@ -10,6 +10,13 @@ class InputManager {
 public:
 	void Initialize(HWND window);
 
+	inline bool IsKeyPressed(DirectX::Keyboard::Keys key) const 
+	{ return m_traker.IsKeyPressed(key); }
+
+	inline bool IsKeyReleased(DirectX::Keyboard::Keys key) const 
+	{ return m_traker.IsKeyReleased(key); }
+
+
 	inline DirectX::Keyboard::State GetKeyboardState() const
 	{
 		assert(m_Initialized && "Input manager not initialized");
@@ -21,11 +28,12 @@ public:
 		assert(m_Initialized && "Input manager not initialized");
 		return m_mouse->GetState(); 
 	}
-	
-	inline DirectX::Keyboard::KeyboardStateTracker GetTracker()
-	{ return m_traker; }
 
-	inline void UpdateTracker() { m_traker.Update(m_keyboard->GetState()); }
+	inline void Update() { m_traker.Update(m_keyboard->GetState()); }
+
+	inline void Reset() {
+		m_traker.Reset();
+	}
 
 private:
 	bool m_Initialized = FALSE;

@@ -1,6 +1,7 @@
 #include "GObject.h"
 
 namespace Game {
+	using namespace Math;
 
 	void GObject::Initialize() 
 	{

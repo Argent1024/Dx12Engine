@@ -66,8 +66,8 @@ namespace Physic
 
 	protected:
 		Intersection _CollideSphere(const BoundingSphere& sphere, bool noisect) const override;
-		Intersection _CollideBox(const BoundingBox& box, bool noisect) const override;
-		Intersection _CollidePlane(const BoundingPlane& plane, bool noisect) const override;
+		Intersection _CollideBox(const BoundingBox& box, bool noisect) const override  { return Intersection(); }
+		Intersection _CollidePlane(const BoundingPlane& plane, bool noisect) const override { return Intersection(); }
 
 		inline Intersection _CollideTree(const BoundingVolumeTree& tree, bool noisect) const override {
 			return tree._CollideSphere(*this, noisect);
@@ -86,9 +86,9 @@ namespace Physic
 		void  ApplyTransform(const Math::Transform& T) override;
 
 	protected:
-		Intersection _CollideSphere(const BoundingSphere& sphere, bool noisect) const override;
-		Intersection _CollideBox(const BoundingBox& box, bool noisect) const override;
-		Intersection _CollidePlane(const BoundingPlane& plane, bool noisect) const override;
+		Intersection _CollideSphere(const BoundingSphere& sphere, bool noisect) const override  { return Intersection(); }
+		Intersection _CollideBox(const BoundingBox& box, bool noisect) const override  { return Intersection(); }
+		Intersection _CollidePlane(const BoundingPlane& plane, bool noisect) const override  { return Intersection(); }
 
 		inline Intersection _CollideTree(const BoundingVolumeTree& tree, bool noisect) const override {
 			return tree._CollidePlane(*this, noisect);

@@ -2,6 +2,8 @@
 
 namespace Game {
 
+	using namespace Math;
+
 	Scene::Scene(const UINT width, const UINT height)
 		:    m_Camera(width, height, 
 			  Vector3(0.0f, 0.0f, 10.f), 

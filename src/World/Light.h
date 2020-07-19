@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Texture.h"
-#include "DepthBuffer.h"
+#include "Graphic/Texture.h"
+#include "Graphic/DepthBuffer.h"
 #include "Camera.h"
 
 namespace Game {
@@ -13,22 +13,20 @@ namespace Game {
 		SPOT_LIGHT
 	};
 
-	using namespace Math;
-
 	struct LightData
 	{
-		Vector3 strength;
-		Vector3 pos;
-		Vector3 direction;
+		Math::Vector3 strength;
+		Math::Vector3 pos;
+		Math::Vector3 direction;
 	};
 
 	struct LightState
 	{
-		XMFLOAT4 strength;
-		XMFLOAT4 pos;		// Point / Spot light
-		XMFLOAT4 direction;	// Dir / Spot light
-		XMFLOAT4X4 view;	
-		XMFLOAT4X4 proj;	// Store Projective/orthnormal matrix
+		DirectX::XMFLOAT4 strength;
+		DirectX::XMFLOAT4 pos;		// Point / Spot light
+		DirectX::XMFLOAT4 direction;	// Dir / Spot light
+		DirectX::XMFLOAT4X4 view;	
+		DirectX::XMFLOAT4X4 proj;	// Store Projective/orthnormal matrix
 	};
 
 

@@ -3,7 +3,8 @@
 
 
 namespace Game {
-	
+	using namespace Math;
+
 	DirectionLight::DirectionLight(UINT width, UINT height)
 		:  m_DepthBuffer(width, height, Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV), 
 		   m_Camera(width, height)

@@ -1,10 +1,9 @@
 #pragma once
 #include "Material.h"
 #include "Mesh.h"
-#include "Transform.h"
-#include "Texture.h"
+#include "Utility/Logger.h"
+#include "Physic/PhysicState.h"
 
-#define ptrMesh std::shared_ptr<Game::Mesh>
 #define ptrMaterial std::shared_ptr<Game::Material>
 #define ptrGobject std::shared_ptr<Game::GObject>
 
