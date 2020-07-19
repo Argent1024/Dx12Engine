@@ -26,7 +26,7 @@ namespace Game {
 		assert(m_Mesh && "Not initialized GameObj");
 		// (TODO may not need to do this every frame & remove it to Physic) Upload data to the cbv
 		XMFLOAT4X4 modelTransform;
-		XMStoreFloat4x4(&modelTransform, XMMatrixTranspose(m_Transform));
+		XMStoreFloat4x4(&modelTransform, XMMatrixTranspose(m_state->GetTransform()));
 		m_CBV->copyData(&modelTransform);
 
 		if (m_Material) {

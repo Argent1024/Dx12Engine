@@ -11,19 +11,22 @@ namespace Game {
 
 	class GObject {
 	public:
+		// TODO create phy state
 		GObject(UINT textureNum=2) : m_table(textureNum) {}
 		
 		GObject(ptrMesh mesh, const Math::Transform& T= Math::Transform(), UINT textureNum=2) 
-			: m_Mesh(mesh), m_Transform(T), m_table(textureNum) {}
+			: m_Mesh(mesh), m_table(textureNum) {}
 
 
 		inline Graphic::DescriptorTable& GetDescriptorTable() { return m_table; }
 
 		inline void SetMaterial(ptrMaterial mat) { m_Material = mat; }
 		inline void SetMesh(ptrMesh mesh) { m_Mesh = mesh; }
-		inline void SetTransform(const Math::Transform& T) { m_Transform = T; }
 
-		inline Math::Transform GetTransform() const { return m_Transform; }
+		inline void SetPhyState(Physic::PState* state) { m_state = state; }
+
+		inline void SetTransform(const Math::Transform& T) { m_state->SetTransform(T); }
+		inline Math::Transform GetTransform() const { return m_state->GetTransform(); }
 
 		virtual void Initialize();
 
@@ -40,11 +43,11 @@ namespace Game {
 		}
 
 	protected:
-		Math::Transform m_Transform;
+		// Math::Transform m_Transform;
+		Physic::PState* m_state;
 
 		// TODO make a struct later. only model Transformation for now
 		// Store const data used in rendering ( Transformation, other settings )
-		//Graphic::TextureBuffer* m_Texture;
 		Graphic::ConstantBuffer* m_CBV;
 
 		Graphic::DescriptorTable m_table;

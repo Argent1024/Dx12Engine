@@ -8,14 +8,16 @@ namespace Physic {
 
 
 	// Store the transform (object -> world) of an object, one game object must contain one and only one physic state 
-	class State {
+	class PState {
 	public:
 		// Default transform T = identity
-		State() : T() {}
+		PState() : T() {}
 
-		State(Math::Transform trans) : T(trans) {}
+		PState(Math::Transform trans) : T(trans) {}
 
-		Math::Transform GetTransform() const { return  T; }
+		inline const Math::Transform& GetTransform() const { return T; }
+
+		inline void SetTransform(const Math::Transform& newT) { T = newT; }
 
 	private:
 		Math::Transform T;

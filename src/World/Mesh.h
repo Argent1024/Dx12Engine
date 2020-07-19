@@ -60,7 +60,10 @@ namespace Game {
 		
 		static const D3D_PRIMITIVE_TOPOLOGY TopologyType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-		static ptrMesh GetXYPlane();
+		static ptrMesh GetXYPlane(UINT subdivision = 0);
+
+		// TODO test
+		static ptrMesh GetSphere(UINT numU, UINT numV);
 
 	protected:
 		ptrVertexBuffer m_VertexBuffer;
