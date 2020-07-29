@@ -27,6 +27,22 @@ namespace Game {
 			m_Textures[slot] = texture;
 		}
 
+		inline virtual Graphic::Texture* GetTexture(UINT slot) 
+		{
+			assert(slot < m_Textures.size() && "Texture slot out of ranged");
+			return m_Textures[slot];
+		}
+
+		inline virtual void BindTexture(UINT slot, 
+										Graphic::DescriptorTable& table, 
+										Graphic::TextureType type = Graphic::TEXTURE_SRV)
+		{
+			Graphic::Texture* T = m_Textures[slot];
+			assert(T != nullptr && "Binding Texture not setted yet");
+			T->CreateView(type, &table, slot);
+		}
+
+
 		Graphic::ConstantBuffer* m_MatCBV;
 		std::vector<Graphic::Texture*> m_Textures;
 	};
@@ -44,10 +60,10 @@ namespace Game {
 		struct Data
 		{
 			DirectX::XMFLOAT4 color;
-			bool UseTexture;
+			bool UseTexture = FALSE;
 		};
 
-		SimpleMaterial(Math::Vector3 color) : m_Tex(nullptr) { SetColor(color); }
+		SimpleMaterial(Math::Vector3 color) { SetColor(color); }
 
 		void Initialize() override
 		{
@@ -60,18 +76,12 @@ namespace Game {
 		inline void BindMaterialAt(Graphic::DescriptorTable& table) override
 		{
 			m_MatCBV->CreateView(table, cbvSlot);
-			if (m_Tex) 
-			{
-				m_Tex->CreateView(Graphic::TEXTURE_SRV, &table, texSlot);
+			if (m_Textures.size() > 0) {
+				m_Textures[0]->CreateView(Graphic::TEXTURE_SRV, &table, texSlot);
 			}
 		}
 
 		inline void UploadCBV() override { m_MatCBV->copyData(&m_Data); }
-
-		inline void SetTexture(Graphic::Texture* texture) 
-		{
-			m_Tex = texture;
-		}
 
 		inline void SetColor(Math::Vector3 color) 
 		{
@@ -80,22 +90,46 @@ namespace Game {
 
 	private:
 		Data m_Data;
-		Graphic::Texture* m_Tex;
 	};
 
 
 	class PrincipleMaterial : public Material 
 	{
 	public:
+		// Should compatatible with root signature
+
+		
+		enum SlotMaps
+		{
+			ObjectCBV, // useless, since Material class doesn't store this CBV
+			MatCBV,
+			Normal,
+			Roughness
+		};
+		
+
 		struct Data
 		{
 			DirectX::XMFLOAT4 diffuse;
-		};
+
+			FLOAT Roughness;
+			FLOAT Metallic;
+			FLOAT Specular;
+			
+			BOOL NTexture = FALSE;  // Normal Texture
+
+			BOOL RTexture = FALSE;  // Roughness Texture
+			BOOL MTexture = FALSE;  // Metallic Texture
+			BOOL STexture = FALSE;  // Specular Texture
+			
+ 		};
 
 		void Initialize(); 
 
-		void BindMaterialAt(Graphic::DescriptorTable& table) {};
+		void BindMaterialAt(Graphic::DescriptorTable& table);
 		
+		inline void SetData(const Data& data) { m_MatData = data; }
+
 		inline void UploadCBV() override { m_MatCBV->copyData(&m_MatData); }
 	private:
 		Data m_MatData;

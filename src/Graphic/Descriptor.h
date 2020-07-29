@@ -176,6 +176,8 @@ namespace Graphic {
 	};
 
 
+	// TODO put gpumem & other when init
+
 	class ConstantBuffer : public HeapDescriptor {
 	public:
 		// Create a CBV, descriptor Heap is nullptr if we are creating a normal cbv, 
