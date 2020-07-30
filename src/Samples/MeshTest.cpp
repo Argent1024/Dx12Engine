@@ -46,7 +46,13 @@ namespace Samples {
 		std::vector<UINT>& index = reader.m_index;
 
 		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
-		m_Material = std::make_shared<SimpleMaterial>(Vector3{0.75f, 0.75f, 0.9f});
+		m_Material = std::make_shared<PrincipleMaterial>();
+
+		PrincipleMaterial::Data mat;
+		DirectX::XMStoreFloat3(&mat.BaseColor, Vector3(0.9, 0.7, 0.9));
+		mat.Roughness = 0.3f;
+		m_Material->SetData(mat);
+
 		m_Material->Initialize();
 
 		// TODO!! error C2338 aligin?

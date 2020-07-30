@@ -11,11 +11,18 @@ namespace Game {
 
 	class GObject {
 	public:
-		// TODO create phy state
-		GObject(UINT textureNum=2) : m_table(textureNum) {}
+		// TODO create phy state & fix textureNum,
+		// Ask material for how large the descriptor table should be
+		GObject(UINT textureNum=2) : m_table(textureNum) 
+		{
+			m_state = new Physic::PState();
+		}
 		
 		GObject(ptrMesh mesh, const Math::Transform& T= Math::Transform(), UINT textureNum=2) 
-			: m_Mesh(mesh), m_table(textureNum) {}
+			: m_Mesh(mesh), m_table(textureNum) 
+		{
+			m_state = new Physic::PState();
+		}
 
 
 		inline Graphic::DescriptorTable& GetDescriptorTable() { return m_table; }

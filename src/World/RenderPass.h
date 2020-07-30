@@ -49,10 +49,11 @@ namespace Game {
 		{
 			DirectX::XMFLOAT4X4 projection;
 			DirectX::XMFLOAT4X4 view;
+			DirectX::XMFLOAT3 CameraPos;
 
 			BOOL debugnormal = FALSE;
 			BOOL debugpos = FALSE;
-			BOOL padding0[2]; // Align
+			BOOL padding0[3]; // Align
 
 		};
 

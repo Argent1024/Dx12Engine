@@ -34,7 +34,7 @@ namespace Samples {
 		ptrRootSignature m_rootSignature;
 		ptrPSO m_GraphicPSO;		// Main Render Pass
 
-		std::shared_ptr<SimpleMaterial> m_Material;
+		std::shared_ptr<PrincipleMaterial> m_Material;
 		std::shared_ptr<TriangleMesh> m_Mesh;
 		// ptrMaterial m_Material;
 		DirectionLight* m_Light; // TODO 

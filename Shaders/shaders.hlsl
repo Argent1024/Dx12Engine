@@ -13,7 +13,8 @@ cbuffer SceneInfo : register(b0)
 	// Camera transformation
 	float4x4 projection;
 	float4x4 view;
-	
+	float3 CameraPos;
+
 	// Debug settings
 	bool debugnormal;
 	bool debugpos;
@@ -28,6 +29,9 @@ cbuffer LightInfo : register(b1)
 	uint maxSpot;
 }
 
+
+/********************** Object & Material Descriptor Table Start ***********************/
+
 // Store Object information
 //		Transformation
 //		Materials' data
@@ -38,8 +42,19 @@ cbuffer ObjectInfo : register(b2)
 
 cbuffer MaterialInfo : register (b3) 
 {
-	float3 diffuseColor;
+	float3 BaseColor;
+	
+	float Roughness;
+	float Metallic;
+	float Specular;
+
+	// TODO add texture stuff later
 }
+
+// TODO Material Textures
+
+/********************** Object & Material Descriptor Table End ****************************/
+
 
 struct VSInput 
 {
@@ -60,6 +75,7 @@ struct PSInput
 
 
 SamplerState g_sampler : register(s0);
+
 
 // Vertex Shader
 PSInput VSMain(VSInput input)
@@ -83,6 +99,34 @@ PSInput VSMain(VSInput input)
     return result;
 }
 
+
+// Calculate brdf
+float3 CalculateBRDF(float3 viewDir, float3, lightDir, float3 normal) {
+
+	// float3 halfVec = normalize(viewDir + lightDir);
+	return BaseColor;
+	/*float cos_L = dot(lightDir, normal);  // Theta L, light and normal
+	float cos_V = dot( viewDir, normal);  // Theta V,  view and normal
+	float cos_H = dot( halfVec, normal);  // Theta H,  half and normal
+	float cos_D = dot(lightDir, halfVec); // Theta D,  half and light
+
+	if (cos_T <= 0.f) {
+		return 0.f;
+	}
+	
+	float3 baseColor = BaseColor;
+	float roughness = Roughness;
+
+	float FD = 0.5f + 2.f* cos_D * cos_D * roughness;
+	// Diffuse Term
+	float3 diffuse = baseColor * (1 + (FD - 1) * pow(1 - cos_L, 5)) * (1 + (FD - 1) * pow(1 - cos_V, 5))
+	
+	// Specular Term
+	return diffuse;*/
+}
+
+
+
 // Pixel Shader
 float4 PSMain(PSInput input) : SV_TARGET
 {
@@ -95,10 +139,18 @@ float4 PSMain(PSInput input) : SV_TARGET
 		return (input.worldpos + 1.0f) / 2.0f;
 	}
 
+	float3 viewDir = normalize(input.worldpos - CameraPos);
+
 	float3 lightDir = SceneLights[0].direction.xyz;
 	float4 strength = SceneLights[0].strength;
 	float3 normal = input.normal;
+	
+	float cos_T = max(dot(lightDir, normal), 0);
 
-	float cos_ln = max(dot(lightDir, normal), 0);
-	return float4(cos_ln * strength * diffuseColor, 1.0f);
+	float3 brdf = CalculateBRDF(viewDir, lightDir, normal);
+	
+	return float4(BaseColor, 1) * cos_T;
+
+	/*float cos_ln = max(dot(lightDir, normal), 0);
+	return float4(cos_ln * strength * BaseColor, 1.0f);*/
 }

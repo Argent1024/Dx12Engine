@@ -102,7 +102,10 @@ namespace Game {
 		enum SlotMaps
 		{
 			ObjectCBV, // useless, since Material class doesn't store this CBV
-			MatCBV,
+			
+			MatCBV,    // Slot store material information. E.X. Diffuse Color, Use Normal map?, ... 
+
+			DiffuseColor,	
 			Normal,
 			Roughness
 		};
@@ -110,18 +113,19 @@ namespace Game {
 
 		struct Data
 		{
-			DirectX::XMFLOAT4 diffuse;
+			DirectX::XMFLOAT3 BaseColor;
 
 			FLOAT Roughness;
 			FLOAT Metallic;
 			FLOAT Specular;
 			
+			BOOL CTexture = FALSE;  // Diffuse Color Texture
 			BOOL NTexture = FALSE;  // Normal Texture
 
 			BOOL RTexture = FALSE;  // Roughness Texture
 			BOOL MTexture = FALSE;  // Metallic Texture
 			BOOL STexture = FALSE;  // Specular Texture
-			
+			BOOL padding;
  		};
 
 		void Initialize(); 

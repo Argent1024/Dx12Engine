@@ -36,11 +36,15 @@ namespace Game {
 		Camera& camera = scene.GetMainCamera();
 		const Transform& view = camera.GetView();
 		const Transform& proj = camera.GetToScreen();
-		
+		Vector3 cameraPos = view * Vector3();
+
 		// Need to transpose
 		XMStoreFloat4x4(&m_CBVData.projection, XMMatrixTranspose((XMMATRIX)proj));
 		XMStoreFloat4x4(&m_CBVData.view, XMMatrixTranspose((XMMATRIX)view));
+
+		XMStoreFloat3(&m_CBVData.CameraPos, cameraPos);
 		
+		// Copy to CBV
 		m_CBV->copyData(&m_CBVData);//, sizeof(CameraBufferData));
 	}
 

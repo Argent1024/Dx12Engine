@@ -22,6 +22,10 @@ namespace Game {
 	{
 		m_MatCBV->CreateView(table, MatCBV);
 
+		if (m_MatData.CTexture) {
+			BindTexture(DiffuseColor, table);
+		}
+
 		if (m_MatData.NTexture) {
 			BindTexture(Normal, table);
 		}
