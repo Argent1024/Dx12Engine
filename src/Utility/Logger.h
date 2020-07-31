@@ -29,6 +29,7 @@ public:
 		Logger::Log("Logger Initialized");
 	}
 
+
 	static void Log(Math::Vector3& T, std::string str="") {
 		if (str.size() != 0) {
 			std::cout << str << " " << T << std::endl;
@@ -37,6 +38,17 @@ public:
 			std::cout << T << std::endl;
 		}
 	}
+
+
+	static void Log(float T, std::string str="") {
+		if (str.size() != 0) {
+			std::cout << str << " " << T << std::endl;
+		}
+		else {
+			std::cout << T << std::endl;
+		}
+	}
+
 
 	static void Log(const char* str) {
 		std::cout << str << std::endl;

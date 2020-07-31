@@ -32,7 +32,7 @@ namespace Samples {
 		// Load light
 		m_Light = new DirectionLight();
 		m_Scene.AddLight(*m_Light);
-		m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {0.0, 3.0, 0.0} });
+		m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {0.0, 1.0, 0.0} });
 		this->LoadAssert();
 
 	}
@@ -40,7 +40,7 @@ namespace Samples {
 	void MeshTest::LoadAssert() 
 	{
 		MeshReader reader;
-		reader.ReadOBJ("D:\\work\\tEngine\\bunny.obj");
+		reader.ReadOBJ("D:\\work\\tEngine\\tyra.obj");
 
 		std::vector<DefaultVertex>& vertex = reader.m_vertex;
 		std::vector<UINT>& index = reader.m_index;
@@ -49,8 +49,9 @@ namespace Samples {
 		m_Material = std::make_shared<PrincipleMaterial>();
 
 		PrincipleMaterial::Data mat;
-		DirectX::XMStoreFloat3(&mat.BaseColor, Vector3(0.9, 0.7, 0.9));
+		DirectX::XMStoreFloat3(&mat.BaseColor, Vector3(0.9, 0.0, 0.0));
 		mat.Roughness = 0.3f;
+		mat.Specular = 0.5f;
 		m_Material->SetData(mat);
 
 		m_Material->Initialize();
@@ -143,7 +144,7 @@ namespace Samples {
 			obj0->SetTransform(Transform(t));
 		}
 
-		Camera& camera = m_Scene.GetMainCamera();
+		/*Camera& camera = m_Scene.GetMainCamera();
 		float cameraSpeed = 0.01;
 		if (kb.Up) {
 			camera.RotatePitch(cameraSpeed);
@@ -158,21 +159,19 @@ namespace Samples {
 			camera.RotateYaw(-cameraSpeed);
 		}
 		camera.Look();
-
-		if (input.IsKeyPressed(Keyboard::L)) {
-			const Transform& T = obj0->GetTransform();
-			const Transform& view = camera.GetView();
-			const Transform& proj = camera.GetToScreen();
-			Vector3 test(-1.0, -1.0, 0.0);
-			test = T * test;
-			Logger::Log(test, "World Space");
-			test = view * test;
-			Logger::Log(test, " Camera Space:");
-			test = proj * test;
-			Logger::Log(test, " Screen Space:");
-			Logger::Log("");
+		*/
+		
+		PrincipleMaterial::Data& matData = m_Material->GetData();
+		
+		if (kb.Up) {
+			matData.Specular += 0.01f;
+			Logger::Log(matData.Specular, "Set Specular :");
 		}
-	
+		
+		if (kb.Down) {
+			matData.Specular -= 0.01f;
+			Logger::Log(matData.Specular, "Set Specular :");
+		}
 		input.Update();
 	}
 

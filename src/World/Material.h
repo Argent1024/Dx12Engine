@@ -132,6 +132,7 @@ namespace Game {
 
 		void BindMaterialAt(Graphic::DescriptorTable& table);
 		
+		inline Data& GetData() { return m_MatData; }
 		inline void SetData(const Data& data) { m_MatData = data; }
 
 		inline void UploadCBV() override { m_MatCBV->copyData(&m_MatData); }
