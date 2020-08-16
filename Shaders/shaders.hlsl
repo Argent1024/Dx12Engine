@@ -191,11 +191,11 @@ float4 PSMain(PSInput input) : SV_TARGET
 
 	// Calculate surface material's data
 	IntersectionPoint isect;
-	isect.BaseColor = BaseColor / 3.1415926;
+	isect.BaseColor = BaseColor;
 	isect.Roughness = Roughness;
 	isect.Specular = Specular;
 	
 	float3 brdf = CalculateBRDF(viewDir, lightDir, normal, isect);
-	return float4(5.f * brdf , 1.0f);
+	return float4(brdf , 1.0f);
 
 }
