@@ -39,22 +39,26 @@ namespace Samples {
 
 	void MeshTest::LoadAssert() 
 	{
-		MeshReader reader;
-		reader.ReadOBJ("D:\\work\\tEngine\\tyra.obj");
-
-		std::vector<DefaultVertex>& vertex = reader.m_vertex;
-		std::vector<UINT>& index = reader.m_index;
-
-		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
 		m_Material = std::make_shared<PrincipleMaterial>();
 
 		PrincipleMaterial::Data mat;
 		DirectX::XMStoreFloat3(&mat.BaseColor, Vector3(0.9, 0.0, 0.0));
-		mat.Roughness = 0.3f;
+		mat.Roughness = 1.0f;
 		mat.Specular = 0.5f;
 		m_Material->SetData(mat);
 
 		m_Material->Initialize();
+
+		
+		m_Mesh = TriangleMesh::GetSphere(64, 32);
+		/*MeshReader reader;
+		reader.ReadOBJ("D:\\work\\tEngine\\bunny.obj");
+
+		std::vector<DefaultVertex>& vertex = reader.m_vertex;
+		std::vector<UINT>& index = reader.m_index;
+
+		m_Mesh = std::make_shared<TriangleMesh>(vertex, index);*/
+
 
 		// TODO!! error C2338 aligin?
 		obj0 = new Game::GObject();
@@ -116,7 +120,7 @@ namespace Samples {
 		}
 
 		frame ++;
-		if (kb.E) {
+		/*if (kb.E) {
 			Matrix4 t = obj0->GetTransform();
 			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 0, 1, 0 }, 0.01));
 			t = t * r;
@@ -144,7 +148,7 @@ namespace Samples {
 			obj0->SetTransform(Transform(t));
 		}
 
-		/*Camera& camera = m_Scene.GetMainCamera();
+		Camera& camera = m_Scene.GetMainCamera();
 		float cameraSpeed = 0.01;
 		if (kb.Up) {
 			camera.RotatePitch(cameraSpeed);
@@ -171,6 +175,16 @@ namespace Samples {
 		if (kb.Down) {
 			matData.Specular -= 0.01f;
 			Logger::Log(matData.Specular, "Set Specular :");
+		}
+
+		if (kb.W) {
+			matData.Roughness += 0.01f;
+			Logger::Log(matData.Roughness, "Set Roughness :");
+		}
+
+		if (kb.S) {
+			matData.Roughness -= 0.01f;
+			Logger::Log(matData.Roughness, "Set Roughness :");
 		}
 		input.Update();
 	}

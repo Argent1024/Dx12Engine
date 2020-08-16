@@ -4,7 +4,7 @@
 #include "utility/logger.h"
 
 #define ptrMesh std::shared_ptr<Game::Mesh>
-
+#define ptrTriMesh std::shared_ptr<Game::TriangleMesh>
 
 namespace Game {
 	class Mesh {

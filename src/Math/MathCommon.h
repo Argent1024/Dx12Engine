@@ -6,7 +6,7 @@
 
 namespace Math {
 	
-	const Scalar PI = 3.1415926f;
+	const float PI = 3.1415926f;
 
 	INLINE Vector3 CrossProduct(const Vector3& a, const Vector3& b) 
 	{

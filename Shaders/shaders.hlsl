@@ -1,3 +1,5 @@
+#define EPLISION 0.00005f
+
 struct Light  // Equal to LightState Class
 {
 	float4 strength;
@@ -43,11 +45,10 @@ cbuffer ObjectInfo : register(b2)
 cbuffer MaterialInfo : register (b3) 
 {
 	float3 BaseColor;
-	
+
 	float Roughness;
 	float Metallic;
 	float Specular;
-
 	// TODO add texture stuff later
 }
 
@@ -73,6 +74,17 @@ struct PSInput
     float2 uv		: TEXCOORD0;
 };
 
+
+// Intersection point's data, helper struct for BRDF
+struct IntersectionPoint
+{
+	float3 BaseColor;
+
+	float Roughness;
+	float Metallic;
+	float Specular;
+
+};
 
 SamplerState g_sampler : register(s0);
 
@@ -101,28 +113,50 @@ PSInput VSMain(VSInput input)
 
 
 // Calculate brdf
-float3 CalculateBRDF(float3 viewDir, float3, lightDir, float3 normal) {
+float3 CalculateBRDF(float3 viewDir, 
+					float3 lightDir, 
+					float3 normal, 
+					IntersectionPoint isect)
+{
 
-	// float3 halfVec = normalize(viewDir + lightDir);
-	return BaseColor;
-	/*float cos_L = dot(lightDir, normal);  // Theta L, light and normal
+	float3 halfVec = normalize(viewDir + lightDir);
+	
+	float cos_L = dot(lightDir, normal);  // Theta L, light and normal
 	float cos_V = dot( viewDir, normal);  // Theta V,  view and normal
 	float cos_H = dot( halfVec, normal);  // Theta H,  half and normal
 	float cos_D = dot(lightDir, halfVec); // Theta D,  half and light
-
-	if (cos_T <= 0.f) {
+	
+	if (cos_L <= EPLISION || cos_V <= EPLISION || cos_D <= EPLISION || cos_H <= EPLISION) {
 		return 0.f;
 	}
 	
-	float3 baseColor = BaseColor;
-	float roughness = Roughness;
+	float3 baseColor = isect.BaseColor;
+	
+	float roughness = isect.Roughness;
+	float metallic = isect.Metallic;
+	float specular = isect.Specular;
+	
 
-	float FD = 0.5f + 2.f* cos_D * cos_D * roughness;
+	float FD = 0.5f + 2.f * cos_D * cos_D * roughness;
 	// Diffuse Term
-	float3 diffuse = baseColor * (1 + (FD - 1) * pow(1 - cos_L, 5)) * (1 + (FD - 1) * pow(1 - cos_V, 5))
+	float3 diffuse = baseColor * (1 + (FD - 1) * pow(1 - cos_L, 5)) * (1 + (FD - 1) * pow(1 - cos_V, 5));
 	
 	// Specular Term
-	return diffuse;*/
+	// microfacet distribution
+	float alpha2 = pow(roughness, 4);
+	float cosH2 = pow(cos_H, 2);
+	float sinH2 = 1.f - cosH2;
+	float D = 1.f / (alpha2 * cosH2 + sinH2);
+
+	// Fresnel reflection
+	float ior = 1.f + specular / 1.25f; // Remap specular to [0, 0.8]
+	float F0 = pow((ior - 1.f) / (ior + 1.f), 2);
+	float F = F0 + (1.f - F0) * pow(1.f - cos_D, 5);
+
+
+	float G = 1.0f;
+	 
+	return diffuse * cos_L + D * F * G / (4.f * cos_V);
 }
 
 
@@ -131,6 +165,10 @@ float3 CalculateBRDF(float3 viewDir, float3, lightDir, float3 normal) {
 float4 PSMain(PSInput input) : SV_TARGET
 {
 	// return float4(1.0, 0.0, 0.0, 1.0);
+
+	/*float cos_ln = max(dot(lightDir, normal), 0);
+	return float4(cos_ln * strength * BaseColor, 1.0f);*/
+
 	if (debugnormal) {
 		return (float4(input.normal, 1.0f) + 1.0f) / 2.0f;
 	}
@@ -139,18 +177,25 @@ float4 PSMain(PSInput input) : SV_TARGET
 		return (input.worldpos + 1.0f) / 2.0f;
 	}
 
-	float3 viewDir = normalize(input.worldpos - CameraPos);
+	// Render default
+
+	float3 viewDir = normalize(CameraPos - input.worldpos.xyz);
 
 	float3 lightDir = SceneLights[0].direction.xyz;
 	float4 strength = SceneLights[0].strength;
-	float3 normal = input.normal;
 	
-	float cos_T = max(dot(lightDir, normal), 0);
-
-	float3 brdf = CalculateBRDF(viewDir, lightDir, normal);
+	// Get and apply Transform to normal
+	float3 normal = mul(float4(input.normal, 0.f), modelTransformation).xyz;
 	
-	return float4(BaseColor, 1) * cos_T;
 
-	/*float cos_ln = max(dot(lightDir, normal), 0);
-	return float4(cos_ln * strength * BaseColor, 1.0f);*/
+
+	// Calculate surface material's data
+	IntersectionPoint isect;
+	isect.BaseColor = BaseColor / 3.1415926;
+	isect.Roughness = Roughness;
+	isect.Specular = Specular;
+	
+	float3 brdf = CalculateBRDF(viewDir, lightDir, normal, isect);
+	return float4(5.f * brdf , 1.0f);
+
 }

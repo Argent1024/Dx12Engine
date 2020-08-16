@@ -54,8 +54,12 @@ namespace Game {
 		inline const Math::Transform& GetToScreen() const { return m_ToScreen; }
 		inline void SetNearZ(float z) { m_nearZ = z; }
 		inline void SetFarZ(float z) { m_farZ = z; }
+
+		inline Math::Vector3 GetPosition() const { return m_Position; }
 		inline void SetPosition(Math::Vector3& pos) { m_Position = pos; }
+
 		inline void SetDirection(Math::Vector3& dir) { m_Direction = dir; }
+
 		inline void SetWorldUp(Math::Vector3& up) { m_WorldUp = up;}
 
 		void LookAt(const Math::Vector3& Position, const Math::Vector3& Target, const Math::Vector3& WorldUp) 

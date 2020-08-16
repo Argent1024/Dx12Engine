@@ -114,7 +114,6 @@ namespace Game {
 		struct Data
 		{
 			DirectX::XMFLOAT3 BaseColor;
-
 			FLOAT Roughness;
 			FLOAT Metallic;
 			FLOAT Specular;
