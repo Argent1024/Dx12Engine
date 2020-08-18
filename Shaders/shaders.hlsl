@@ -146,17 +146,19 @@ float3 CalculateBRDF(float3 viewDir,
 	float alpha2 = pow(roughness, 4);
 	float cosH2 = pow(cos_H, 2);
 	float sinH2 = 1.f - cosH2;
-	float D = 1.f / (alpha2 * cosH2 + sinH2);
+	float D = alpha2 / pow(alpha2 * cosH2 + sinH2, 2);
 
 	// Fresnel reflection
-	float ior = 1.f + specular / 1.25f; // Remap specular to [0, 0.8]
-	float F0 = pow((ior - 1.f) / (ior + 1.f), 2);
-	float F = F0 + (1.f - F0) * pow(1.f - cos_D, 5);
-
+	float F0 = 0.08 * specular; 
+	float F = 0;
+	// Ignore specular if it's small
+	if (specular > EPLISION) {
+		F = F0 + (1.f - F0) * pow(1.f - cos_D, 5);
+	}
 
 	float G = 1.0f;
 	 
-	return diffuse * cos_L + D * F * G / (4.f * cos_V);
+	return (diffuse * cos_L + D * F * G / (4.f * cos_V)) / 3.1415f;
 }
 
 
@@ -196,6 +198,6 @@ float4 PSMain(PSInput input) : SV_TARGET
 	isect.Specular = Specular;
 	
 	float3 brdf = CalculateBRDF(viewDir, lightDir, normal, isect);
-	return float4(brdf , 1.0f);
+	return 2 * float4(brdf + 0.2 * BaseColor, 1.0f);
 
 }

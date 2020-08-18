@@ -8,6 +8,7 @@ namespace Graphic
 {
 	class DescriptorHeap;
 
+	// TODO Rename this
 	class GraphicCore {
 	public:
 		GraphicCore(UINT t_width, UINT t_height, LPCTSTR t_title):
