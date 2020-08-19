@@ -19,13 +19,12 @@ namespace Game {
 		// TODO determine how large the table should be
 		const UINT tableSize = 4;
 		m_DescriptorTable = new Graphic::DescriptorTable(tableSize);
-		m_DescriptorTable->Initialize(Engine::GetInitHeap());
+	
 
 		// Creata CBV 
 		const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(DefaultRenderPass::ConstBufferData));
 		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
 		m_CBV = new Graphic::ConstantBuffer(gpumem, cbvSize); // Bind at slot 0
-		m_CBV->Initialize();
 		m_CBV->CreateView(*m_DescriptorTable, 0);
 
 		// The other textures needed is binded outside by render engine
@@ -82,7 +81,6 @@ namespace Game {
 
 	void MixtureRenderPass::Initialize() 
 	{
-		m_DescriptorTable->Initialize(Engine::GetInitHeap());
 
 		// TODO Use only one root signature
 		m_rootSignature = std::make_shared<Graphic::RootSignature>();

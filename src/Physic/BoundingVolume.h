@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "Transform.h"
+#include "MathLib.h"
 
 
 namespace Physic
@@ -12,8 +12,8 @@ namespace Physic
 		bool intersect = false;
 		Math::Vector3 p1;
 		Math::Vector3 p2;
-		Math::Vector3 n1 = Math::Vector3(kZero);
-		Math::Vector3 n2 = Math::Vector3(kZero);
+		Math::Vector3 n1 = Math::Vector3(Math::kZero);
+		Math::Vector3 n2 = Math::Vector3(Math::kZero);
 		
 		inline void SwapOrder() { std::swap(n1, n2); }
 	};
@@ -127,7 +127,7 @@ namespace Physic
 
 	private:
 		inline void AssertVerticle() { 
-			assert( Abs(Dot(dirX, dirY)) < Math::TOLERENCE && "The X, Y directions are not verticle"); 
+			assert( Math::Abs(Math::Dot(dirX, dirY)) < Math::TOLERENCE && "The X, Y directions are not verticle"); 
 		}
 
 	};

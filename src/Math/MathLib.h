@@ -3,6 +3,7 @@
 #include "Vector.h"
 #include "Matrix3.h"
 #include "Matrix4.h"
+#include "Transform.h"
 
 namespace Math {
 	

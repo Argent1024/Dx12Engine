@@ -13,29 +13,20 @@ namespace Game {
 	public:
 		// TODO create phy state & fix textureNum,
 		// Ask material for how large the descriptor table should be
-		GObject(UINT textureNum=2) : m_table(textureNum) 
-		{
-			m_state = new Physic::PState();
-		}
-		
-		GObject(ptrMesh mesh, const Math::Transform& T= Math::Transform(), UINT textureNum=2) 
-			: m_Mesh(mesh), m_table(textureNum) 
-		{
-			m_state = new Physic::PState();
+		GObject();
+
+		inline void SetMaterial(ptrMaterial mat)
+		{ 
+			m_Material = mat; 
+			m_Material->BindMaterialAt(m_table);
 		}
 
-
-		inline Graphic::DescriptorTable& GetDescriptorTable() { return m_table; }
-
-		inline void SetMaterial(ptrMaterial mat) { m_Material = mat; }
 		inline void SetMesh(ptrMesh mesh) { m_Mesh = mesh; }
 
 		inline void SetPhyState(Physic::PState* state) { m_state = state; }
 
 		inline void SetTransform(const Math::Transform& T) { m_state->SetTransform(T); }
 		inline Math::Transform GetTransform() const { return m_state->GetTransform(); }
-
-		virtual void Initialize();
 
 		// Prepare for drawing
 		virtual void RecordCommand(Graphic::CommandList& commandList); 
@@ -55,7 +46,8 @@ namespace Game {
 
 		// TODO make a struct later. only model Transformation for now
 		// Store const data used in rendering ( Transformation, other settings )
-		Graphic::ConstantBuffer* m_CBV;
+		static const UINT cbSize = CalculateConstantBufferByteSize(sizeof(DirectX::XMMATRIX));
+		Graphic::ConstantBuffer m_CBV;
 
 		Graphic::DescriptorTable m_table;
 		

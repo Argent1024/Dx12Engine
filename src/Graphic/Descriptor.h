@@ -33,18 +33,16 @@ namespace Graphic {
 	class DescriptorTable {
 
 	public:
-		DescriptorTable(UINT size)  : m_size(size) { }
-
-		void Initialize(DescriptorHeap* heap) 
-		{
-			m_heap = heap;
+		DescriptorTable(UINT size, DescriptorHeap* heap=Engine::GetInitHeap())  
+			: m_size(size), m_heap(heap) 
+		{ 
 			m_heapIndexStart = m_heap->MallocHeap(m_size);
 		}
 
 		// Only Bind SRV & UAV & CBV
 		inline CD3DX12_GPU_DESCRIPTOR_HANDLE BindDescriptorTable() const
 		{
-			assert(m_heap && "Descriptor Table havn't initialized");
+			// assert(m_heap && "Descriptor Table havn't initialized");
 			DescriptorHeap* InUseHeap = Engine::GetInUseHeap();
 			UINT destHeapIndex = InUseHeap->MallocHeap(m_size);
 			BindMultiDescriptor(m_heapIndexStart, m_size, destHeapIndex);
@@ -71,6 +69,7 @@ namespace Graphic {
 
 	private:
 		DescriptorHeap* m_heap;
+
 		UINT m_heapIndexStart;
 		const UINT m_size;
 	};
@@ -83,9 +82,6 @@ namespace Graphic {
 	public:
 		Descriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
 			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
-
-		// Malloc space in m_Buffer, store the view desc
-		virtual void Initialize() = 0; 
 
 		inline void copyData(const void* data, UINT size) { Engine::MemoryAllocator.UploadData(*m_Buffer, data, size, m_Offset); }
 		inline void copyData(const void* data) { copyData(data, m_BufferSize); }
@@ -143,7 +139,6 @@ namespace Graphic {
 	public:
 		VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize);
 		
-		void Initialize() override;
 		
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
 
@@ -166,8 +161,7 @@ namespace Graphic {
 		//      3. When rendering, we're going to use the m_start variable
 		// IndexBuffer(IndexBuffer& buffer, const UINT start, const UINT end);
 
-		void Initialize() override;
-
+		
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
 		
 	private:
@@ -183,8 +177,6 @@ namespace Graphic {
 		// Create a CBV, descriptor Heap is nullptr if we are creating a normal cbv, 
 		// if provide decriptorHeap, we are creaing a root CBV
 		ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize);
-		
-		void Initialize() override;
 
 		void CreateView(DescriptorTable& table, UINT slot) override;
 
@@ -204,8 +196,6 @@ namespace Graphic {
 	class ShaderResource : public HeapDescriptor {
 	public:
 		ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc);
-		
-		void Initialize() override;
 
 		void CreateView(DescriptorTable& table, UINT slot) override;
 
@@ -220,10 +210,7 @@ namespace Graphic {
 	class UnorderedAccess : public HeapDescriptor {
 	public:
 		UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc);
-		
 	
-		void Initialize() override;
-
 		void CreateView(DescriptorTable& table, UINT slot) override;
 
 		void CreateRootView() override;
@@ -236,8 +223,6 @@ namespace Graphic {
 	class RenderTarget : public HeapDescriptor {
 	public:
 		RenderTarget(ptrGPUMem gpubuffer, const D3D12_RENDER_TARGET_VIEW_DESC& desc, DescriptorHeap* descriptorHeap);
-		
-		void Initialize() override;
 
 		void CreateView(DescriptorTable& table, UINT slot) override 
 		{ assert(FALSE && "RTV should not call this function"); };
@@ -253,8 +238,6 @@ namespace Graphic {
 	class DepthStencil : public HeapDescriptor {
 	public:
 		DepthStencil(ptrGPUMem gpubuffer, const D3D12_DEPTH_STENCIL_VIEW_DESC & desc, DescriptorHeap* descriptorHeap);
-
-		void Initialize() override;
 
 		void CreateView(DescriptorTable& table, UINT slot) override 
 		{ assert(FALSE && "DSV should not call this function"); };

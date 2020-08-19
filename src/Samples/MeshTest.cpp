@@ -46,9 +46,7 @@ namespace Samples {
 		mat.Roughness = 0.15f;
 		mat.Specular = 0.0f;
 		m_Material->SetData(mat);
-
-		m_Material->Initialize();
-
+		m_Material->UploadCBV();
 		
 		//m_Mesh = TriangleMesh::GetSphere(64, 32);
 		
@@ -66,7 +64,7 @@ namespace Samples {
 		obj0->SetMesh(m_Mesh);
 		 //obj0->SetMesh(plane);
 		obj0->SetMaterial(m_Material);
-		obj0->Initialize();
+		
 		obj0->SetTransform(Transform({ 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, 0, 1.0 }, {0.0, 0.0, 0.0}));
 
 		m_Scene.AddGameObj(obj0);
@@ -123,28 +121,28 @@ namespace Samples {
 		frame ++;
 		if (kb.E) {
 			Matrix4 t = obj0->GetTransform();
-			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 0, 1, 0 }, 0.01));
+			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 0, 1, 0 }, 0.01f));
 			t = t * r;
 			obj0->SetTransform(Transform(t));
 		}
 
 		if (kb.Q) {
 			Matrix4 t = obj0->GetTransform();
-			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 0, 1, 0 }, -0.01));
+			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 0, 1, 0 }, -0.01f));
 			t = t * r;
 			obj0->SetTransform(Transform(t));
 		}
 
 		if (kb.W) {
 			Matrix4 t = obj0->GetTransform();
-			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 1, 0, 0 }, 0.01));
+			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 1, 0, 0 }, 0.01f));
 			t = t * r;
 			obj0->SetTransform(Transform(t));
 		}
 
 		if (kb.S) {
 			Matrix4 t = obj0->GetTransform();
-			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 1, 0, 0 }, -0.01));
+			Matrix4 r = Matrix4(XMMatrixRotationAxis({ 1, 0, 0 }, -0.01f));
 			t = t * r;
 			obj0->SetTransform(Transform(t));
 		}
@@ -171,21 +169,25 @@ namespace Samples {
 		if (kb.Up) {
 			matData.Specular += 0.01f;
 			Logger::Log(matData.Specular, "Set Specular :");
+			m_Material->UploadCBV();
 		}
 		
 		if (kb.Down) {
 			matData.Specular -= 0.01f;
 			Logger::Log(matData.Specular, "Set Specular :");
+			m_Material->UploadCBV();
 		}
 
 		if (kb.Left) {
 			matData.Roughness += 0.01f;
 			Logger::Log(matData.Roughness, "Set Roughness :");
+			m_Material->UploadCBV();
 		}
 
 		if (kb.Right) {
 			matData.Roughness -= 0.01f;
 			Logger::Log(matData.Roughness, "Set Roughness :");
+			m_Material->UploadCBV();
 		}
 		input.Update();
 	}

@@ -1,5 +1,5 @@
 #include "Mesh.h"
-#include "MathCommon.h"
+#include "MathLib.h"
 #include "Utility/MeshReader.h"
 
 
@@ -50,8 +50,8 @@ namespace Game {
 		float x, y, z;
 		std::vector<DefaultVertex> vertices;
 
-		for (int j = 0; j <= numV; ++j) {
-			for (int i = 0; i < numU; ++i) {
+		for (UINT j = 0; j <= numV; ++j) {
+			for (UINT i = 0; i < numU; ++i) {
 			
 				/* // Make the triganle same area
 				u = 2.0f * i * Math::PI / numU;
@@ -81,7 +81,7 @@ namespace Game {
 		std::vector<UINT> index;
 		// connect north south pole
 
-		for (int i = 0; i < numU; ++i) {
+		for (UINT i = 0; i < numU; ++i) {
 			const UINT n = 0;
 			const UINT s = vertices.size() - 1;
 			UINT a = 1 + i;
@@ -104,8 +104,8 @@ namespace Game {
 		}
 
 		// connect other
-		for (int j = 1; j < numV ; ++j) {
-			for (int i = 0; i < numU; ++i) {
+		for (UINT j = 1; j < numV ; ++j) {
+			for (UINT i = 0; i < numU; ++i) {
 				UINT a = 1 + j * numU + i;
 				UINT b = a + 1;
 				if (i == numU - 1) { b -= numU; }

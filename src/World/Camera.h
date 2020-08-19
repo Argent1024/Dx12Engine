@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Math/MathCommon.h"
-#include "Math/Transform.h"
+#include "Math/MathLib.h"
 #include "Graphic/Descriptor.h"
 #include "Graphic/CommandList.h"
 

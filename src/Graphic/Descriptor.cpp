@@ -3,20 +3,16 @@
 namespace Graphic {
 	VertexBuffer::VertexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize, const UINT strideSize) 
 		:Descriptor(gpubuffer, bufferSize), m_strideSize(strideSize) 
-	{ }
-
-	void VertexBuffer::Initialize() 
-	{
+	{ 
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
 		m_view.StrideInBytes = m_strideSize;
 		m_view.SizeInBytes = m_BufferSize;
 	}
 
-	IndexBuffer::IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
-		: Descriptor(gpubuffer, bufferSize), m_start(0) { }
 
-	void IndexBuffer::Initialize() 
+	IndexBuffer::IndexBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
+		: Descriptor(gpubuffer, bufferSize), m_start(0) 
 	{
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
@@ -37,15 +33,12 @@ namespace Graphic {
 
 	ConstantBuffer::ConstantBuffer(ptrGPUMem gpubuffer, const UINT bufferSize)
 		: HeapDescriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize))
-	{ assert(m_BufferSize % 256 == 0 && "Constant buffer size not aligned"); }	
-
-	void ConstantBuffer::Initialize() 
 	{
+		assert(m_BufferSize % 256 == 0 && "Constant buffer size not aligned");
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
-
 		m_cbvDesc.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
 		m_cbvDesc.SizeInBytes = m_BufferSize;  
-	}
+	}	
 
 	void ConstantBuffer::CreateView(DescriptorTable& table, UINT slot) 
 	{
@@ -67,12 +60,8 @@ namespace Graphic {
 	// TODO fix buffer size
 	ShaderResource::ShaderResource(ptrGPUMem gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc) 
 		: m_srvDesc(desc), HeapDescriptor(gpubuffer, 0)
-	{ }
-	
-	void ShaderResource::Initialize() 
-	{
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
-	}
+	{ m_Offset = m_Buffer->MemAlloc(m_BufferSize); }
+
 
 	void ShaderResource::CreateView(DescriptorTable& table, UINT slot) 
 	{
@@ -96,10 +85,6 @@ namespace Graphic {
 	/*************************   UnorderedAccess Resource Begin ******************************/
 	UnorderedAccess::UnorderedAccess(ptrGPUMem gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc)
 		: m_uavDesc(desc), HeapDescriptor(gpubuffer, 0) 
-	{
-	}
-
-	void UnorderedAccess::Initialize() 
 	{
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 	}
@@ -126,12 +111,8 @@ namespace Graphic {
 
 	RenderTarget::RenderTarget(ptrGPUMem gpubuffer, const D3D12_RENDER_TARGET_VIEW_DESC& desc, DescriptorHeap* descriptorHeap) 
 		: m_rtvDesc(desc), m_DescriptorHeap(descriptorHeap), HeapDescriptor(gpubuffer, 0) 
-	{ }
+	{ m_Offset = m_Buffer->MemAlloc(m_BufferSize); }
 
-	void RenderTarget::Initialize() 
-	{
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
-	}
 
 	void RenderTarget::CreateRootView() 
 	{
@@ -144,13 +125,9 @@ namespace Graphic {
 
 	DepthStencil::DepthStencil(ptrGPUMem gpubuffer, const D3D12_DEPTH_STENCIL_VIEW_DESC & desc, DescriptorHeap* descriptorHeap)
 		: m_dsvDesc(desc), m_DescriptorHeap(descriptorHeap), HeapDescriptor(gpubuffer, 0)
-	{ }
+	{ m_Offset = m_Buffer->MemAlloc(m_BufferSize); }
 
-	void DepthStencil::Initialize() 
-	{
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
-	}
-
+	
 	void DepthStencil::CreateRootView() 
 	{
 		assert(m_RootHeapIndex==-1 && "Root View should be created only once");

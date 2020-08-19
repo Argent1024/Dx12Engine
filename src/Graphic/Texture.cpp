@@ -79,7 +79,6 @@ namespace Graphic {
 	{
 		if (!m_CBV) {
 			m_CBV = new ConstantBuffer(m_gpuMem, m_totalSize);
-			m_CBV->Initialize();
 		}
 		if (table) {
 			m_CBV->CreateView(*table, tableIndex);
@@ -100,7 +99,6 @@ namespace Graphic {
 			srvDesc.Buffer.StructureByteStride = m_stride;
 			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 			m_SRV = new ShaderResource(m_gpuMem, srvDesc);
-			m_SRV->Initialize();
 		}
 		if (table) {
 			m_SRV->CreateView(*table, tableIndex);
@@ -121,7 +119,6 @@ namespace Graphic {
 			uavDesc.Buffer.CounterOffsetInBytes = 0;
 			uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 			m_UAV = new UnorderedAccess(m_gpuMem, uavDesc);
-			m_UAV->Initialize();
 		}
 
 		if (table) {
@@ -204,7 +201,6 @@ namespace Graphic {
 			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 			srvDesc.Texture2D.MipLevels = 1;
 			m_SRV = new ShaderResource(m_gpuMem, srvDesc);
-			m_SRV->Initialize();
 		}
 
 		if(table) {
@@ -226,7 +222,6 @@ namespace Graphic {
 			dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 			dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 			m_DSV = new DepthStencil(m_gpuMem, dsvDesc, Engine::GetDSVHeap());
-			m_DSV->Initialize();
 			m_DSV->CreateRootView();
 		}	
 		else {

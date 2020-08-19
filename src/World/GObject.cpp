@@ -2,24 +2,17 @@
 
 namespace Game {
 	using namespace Math;
-
-	void GObject::Initialize() 
+	
+	GObject::GObject() 
+		: m_table(2),
+		  m_CBV(Engine::MemoryAllocator.CreateCommittedBuffer(cbSize, D3D12_HEAP_TYPE_UPLOAD), 
+			    cbSize)
 	{
-		m_table.Initialize(Engine::GetInitHeap());
+		// TODO Fix this
+		m_state = new Physic::PState();
 
-		// TODO temperate cbv
-		const UINT cbSize = CalculateConstantBufferByteSize(sizeof(DirectX::XMMATRIX));
-		/*m_Texture = new Graphic::TextureBuffer(cbSize);
-		m_Texture->CreateView(Graphic::TEXTURE_CBV, &m_table, 0); */
-		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbSize, D3D12_HEAP_TYPE_UPLOAD);
-		m_CBV = new Graphic::ConstantBuffer(gpumem, cbSize);
-		m_CBV->Initialize();
-		m_CBV->CreateView(m_table, 0);
 		// slot 0 in the table is for const data
-
-		// Bind material to the descriptor tbl
-		m_Material->BindMaterialAt(m_table);
-		
+		m_CBV.CreateView(m_table, 0);
 	}
 
 	void GObject::RecordCommand(Graphic::CommandList& commandList) {
@@ -27,11 +20,7 @@ namespace Game {
 		// (TODO may not need to do this every frame & remove it to Physic) Upload data to the cbv
 		XMFLOAT4X4 modelTransform;
 		XMStoreFloat4x4(&modelTransform, XMMatrixTranspose(m_state->GetTransform()));
-		m_CBV->copyData(&modelTransform);
-
-		if (m_Material) {
-			m_Material->UploadCBV();
-		}
+		m_CBV.copyData(&modelTransform);
 
 		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
 		

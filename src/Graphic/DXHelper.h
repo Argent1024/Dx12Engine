@@ -138,7 +138,7 @@ inline void SetNameIndexed(ID3D12Object*, LPCWSTR, UINT)
 #define NAME_D3D12_OBJECT(x) SetName((x).Get(), L#x)
 #define NAME_D3D12_OBJECT_INDEXED(x, n) SetNameIndexed((x)[n].Get(), L#x, n)
 
-inline UINT CalculateConstantBufferByteSize(UINT byteSize)
+inline constexpr UINT CalculateConstantBufferByteSize(UINT byteSize)
 {
 	// Constant buffer size is required to be aligned.
 	return (byteSize + (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT - 1)) & ~(D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT - 1);

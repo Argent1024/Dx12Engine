@@ -27,11 +27,9 @@ namespace Game {
 			// Allocate memory from gpu to store vertex buffer and index buffer
 			ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(vertexBufferSize + indexBufferSize);
 			m_VertexBuffer = std::make_shared<Graphic::VertexBuffer>(gpumem, vertexBufferSize, sizeof(Vertex));
-			m_VertexBuffer->Initialize();
 			m_VertexBuffer->copyData(&vertex[0]);
 		
 			m_IndexBuffer = std::make_shared<Graphic::IndexBuffer>(gpumem, indexBufferSize);
-			m_IndexBuffer->Initialize();
 			m_IndexBuffer->copyData(&index[0]);
 		}
 
