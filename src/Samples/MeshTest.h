@@ -5,7 +5,7 @@
 #include "../World/Camera.h"
 #include "../World/GObject.h"
 #include "../World/Scene.h"
-#include "../World/RenderEngine.h"
+#include "../World/Engine.h"
 
 
 namespace Samples {

@@ -7,7 +7,9 @@
 HWND WinApp::m_hwnd = nullptr;
 
 using namespace DirectX;
-void WinApp::InitWindow(HINSTANCE hInst, Graphic::GraphicCore* t_core)
+using namespace Engine;
+
+void WinApp::InitWindow(HINSTANCE hInst, Engine::GameEngine* t_engine)
 {
 	//TODO Parse the command line parameters
 	//int argc;
@@ -24,13 +26,14 @@ void WinApp::InitWindow(HINSTANCE hInst, Graphic::GraphicCore* t_core)
 	windowClass.lpszClassName = L"WinAppClass";
 	RegisterClassEx(&windowClass);
 
-	RECT windowRect = { 0, 0, static_cast<LONG>(t_core->GetWidth()), static_cast<LONG>(t_core->GetHeight()) };
+	const GameEngine::GameConfiguration GameSetting = t_engine->GetSetting();
+	RECT windowRect = { 0, 0, static_cast<LONG>(GameSetting.Width), static_cast<LONG>(GameSetting.Height) };
 	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
 	// Create the window and store a handle to it.
 	m_hwnd = CreateWindow(
 		windowClass.lpszClassName,
-		t_core->GetTitle(),
+		GameSetting.Title,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -39,15 +42,15 @@ void WinApp::InitWindow(HINSTANCE hInst, Graphic::GraphicCore* t_core)
 		nullptr,        // We have no parent window.
 		nullptr,        // We aren't using menus.
 		hInst,
-		t_core);      // Passing data into call back function
+		t_engine);      // Passing data into call back function
 	assert(m_hwnd != nullptr);
 
 	// Init graphics core after get a handle
-	t_core->Init(m_hwnd);
+	t_engine->Initialize(m_hwnd);
 }
 
 LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-	Graphic::GraphicCore* t_core = reinterpret_cast<Graphic::GraphicCore*> (GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	 GameEngine* t_engine = reinterpret_cast<GameEngine*> (GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	switch (message) 
 	{
 	case WM_CREATE: 
@@ -59,8 +62,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	   return 0;
 
 	case WM_PAINT:
-		t_core->Update();
-		t_core->Render();
+		t_engine->GameLoop();
 		return 0;
 
 	case WM_DESTROY:

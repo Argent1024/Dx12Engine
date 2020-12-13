@@ -2,17 +2,16 @@
 #include "RenderPass.h"
 
 // TODO why render engine in game namespace...?
-namespace Game {
+namespace Engine {
 
 	// The main renderer use(called) by the engine
 	// TODO hard code passes for now, make it configable
 	// Don't think a virtual class or any override is needed
 	class RenderEngine {
 
-	friend Graphic::GraphicCore;
-
 	public:
-		struct Config 
+		// TODO move all the setting in the render pass to here
+		struct RenderConfiguration 
 		{
 			bool mixpass = false;
 		};
@@ -21,17 +20,18 @@ namespace Game {
 
 		void Initialize(const HWND appHwnd);
 
-		void Render(Scene& scene);
+		void Render(Game::Scene& scene);
 
-		Config& GetRenderSetting() { return Setting; }
+		RenderConfiguration& GetRenderSetting() { return Setting; }
 
-		DefaultRenderPass& GetDefaultPass() { return defalutpass; }
+		Game::DefaultRenderPass& GetDefaultPass() { return defalutpass; }
 
 	protected:
-		Config Setting;
+		RenderConfiguration Setting;
 
-		DefaultRenderPass defalutpass;
-		MixtureRenderPass mixPass;
+		// Different pass
+		Game::DefaultRenderPass defalutpass;
+		Game::MixtureRenderPass mixPass;
 
 	private:
 
@@ -43,10 +43,4 @@ namespace Game {
 		Graphic::DepthBuffer depthBuffer;
 
 	};
-}
-
-namespace Engine {
-	// TODO global render engine
-
-
 }

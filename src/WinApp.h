@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
-#include "GraphicCore.h"
+#include "World/Engine.h"
 
 class WinApp {
 public:
@@ -9,9 +9,9 @@ public:
 
 	static HWND GetHwnd() { return m_hwnd; }
 
-	static int RunApp(Graphic::GraphicCore* t_core,HINSTANCE hInst, int nCmdShow) {
+	static int RunApp(Engine::GameEngine* t_engine,HINSTANCE hInst, int nCmdShow) {
 		// Init Window
-		InitWindow(hInst, t_core);
+		InitWindow(hInst, t_engine);
 		// Init GameApp
 
 		ShowWindow(m_hwnd, nCmdShow);
@@ -36,7 +36,7 @@ public:
 
 protected:
 
-	static void InitWindow(HINSTANCE hInst, Graphic::GraphicCore* t_core);
+	static void InitWindow(HINSTANCE hInst,Engine::GameEngine* t_engine);
 
 	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
