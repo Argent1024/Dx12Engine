@@ -1,6 +1,6 @@
 #include "RenderEngine.h"
 
-namespace Game {
+namespace Engine {
 	
 	RenderEngine::RenderEngine(const UINT width, const UINT height) 
 		: swapChain(width, height),
@@ -27,7 +27,7 @@ namespace Game {
 	}
 
 
-	void RenderEngine::Render(Scene& scene) 
+	void RenderEngine::Render(Game::Scene& scene) 
 	{
 		BeginRender();
 

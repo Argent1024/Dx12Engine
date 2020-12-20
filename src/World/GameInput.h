@@ -11,5 +11,9 @@ namespace Game {
 		virtual void UpdateScene(Scene& scene) = 0;
 	};
 
-	
+	class VoidGameControl : public GameControl {
+	public:
+		void UpdateScene(Scene& scene) { };
+
+	};
 }

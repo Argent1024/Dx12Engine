@@ -9,10 +9,15 @@ namespace Engine {
 	void GameEngine::Initialize(const HWND m_appHwnd)
 	{
 		Engine::InitializeEngine();
+		
+		// Control
 		Engine::InitializeInputManager(m_appHwnd);
+		m_GameControl = new VoidGameControl();
 
 		m_RenderEngine = new RenderEngine(m_Setting.Width, m_Setting.Height);
 		m_RenderEngine->Initialize(m_appHwnd);
+
+		
 
 		// TODO should put into logic
 		LoadAssert();

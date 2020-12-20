@@ -75,7 +75,7 @@ namespace Samples {
 	{
 		// m_Scene->Render();
 		m_Render->Render(m_Scene);
-	}
+	}m
 
 	void MeshTest::Update() {
 		InputManager& input = Engine::GetInputManager();
