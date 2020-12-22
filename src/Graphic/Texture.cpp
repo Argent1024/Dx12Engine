@@ -1,6 +1,26 @@
 #include "Texture.h"
+#include "Utility/Logger.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb/stb_image_write.h"    
+
+namespace 
+{
+	// Copy from Dartmouth CS 73/273 Computational Aspects of Digital Photography C++ basecode.
+	std::string getExtension(const std::string &filename)
+	{
+		if (filename.find_last_of(".") != std::string::npos)
+			return filename.substr(filename.find_last_of(".") + 1);
+		return "";
+	}
+
+
+}
 
 namespace Graphic {
+
 
 	void LoadChessBoard(const UINT width, const UINT height, const UINT pixelSize, std::vector<UINT8>& data)
 	{
@@ -138,8 +158,27 @@ namespace Graphic {
 		assert(false && "Not implementend!");
 	}
 
-	Texture2D::Texture2D(UINT width, UINT height, UINT type, const std::wstring& textureFile)
+	Texture2D::Texture2D(UINT width, UINT height, UINT type)
 		: Texture(type)
+	{
+		TextureDescHelper(width, height);
+		Initialize();
+	}
+
+	Texture2D::Texture2D(std::string& filename, UINT type) 
+		: Texture(type)
+	{	
+		unsigned char* data = nullptr;
+		ImageMetadata metadata = LoadFromImage(filename, data);
+		D3D12_SUBRESOURCE_DATA texData = CreateTextureData(metadata, data);
+
+		UploadTexture(texData);
+
+		// Using stb_image so need to free data here
+		stbi_image_free(data);
+	}
+	
+	void Texture2D::TextureDescHelper(UINT width, UINT height) 
 	{
 		m_textureDesc = {};
 		m_textureDesc.MipLevels = 1;
@@ -151,7 +190,10 @@ namespace Graphic {
 		m_textureDesc.SampleDesc.Count = 1;
 		m_textureDesc.SampleDesc.Quality = 0;
 		m_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	}
 
+	void Texture2D::Initialize() 
+	{
 		if (m_Type & TEXTURE_DSV) {
 			// Change Texture format to D32
 			m_textureDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -169,23 +211,29 @@ namespace Graphic {
 			// Emmmmm Hack here TODO Format
 			// Since SRV only use R32 not D32
 			m_textureDesc.Format = DXGI_FORMAT_R32_FLOAT;
-		}
-		else {
+		} else {
 			m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
 		}
 
 		if (m_Type & TEXTURE_RTV) {
 			throw std::runtime_error("Not Implemented!");
-		} 
-		
-
-		/*std::vector<UINT8> data;
-		LoadChessBoard(width, height, 4, data);
-
-		D3D12_SUBRESOURCE_DATA textureData = CreateTextureData(m_textureDesc.Width, m_textureDesc.Height, 4, data);
-		UploadTexture(textureData);*/
+		}
 	}
-	
+
+	ImageMetadata Texture2D::LoadFromImage(std::string& filename, unsigned char*& data) 
+	{
+		const UINT BitChannel = 8; // stb image only support 8 bit
+		ImageMetadata metadata = {};
+		data = stbi_load(filename.c_str(), &metadata.width, &metadata.height, &metadata.channel, 0);
+		if (data == nullptr) {
+			std::string errormsg = "ERROR when reading image " + filename;
+			Logger::Log(errormsg);
+		}
+		metadata.pixelSize = BitChannel * metadata.channel;
+		return metadata;
+	}
+
+
 	void Texture2D::CreateCBV(DescriptorTable* table, UINT tableIndex) {
 		assert(FALSE && "Why Creating 2d CBV? ");
 	}

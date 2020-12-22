@@ -14,9 +14,16 @@ namespace Graphic {
 		TEXTURE_RTV = 16
 	};
 
+	struct ImageMetadata
+	{
+		int width;
+		int height;
+		int channel;
+		int pixelSize;
+	};
 
 	void LoadChessBoard(const UINT width, const UINT height, const UINT pixelSize, std::vector<UINT8>& data);
-	
+
 	// TODO when creating views, the control of format stuff need to be exposed outside
 	// Texture
 	// Texture class implement this base class should 
@@ -123,18 +130,38 @@ namespace Graphic {
 			return textureData;
 		}
 		
-		// TODO Template
 		// Create 2d texture data
-		static D3D12_SUBRESOURCE_DATA CreateTextureData(const UINT width, const UINT height, const UINT pixelSize, 
-												 const std::vector<UINT8>& data) 
+		static D3D12_SUBRESOURCE_DATA CreateTextureData(
+			const ImageMetadata& metadata, 
+			const std::vector<UINT8>& data) 
 		{
 			D3D12_SUBRESOURCE_DATA textureData = {};
 			// Set infomation to m_textureData
 			textureData.pData = &data[0];
-			textureData.RowPitch = width * pixelSize;
-			textureData.SlicePitch = textureData.RowPitch * height;
+			textureData.RowPitch = metadata.width * metadata.pixelSize;
+			textureData.SlicePitch = textureData.RowPitch * metadata.height;
 			return textureData;
 		}
+
+		// Create 2d texture data (helper method for stb_image, so don't need to copy the image again)
+		static D3D12_SUBRESOURCE_DATA CreateTextureData(
+			const ImageMetadata& metadata, 
+			const unsigned char* data) 
+		{
+			D3D12_SUBRESOURCE_DATA textureData = {};
+			// Set infomation to m_textureData
+			textureData.pData = data;
+			textureData.RowPitch = metadata.width * metadata.pixelSize;
+			textureData.SlicePitch = textureData.RowPitch * metadata.height;
+			return textureData;
+		}
+
+		/*
+		// TODO Need this when writing image back to disk
+		static ImageMetadata CalculateMetaData() 
+		{
+			
+		} */
 
 	protected:
 		// Create the SRV & UAV at the table at tableIndex
@@ -181,12 +208,22 @@ namespace Graphic {
 		UINT m_totalSize;
 	};
 
-
+	// TODO dont use stb_image, only support 8-bit's channel
 	class Texture2D : public Texture {
 	public:
 		// TODO better way to express type?
-		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV, const std::wstring& textureFile=L"");
+		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV);
+
+		Texture2D(std::string& filename, UINT type=TEXTURE_SRV);
+
 	private:
+		void TextureDescHelper(UINT width, UINT height);
+
+		// After we have m_textureDesc and m_Type Allocate GPU memory and create texture
+		void Initialize();
+
+		ImageMetadata LoadFromImage(std::string& filename, unsigned char*& data);
+
 		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
@@ -194,5 +231,10 @@ namespace Graphic {
 		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 	};
 
+	class Texture3D : public Texture 
+	{
+	
+
+	};
 
 }
