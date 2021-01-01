@@ -4,7 +4,7 @@ namespace Game {
 	using namespace Math;
 	
 	GObject::GObject() 
-		: m_table(2),
+		: m_table(4), // TODO table size according to material
 		  m_CBV(Engine::MemoryAllocator.CreateCommittedBuffer(cbSize, D3D12_HEAP_TYPE_UPLOAD), 
 			    cbSize)
 	{

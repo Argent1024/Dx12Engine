@@ -171,7 +171,7 @@ namespace Graphic {
 		: Texture(type)
 	{	
 		// Load Chess Board
-		
+		/*
 		TextureDescHelper(960, 960);
 		Initialize();
 		std::vector<UINT8> data;
@@ -179,12 +179,14 @@ namespace Graphic {
 		D3D12_SUBRESOURCE_DATA textureData = 
 			CreateTextureData({ (int)m_textureDesc.Width, (int)m_textureDesc.Height, 4, 4}, data);
 		UploadTexture(&textureData);
-		
+		*/
 
-		/*
 		unsigned char* data = nullptr;
 		
 		ImageMetadata metadata = LoadFromImage(filename, data);
+		metadata.channel = 4;
+		metadata.pixelSize = 4;
+
 		D3D12_SUBRESOURCE_DATA texData = CreateTextureData(metadata, data);
 		TextureDescHelper(metadata.width, metadata.height);
 		Initialize();
@@ -193,7 +195,7 @@ namespace Graphic {
 		// Using stb_image so need to free data here
 		// TODO Thinking sometime we need store the data in memory = =
 		stbi_image_free(data);
-		*/
+		
 	}
 	
 	void Texture2D::TextureDescHelper(UINT width, UINT height) 
@@ -240,9 +242,9 @@ namespace Graphic {
 
 	ImageMetadata Texture2D::LoadFromImage(std::string& filename, unsigned char*& data) 
 	{
-		const UINT BitChannel = 8; // stb image only support 8 bit
+		// stb image only support 8 bit
 		ImageMetadata metadata = {};
-		data = stbi_load(filename.c_str(), &metadata.width, &metadata.height, &metadata.channel, 0);
+		data = stbi_load(filename.c_str(), &metadata.width, &metadata.height, &metadata.channel, 4);
 		if (data == nullptr) {
 			std::string errormsg = "ERROR when reading image " + filename;
 			Logger::Log(errormsg);

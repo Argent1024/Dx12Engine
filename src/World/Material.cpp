@@ -50,7 +50,7 @@ namespace Game {
 		case Game::PrincipleMaterial::MatCBV:
 			break;
 		case Game::PrincipleMaterial::DiffuseTex:
-			m_MatData.CTexture = tex == nullptr;
+			m_MatData.CTexture = tex != nullptr;
 			m_DiffuseTex = tex;
 			break;
 		case Game::PrincipleMaterial::NormalTex:
