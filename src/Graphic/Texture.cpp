@@ -1,6 +1,8 @@
 #include "Texture.h"
 #include "Utility/Logger.h"
 
+#include <WICTextureLoader.h>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -168,14 +170,30 @@ namespace Graphic {
 	Texture2D::Texture2D(std::string& filename, UINT type) 
 		: Texture(type)
 	{	
+		// Load Chess Board
+		
+		TextureDescHelper(960, 960);
+		Initialize();
+		std::vector<UINT8> data;
+		LoadChessBoard(960, 960, 4, data);
+		D3D12_SUBRESOURCE_DATA textureData = 
+			CreateTextureData({ (int)m_textureDesc.Width, (int)m_textureDesc.Height, 4, 4}, data);
+		UploadTexture(&textureData);
+		
+
+		/*
 		unsigned char* data = nullptr;
+		
 		ImageMetadata metadata = LoadFromImage(filename, data);
 		D3D12_SUBRESOURCE_DATA texData = CreateTextureData(metadata, data);
-
-		UploadTexture(texData);
+		TextureDescHelper(metadata.width, metadata.height);
+		Initialize();
+		UploadTexture(&texData);
 
 		// Using stb_image so need to free data here
+		// TODO Thinking sometime we need store the data in memory = =
 		stbi_image_free(data);
+		*/
 	}
 	
 	void Texture2D::TextureDescHelper(UINT width, UINT height) 
@@ -229,14 +247,15 @@ namespace Graphic {
 			std::string errormsg = "ERROR when reading image " + filename;
 			Logger::Log(errormsg);
 		}
-		metadata.pixelSize = BitChannel * metadata.channel;
+		metadata.pixelSize = metadata.channel; // Store pixel size in Byte
 		return metadata;
+		// LoadWICTextureFromFile()
 	}
-
 
 	void Texture2D::CreateCBV(DescriptorTable* table, UINT tableIndex) {
 		assert(FALSE && "Why Creating 2d CBV? ");
 	}
+
 	void Texture2D::CreateSRV(DescriptorTable* table, UINT tableIndex)  {
 
 		// Create SRV if not created
@@ -277,11 +296,21 @@ namespace Graphic {
 		}
 	}
 
-	void Texture2D::CreateRTV(DescriptorTable* table, UINT tableIndex)  {
+	void Texture2D::CreateRTV(DescriptorTable* table, UINT tableIndex)  
+	{
 		//D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 		//rtvDesc.Format = m_textureDesc.Format;
 		//rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 		throw std::runtime_error("Not Implemented!");
 		//m_RTV = new RenderTarget(m_gpuMem, rtvDesc, Engine::GetRTVHeap());
 	}
+
+	/*
+	void Texture3D::TextureDescHelper() 
+	{
+		// DirectX::LoadWICTextureFromMemory();
+
+	} */
+
+
 }

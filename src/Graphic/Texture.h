@@ -19,7 +19,7 @@ namespace Graphic {
 		int width;
 		int height;
 		int channel;
-		int pixelSize;
+		int pixelSize;	// In Byte
 	};
 
 	void LoadChessBoard(const UINT width, const UINT height, const UINT pixelSize, std::vector<UINT8>& data);
@@ -114,10 +114,13 @@ namespace Graphic {
 		}
 
 		// Write texture data to gpu memory
-		// Only need to upload once since SRV, UAV will point to the same memory!
-		inline void UploadTexture(D3D12_SUBRESOURCE_DATA& data) {
+		// Only need to upload once since all views point to the same memory!
+		inline void UploadTexture(D3D12_SUBRESOURCE_DATA* data) {
 			assert(m_Type & TEXTURE_SRV  && "The Texture type doesn't contain SRV");
-			m_SRV->CopyTexture(&data); 
+
+			// May not init SRV when calling upload
+			// m_SRV->CopyTexture(&data); 
+			Engine::MemoryAllocator.UploadTexure(*m_gpuMem, data);
 		}
 
 		// Create 1d texture data
@@ -231,10 +234,27 @@ namespace Graphic {
 		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 	};
 
+	/*
 	class Texture3D : public Texture 
 	{
-	
+	public:
+		Texture3D(UINT type=TEXTURE_SRV);
+
+	private:
+		void TextureDescHelper();
+
+		// After we have m_textureDesc and m_Type Allocate GPU memory and create texture
+		void Initialize();
+
+		ImageMetadata LoadFromImage(std::string& filename, unsigned char*& data);
+
+		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 
 	};
+	*/
 
 }

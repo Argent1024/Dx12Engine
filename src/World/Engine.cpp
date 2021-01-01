@@ -37,21 +37,31 @@ namespace Engine {
 			m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {0.0, 1.0, 0.0} });
 			m_Material = std::make_shared<PrincipleMaterial>();
 
-			PrincipleMaterial::Data mat;
+			PrincipleMaterial::MatData mat;
 			DirectX::XMStoreFloat3(&mat.BaseColor, Vector3(1.0, 0.0, 0.0));
 			mat.Roughness = 0.15f;
 			mat.Specular = 0.0f;
 			m_Material->SetData(mat);
 			m_Material->UploadCBV();
 		
-			MeshReader reader;
+			/*MeshReader reader;
 			reader.ReadOBJ("D:\\work\\tEngine\\bunny.obj");
 
 			std::vector<DefaultVertex>& vertex = reader.m_vertex;
 			std::vector<UINT>& index = reader.m_index;
 
-			m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
-		
+			m_Mesh = std::make_shared<TriangleMesh>(vertex, index);*/
+
+			// Texture test
+			m_Mesh = TriangleMesh::GetXYPlane();
+			std::string texpath = "D://work/tEngine/snow.png";
+			Graphic::Texture2D* tex = new Graphic::Texture2D(texpath);
+
+			m_Material->SetTexture(PrincipleMaterial::DiffuseTex, tex);
+			m_Material->UploadCBV();
+			// Texture Test end
+
+
 			// TODO!! error C2338 aligin?
 			GObject* obj0 = new Game::GObject();
 			obj0->SetMesh(m_Mesh);
