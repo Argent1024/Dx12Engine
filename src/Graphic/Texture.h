@@ -38,31 +38,6 @@ namespace Graphic {
 		}
 
 		inline UINT GetType() { return m_Type; }
-		/*// Copy (one)view to in use descriptor heap
-		inline void BindTexture(UINT index, TextureType type=TEXTURE_SRV) const
-		{
-			assert(type & m_Type && "Binding view type not created");
-			switch (type)
-			{
-			case Graphic::TEXTURE_SRV:
-				m_SRV->BindDescriptor(index);
-				break;
-			case Graphic::TEXTURE_UAV:
-				m_UAV->BindDescriptor(index);
-				break;
-			case Graphic::TEXTURE_CBV:
-				
-				break;
-			case Graphic::TEXTURE_DSV:
-				// I think we don't need to bind DSV / RTV
-				break;
-			case Graphic::TEXTURE_RTV:
-
-				break;
-			default:
-				break;
-			}
-		} */
 
 		// Giving a slot, create the view on that slot
 		inline void CreateView(TextureType type, DescriptorTable* table=nullptr, UINT index=0) {
@@ -168,11 +143,12 @@ namespace Graphic {
 
 	protected:
 		// Create the SRV & UAV at the table at tableIndex
-		virtual void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
-		virtual void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
-		virtual void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
-		virtual void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
-		virtual void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) = 0;
+		virtual void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "CBV not implemented!"); }
+		virtual void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "SRV not implemented!"); }
+		virtual void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "UAV not implemented!"); }
+		virtual void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "DSV not implemented!"); }
+		virtual void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "RTV not implemented!"); }
+		
 
 		ptrGPUMem m_gpuMem;
 
@@ -204,8 +180,8 @@ namespace Graphic {
 		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		//void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		//void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		UINT m_elementNum;
 		UINT m_stride;
 		UINT m_totalSize;
@@ -215,7 +191,7 @@ namespace Graphic {
 	class Texture2D : public Texture {
 	public:
 		// TODO better way to express type?
-		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV);
+		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV, bool loadChessBoard=false);
 
 		Texture2D(std::string& filename, UINT type=TEXTURE_SRV);
 
@@ -227,11 +203,32 @@ namespace Graphic {
 
 		ImageMetadata LoadFromImage(std::string& filename, unsigned char*& data);
 
-		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		//void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		//void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+	};
+
+	
+	// Cube map helper
+	class TextureCube : public Texture
+	{
+	public:
+		TextureCube(UINT resolution, UINT type=TEXTURE_SRV & TEXTURE_RTV);
+
+	private:
+		void TextureDescHelper(UINT resolution);
+
+		// After we have m_textureDesc and m_Type Allocate GPU memory and create texture
+		void Initialize();
+
+		ImageMetadata LoadFromImage(std::string& filename, unsigned char*& data);
+
+		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		// void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+
 	};
 
 	/*
