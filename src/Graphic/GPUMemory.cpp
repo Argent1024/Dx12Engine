@@ -91,7 +91,7 @@ namespace Graphic {
 			resource->Unmap(0, nullptr);
 		}
 
-		void MemoryAllocator::_CopyBuffer(GPUMemory& dest, GPUMemory& src)  {
+		void MemoryAllocator::_CopyBuffer(GPUBuffer& dest, GPUBuffer& src)  {
 			UINT size = src.GetBufferSize();
 			UINT destSize = dest.GetBufferSize();
 			UINT destOffset = dest.m_MemAllocated ;

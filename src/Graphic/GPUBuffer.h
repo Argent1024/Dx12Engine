@@ -2,77 +2,73 @@
 #include "GPUMemory.h"
 #include "GPUHeap.h"
 
-namespace Graphic {
-	namespace GPU {
-		class CommittedBuffer : public GPUMemory {
-		public:
-			CommittedBuffer(const UINT size, D3D12_HEAP_TYPE type, D3D12_RESOURCE_STATES state) 
-				: GPUMemory(size), 
-				  m_HeapType(type), 
-				  m_useClear(false), 
-				  m_ClearValue(),
-				  m_initState(state) {}
-			
-			CommittedBuffer(const D3D12_RESOURCE_DESC& desc, D3D12_HEAP_TYPE type,
-						   D3D12_RESOURCE_STATES state)
-				: GPUMemory(desc), 
-				  m_HeapType(type), 
-				  m_useClear(false),
-				  m_ClearValue(),
-				  m_initState(state) {}
+namespace GPU {
+	// Memory for index buffer / vertex buffer / constant buffer
+	class GPUBuffer : GPUMemory
+	{
+	public:
+		GPUBuffer(UINT p_size) :
+			m_MemSize(p_size), m_MemAllocated(0), m_GPUAddr(D3D12_GPU_VIRTUAL_ADDRESS_NULL)
+		{
+			assert(p_size > 0 && "GPU Buffer size < 0");
+		}
 
-			CommittedBuffer(const UINT size, D3D12_HEAP_TYPE type, 
-				            D3D12_RESOURCE_STATES state, const D3D12_CLEAR_VALUE& clear) 
-				: GPUMemory(size), 
-				  m_HeapType(type), 
-				  m_useClear(true), 
-				  m_ClearValue(clear), 
-				  m_initState(state) {}
-			
-			CommittedBuffer(const D3D12_RESOURCE_DESC& desc, D3D12_HEAP_TYPE type, 
-							D3D12_RESOURCE_STATES state, const D3D12_CLEAR_VALUE& clear)
-				: GPUMemory(desc), 
-				  m_HeapType(type), 
-				  m_useClear(true), 
-				  m_ClearValue(clear), 
-				  m_initState(state) {}
+		// Return offset of the memory, the user need to stored this
+		UINT MemAlloc(const UINT size)
+		{
+			assert(m_MemAllocated + size <= m_MemSize);
+			UINT offset = m_MemAllocated;
+			m_MemAllocated += size;
+			return offset;
+		}
 
-			void Initialize() override;
+		inline UINT GetBufferSize() const { return m_MemSize; }
 
-			void Destroy() override;
+		inline D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddr() const
+		{
+			assert(m_GPUAddr != D3D12_GPU_VIRTUAL_ADDRESS_NULL);
+			return m_GPUAddr;
+		}
 
-			inline D3D12_HEAP_TYPE GetHeapType() override { return m_HeapType;}
+		// Create Committed Resource
+		void Initialize(const D3D12_HEAP_TYPE heapType, const D3D12_RESOURCE_STATES initState)
+		{
+			D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(m_MemSize);
+			D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(heapType);
+			D3D12_HEAP_FLAGS flag = D3D12_HEAP_FLAG_NONE;
+			DestoryAndCreateCommitted(&resourceDesc, &heapProp, initState, nullptr, flag);
+		}
 
-		private:
-			// Committed buffer need a heap type to distinguish default or upload
-			D3D12_HEAP_TYPE m_HeapType;
-			
-			// Use a clear value or not
-			bool m_useClear;
-			const D3D12_CLEAR_VALUE m_ClearValue;
+		void Destroy() override
+		{
+			m_Resource = nullptr;
+			m_GPUAddr = D3D12_GPU_VIRTUAL_ADDRESS_NULL;
+			m_MemAllocated = 0;
+			m_MemSize = 0;
+		}
 
-			D3D12_RESOURCE_STATES m_initState;
+	private:
+		UINT m_MemAllocated;
+		UINT m_MemSize;		// Total Memory Size
+		D3D12_GPU_VIRTUAL_ADDRESS m_GPUAddr;
+	};
 
-		};
-		
-		// TODO Test this buffer
-		class PlacedBuffer : public GPUMemory {
-		public:
-			PlacedBuffer(GPUHeap* const GPUHeap, const UINT size)
-				:GPUMemory(size), m_Heap(GPUHeap) {}
 
-			void Initialize() override;
-			void Destroy() override;
-			
-			inline UINT GetHeapOffset() const { return m_HeapOffset; }
+	// Memory for Texture (srv, uav, rtv, dsv ...)
+	class TextureBuffer : GPUMemory
+	{
+	public:
+		TextureBuffer() { }
 
-		private:
-			static const D3D12_HEAP_TYPE m_HeapType = D3D12_HEAP_TYPE_DEFAULT;
-			
-			GPUHeap* const m_Heap;
-			UINT m_HeapOffset;
-		
-		};
-
-	}
+		// Create Committed Resource
+		void Initialize(const D3D12_RESOURCE_DESC& resourceDesc,
+			const D3D12_HEAP_TYPE heapType, 
+			const D3D12_RESOURCE_STATES initState,
+			const D3D12_CLEAR_VALUE* clearValue)
+		{
+			D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(heapType);
+			D3D12_HEAP_FLAGS flag = D3D12_HEAP_FLAG_NONE;
+			DestoryAndCreateCommitted(&resourceDesc, &heapProp, initState, clearValue, flag);
+		}
+	};
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GPUBuffer.h"
+#include "GPUMemManager.h"
 #include "DescriptorHeap.h"
 
 #define ptrVertexBuffer std::shared_ptr<Graphic::VertexBuffer>
@@ -22,7 +22,7 @@ namespace Graphic {
 		CD3DX12_CPU_DESCRIPTOR_HANDLE srcCPUHandle = InitHeap->GetCPUHandle(srcIndex);
 
 
-		ID3D12Device* device = Engine::GetDevice();
+		ID3D12Device* device = ::Engine::GetDevice();
 		// Free threaded as long as different threads don't write to a same place
 		device->CopyDescriptorsSimple(size, destCPUHandle, srcCPUHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
@@ -78,27 +78,28 @@ namespace Graphic {
 
 	// Most Descriptor here shouldn't be used directly, use Mesh & Material & Texture class instead
 	// Descriptors don't need to know about GPU memory stuff
-	class Descriptor {
+	class BufferDescriptor {
 	public:
-		Descriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
+		BufferDescriptor(ptrGBuffer gpubuffer, const UINT bufferSize)
 			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
 
-		inline void copyData(const void* data, UINT size) { Engine::MemoryAllocator.UploadData(*m_Buffer, data, size, m_Offset); }
+		inline void copyData(const void* data, UINT size) 
+		{ Engine::MemoryAllocator.UploadData(*m_Buffer, data, size, m_Offset); }
 		inline void copyData(const void* data) { copyData(data, m_BufferSize); }
 
 		inline UINT GetSize() { return m_BufferSize; }
 
 	protected:
-		ptrGPUMem m_Buffer;
+		ptrGBuffer m_Buffer;
 		UINT m_BufferSize;
 		UINT m_Offset;
 	};
 
 	// TODO fix gpubuffer size
 	// Base class for those view who use descriptor heap to bind 
-	class HeapDescriptor : public Descriptor {
+	class HeapDescriptor {
 	public:
-		HeapDescriptor(ptrGPUMem gpubuffer, const UINT bufferSize)
+		HeapDescriptor(ptrTBuffer gpubuffer, const UINT bufferSize)
 			: Descriptor(gpubuffer, bufferSize), m_RootHeapIndex(-1) {}
 
 		// Create view in the given descriptor table
@@ -123,6 +124,7 @@ namespace Graphic {
 		}
 
 	protected:
+		ptrTBuffer m_Buffer;
 		UINT m_RootHeapIndex; // If we are using this descriptor as root signature, store it's location in the init heap
 
 	};
