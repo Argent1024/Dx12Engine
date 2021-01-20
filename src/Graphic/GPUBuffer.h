@@ -4,7 +4,7 @@
 
 namespace GPU {
 	// Memory for index buffer / vertex buffer / constant buffer
-	class GPUBuffer : GPUMemory
+	class GPUBuffer : public GPUMemory
 	{
 	public:
 		GPUBuffer(UINT p_size) :
@@ -55,7 +55,7 @@ namespace GPU {
 
 
 	// Memory for Texture (srv, uav, rtv, dsv ...)
-	class TextureBuffer : GPUMemory
+	class TextureBuffer : public GPUMemory
 	{
 	public:
 		TextureBuffer() { }
