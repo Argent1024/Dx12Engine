@@ -81,43 +81,12 @@ namespace Graphic {
 	{
 
 	public:
-		// Create view in the given descriptor table
-		virtual void CreateView(DescriptorTable& table, UINT slot)
-		{ throw std::runtime_error("Using function not defined"); }
-
-		// Create view simply in the heap, without using a table, should be called only once
-		virtual void CreateRootView()
-		{ throw std::runtime_error("Using function not defined"); }
-
-	};
-
-
-	// For 1d stuff: Constant, Vertex & index buffer
-	class BufferDescriptor : public Descriptor {
-	public:
-		BufferDescriptor(ptrGBuffer gpubuffer, const UINT bufferSize)
-			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
-
-		void copyData(const void* data, UINT size);
-
-		inline void copyData(const void* data) { copyData(data, m_BufferSize); }
-
-		inline UINT Size() { return m_BufferSize; }
-
-	protected:
-		ptrGBuffer m_Buffer;
-		UINT m_BufferSize;
-		UINT m_Offset;
-	};
-
-
-	class HeapDescriptor {
-	public:
-		HeapDescriptor() { m_handle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_NULL; }
+		Descriptor() { m_handle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_NULL; }
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetHandle() const { return m_handle; }
 
-		bool IsCreated() { return  m_handle.ptr != D3D12_GPU_VIRTUAL_ADDRESS_NULL;  }
+		// For debug/assert use
+		virtual bool IsCreated() { return  m_handle.ptr != D3D12_GPU_VIRTUAL_ADDRESS_NULL;  }
 
 		// Bind Root descriptor, not sure if useful
 		/*inline void BindDescriptor(UINT destIndex) const
@@ -128,7 +97,21 @@ namespace Graphic {
 
 	protected:
 		D3D12_CPU_DESCRIPTOR_HANDLE m_handle;
+
 	};
+
+
+	// For 1d stuff: Constant, Vertex & index buffer
+	class BufferDescriptor : public Descriptor {
+	public:
+		//void copyData(const void* data, UINT size);
+
+		//inline void copyData(const void* data) { copyData(data, m_BufferSize); }
+		UINT Offset() const { return m_Offset; }
+	protected:
+		UINT m_Offset;
+	};
+
 
 /*****************************************************************
 
@@ -139,24 +122,32 @@ namespace Graphic {
 
 	class VertexBuffer : public BufferDescriptor {
 	public:
-		VertexBuffer(ptrGBuffer gpubuffer, const UINT bufferSize, const UINT strideSize);
+		VertexBuffer() { }
 		
-		
+		void CreateView(ptrGBuffer buffer, UINT size, UINT stride)
+		{
+			m_Offset = buffer->MemAlloc(size);
+			m_view.BufferLocation = buffer->GetGPUAddr() + m_Offset;
+			m_view.StrideInBytes = stride;
+			m_view.SizeInBytes = size;
+		}
+
+		bool IsCreated() override { return m_view.SizeInBytes != 0; };
+
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
 
-		inline UINT GetStrideSize() const { return m_strideSize; }
+		inline UINT GetStrideSize() const { return m_view.StrideInBytes; }
 
 	private:
-		const UINT m_strideSize;
 		D3D12_VERTEX_BUFFER_VIEW m_view;
 	};
 
 
 	class IndexBuffer : public BufferDescriptor  {
 	public:
-		IndexBuffer(ptrGBuffer gpubuffer, const UINT bufferSize);
+		IndexBuffer() { }
 
-		// TODO: Not working after some update...
+		// TODO: Not working after some update... and this comment is outdated after another update
 		// Suballocate from a index buffer
 		// Example use:
 		//		1. Create an large index buffer store everything
@@ -164,38 +155,63 @@ namespace Graphic {
 		//      3. When rendering, we're going to use the m_start variable
 		// IndexBuffer(IndexBuffer& buffer, const UINT start, const UINT end);
 
+		void CreateView(ptrGBuffer buffer, const UINT size) 
+		{
+			m_Offset = buffer->MemAlloc(size);
+			m_view.BufferLocation = buffer->GetGPUAddr() + m_Offset;
+			m_view.Format = DXGI_FORMAT_R32_UINT;
+			m_view.SizeInBytes = size;
+		}
+
+		bool IsCreated() override { return m_view.SizeInBytes != 0; };
+
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
 
 	private:
-		UINT m_start;
+		// UINT m_start;
 		D3D12_INDEX_BUFFER_VIEW m_view;
 	};
 
 
-	class ConstantBuffer : public BufferDescriptor {
+	class ConstantBuffer : public BufferDescriptor 
+	{
 	public:
 		// Create a CBV, descriptor Heap is nullptr if we are creating a normal cbv, 
 		// if provide decriptorHeap, we are creaing a root CBV
-		ConstantBuffer(ptrGBuffer gpubuffer, const UINT bufferSize);
+		ConstantBuffer() { }
 
-		void CreateView(DescriptorTable& table, UINT slot) override;
-
-		void CreateRootView() override;
-		
+		void CreateView(DescriptorTable* table, UINT slot, ptrGBuffer buffer, UINT size)
+		{	
+			size = CalculateConstantBufferByteSize(size);
+			assert(size % 256 == 0 && "Constant buffer size not aligned");
+			m_Offset = buffer->MemAlloc(size);
+			m_cbvDesc.BufferLocation = buffer->GetGPUAddr() + m_Offset;
+			m_cbvDesc.SizeInBytes = size;
+			
+			ID3D12Device* device = Engine::GetDevice();
+			if (table) {
+				m_handle = table->GetSlot(slot);
+				device->CreateConstantBufferView(&m_cbvDesc, m_handle);
+			}
+			else {
+				DescriptorHeap* initheap = Engine::GetInitHeap();
+				UINT HeapIndex = initheap->MallocHeap();
+				m_handle = initheap->GetCPUHandle(HeapIndex);
+				device->CreateConstantBufferView(&m_cbvDesc, m_handle);
+			}
+		}
 		// Method to use this CBV as a root CBV
 		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const 
 		{
 			// assert(m_isRootCBV && "CBV should be a root CBV to call this function");
 			return m_cbvDesc.BufferLocation; 
 		}
-
 	private:
-		UINT m_RootHeapIndex;		// Hack here since const buffer is a mix of Buffer & Heap buffer
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
 	};
 
 
-	class ShaderResource : public HeapDescriptor
+	class ShaderResource : public Descriptor
 	{
 	public:
 		void CreateView(DescriptorTable* table, UINT tableIndex, ID3D12Resource* resource, D3D12_SHADER_RESOURCE_VIEW_DESC* desc) 
@@ -214,7 +230,7 @@ namespace Graphic {
 	};
 
 
-	class UnorderedAccess : public HeapDescriptor
+	class UnorderedAccess : public Descriptor
 	{
 	public:
 		void CreateView(DescriptorTable* table, UINT tableIndex, ID3D12Resource* resource, D3D12_UNORDERED_ACCESS_VIEW_DESC* desc) 
@@ -233,7 +249,7 @@ namespace Graphic {
 	};
 
 
-	class RenderTarget : public HeapDescriptor
+	class RenderTarget : public Descriptor
 	{
 	public:
 		void CreateView(ID3D12Resource* resource, D3D12_RENDER_TARGET_VIEW_DESC* desc)
@@ -251,7 +267,7 @@ namespace Graphic {
 	};
 
 	
-	class DepthStencil : public HeapDescriptor
+	class DepthStencil : public Descriptor
 	{
 	public:
 		void CreateView(ID3D12Resource* resource, D3D12_DEPTH_STENCIL_VIEW_DESC* desc)

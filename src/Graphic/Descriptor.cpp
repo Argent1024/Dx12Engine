@@ -2,27 +2,18 @@
 #include "GPUMemManager.h"
 
 namespace Graphic {
-	void BufferDescriptor::copyData(const void* data, UINT size)
-	{ GPU::MemoryManager::UploadData(*m_Buffer, data, size, m_Offset); }
-
-	VertexBuffer::VertexBuffer(ptrGBuffer gpubuffer, const UINT bufferSize, const UINT strideSize)
-		:BufferDescriptor(gpubuffer, bufferSize), m_strideSize(strideSize)
-	{
-		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
-		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
-		m_view.StrideInBytes = m_strideSize;
-		m_view.SizeInBytes = m_BufferSize;
-	}
+	/*void BufferDescriptor::copyData(const void* data, UINT size)
+	{ GPU::MemoryManager::UploadData(*m_Buffer, data, size, m_Offset); }*/
 
 
-	IndexBuffer::IndexBuffer(ptrGBuffer gpubuffer, const UINT bufferSize)
+	/*IndexBuffer::IndexBuffer(ptrGBuffer gpubuffer, const UINT bufferSize)
 		: BufferDescriptor(gpubuffer, bufferSize), m_start(0)
 	{
 		m_Offset = m_Buffer->MemAlloc(m_BufferSize);
 		m_view.BufferLocation = m_Buffer->GetGPUAddr() + m_Offset;
 		m_view.Format = DXGI_FORMAT_R32_UINT;
 		m_view.SizeInBytes = m_BufferSize;
-	}
+	}*/
 
 	/*// TODO check whether buffersize & start is correct
 	IndexBuffer::IndexBuffer(IndexBuffer& buffer, const UINT start, const UINT end)
@@ -35,7 +26,7 @@ namespace Graphic {
 		m_view.SizeInBytes = m_BufferSize;
 	}*/
 
-	ConstantBuffer::ConstantBuffer(ptrGBuffer gpubuffer, const UINT bufferSize)
+	/*ConstantBuffer::ConstantBuffer(ptrGBuffer gpubuffer, const UINT bufferSize)
 		: BufferDescriptor(gpubuffer, CalculateConstantBufferByteSize(bufferSize)),
 		m_RootHeapIndex(-1)
 	{
@@ -59,5 +50,5 @@ namespace Graphic {
 		DescriptorHeap* initheap = Engine::GetInitHeap();
 		m_RootHeapIndex = initheap->MallocHeap();
 		device->CreateConstantBufferView(&m_cbvDesc, initheap->GetCPUHandle(m_RootHeapIndex));
-	}
+	}*/
 }
