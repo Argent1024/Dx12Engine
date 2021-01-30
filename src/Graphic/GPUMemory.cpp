@@ -1,7 +1,7 @@
 #include "GPUMemory.h"
 #include "GPUBuffer.h"
 #include "CommandQueue.h"
-
+/*
 namespace Graphic {
 
 	namespace GPU {
@@ -106,4 +106,4 @@ namespace Graphic {
 		}
 
 	}
-}
+} */

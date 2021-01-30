@@ -1,6 +1,7 @@
 #pragma once
 #include "Descriptor.h"
 
+
 #define ptrTexture std::shared_ptr<Graphic::Texture>
 
 namespace Graphic {
@@ -54,73 +55,17 @@ namespace Graphic {
 				CreateCBV(table, index);
 				break;
 			case Graphic::TEXTURE_DSV:
-				CreateDSV(table, index);
+				CreateDSV();
 				break;
 			case Graphic::TEXTURE_RTV:
-				CreateRTV(table, index);
+				CreateRTV();
 				break;
 			default:
 				break;
 			}
 		}
+	
 		
-		inline ShaderResource* GetShaderResourceView() const 
-		{ 
-			assert(m_Type & TEXTURE_SRV && "SRV not created for this texture");
-			return m_SRV; 
-		}
-		
-		inline UnorderedAccess* GetUnorderedAccessView() const 
-		{ 
-			assert(m_Type & TEXTURE_UAV && "DSV not created for this texture");
-			return m_UAV; 
-		}
-
-		inline DepthStencil* GetDepthStencilView() const 
-		{
-			assert(m_Type & TEXTURE_DSV && "DSV not created for this texture");
-			return m_DSV; 
-		}
-
-		inline RenderTarget* GetRenderTargetView() const
-		{
-			assert(m_Type & TEXTURE_RTV && "RTV not created for this texture");
-			return m_RTV; 
-		}
-
-		// Write texture data to gpu memory
-		// Only need to upload once since all views point to the same memory!
-		inline void UploadTexture(D3D12_SUBRESOURCE_DATA* data) {
-			assert(m_Type & TEXTURE_SRV  && "The Texture type doesn't contain SRV");
-
-			// May not init SRV when calling upload
-			// m_SRV->CopyTexture(&data); 
-			Engine::MemoryAllocator.UploadTexure(*m_gpuMem, data);
-		}
-
-		// Create 1d texture data
-		template <class T>
-		static D3D12_SUBRESOURCE_DATA CreateTextureData(const std::vector<T>&  data) {
-			D3D12_SUBRESOURCE_DATA textureData = {};
-			textureData.pData = &data[0];
-			textureData.RowPitch = data.size() * sizeof(T);
-			textureData.SlicePitch = data.size() * sizeof(T);
-			return textureData;
-		}
-		
-		// Create 2d texture data
-		static D3D12_SUBRESOURCE_DATA CreateTextureData(
-			const ImageMetadata& metadata, 
-			const std::vector<UINT8>& data) 
-		{
-			D3D12_SUBRESOURCE_DATA textureData = {};
-			// Set infomation to m_textureData
-			textureData.pData = &data[0];
-			textureData.RowPitch = metadata.width * metadata.pixelSize;
-			textureData.SlicePitch = textureData.RowPitch * metadata.height;
-			return textureData;
-		}
-
 		// Create 2d texture data (helper method for stb_image, so don't need to copy the image again)
 		static D3D12_SUBRESOURCE_DATA CreateTextureData(
 			const ImageMetadata& metadata, 
@@ -146,23 +91,14 @@ namespace Graphic {
 		virtual void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "CBV not implemented!"); }
 		virtual void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "SRV not implemented!"); }
 		virtual void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "UAV not implemented!"); }
-		virtual void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "DSV not implemented!"); }
-		virtual void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "RTV not implemented!"); }
-		
-
-		ptrGPUMem m_gpuMem;
+		virtual void CreateDSV() { assert(FALSE && "DSV not implemented!"); }
+		virtual void CreateRTV() { assert(FALSE && "RTV not implemented!"); }
 
 		// Store or value for texture_type
 		// EX: m_Type = TEXUTRE_SRV | TEXTURE_UAV | TEXTURE_DSV
 		const UINT m_Type;
 
-		// TODO Use clever way
-		ConstantBuffer* m_CBV;
-		ShaderResource* m_SRV;
-		UnorderedAccess* m_UAV;
-		DepthStencil* m_DSV;
-		RenderTarget* m_RTV;
-
+		// TODO, actually don't need to store this
 		D3D12_RESOURCE_DESC m_textureDesc;
 	};
 
@@ -180,8 +116,9 @@ namespace Graphic {
 		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		//void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		//void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		
+		ptrGBuffer m_buffer;
+
 		UINT m_elementNum;
 		UINT m_stride;
 		UINT m_totalSize;
@@ -195,7 +132,15 @@ namespace Graphic {
 
 		Texture2D(std::string& filename, UINT type=TEXTURE_SRV);
 
+		// Write texture data to gpu memory
+		// Only need to upload once since all views point to the same memory!
+		inline void UploadTexture(D3D12_SUBRESOURCE_DATA* data) {
+			GPU::MemoryManager::UploadTexure(*m_buffer, data);
+		}
+
 	private:
+		ptrTBuffer m_buffer;
+
 		void TextureDescHelper(UINT width, UINT height);
 
 		// After we have m_textureDesc and m_Type Allocate GPU memory and create texture
@@ -206,8 +151,8 @@ namespace Graphic {
 		//void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		//void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateDSV() override;
+		void CreateRTV() override;
 	};
 
 	
@@ -231,27 +176,5 @@ namespace Graphic {
 
 	};
 
-	/*
-	class Texture3D : public Texture 
-	{
-	public:
-		Texture3D(UINT type=TEXTURE_SRV);
-
-	private:
-		void TextureDescHelper();
-
-		// After we have m_textureDesc and m_Type Allocate GPU memory and create texture
-		void Initialize();
-
-		ImageMetadata LoadFromImage(std::string& filename, unsigned char*& data);
-
-		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-
-	};
-	*/
 
 }

@@ -97,7 +97,7 @@ namespace Graphic {
 			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
 
 		inline void copyData(const void* data, UINT size) 
-		{ Engine::MemoryAllocator.UploadData(*m_Buffer, data, size, m_Offset); }
+		{ GPU::MemoryManager::UploadData(*m_Buffer, data, size, m_Offset); }
 
 		inline void copyData(const void* data) { copyData(data, m_BufferSize); }
 
@@ -118,7 +118,7 @@ namespace Graphic {
 
 		inline void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData)
 		{
-			Engine::MemoryAllocator.UploadTexure(*m_Buffer, textureData);
+			GPU::MemoryManager::UploadTexure(*m_Buffer, textureData);
 		}
 
 		// Simple Bind function, just bind one descriptor to InUse heap (Use Graphics::BindMultiDescriptor instead)
