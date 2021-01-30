@@ -1,10 +1,7 @@
 #pragma once
 #include "GPUBuffer.h"
-#include "CommandQueue.h"
 
-using ptrGMem = std::shared_ptr<GPU::GPUMemory>;
-using ptrGBuffer = std::shared_ptr<GPU::GPUBuffer>;
-using ptrTBuffer = std::shared_ptr<GPU::Texturebuffer>;
+class Graphic::CommandList;
 
 namespace GPU 
 {
@@ -24,8 +21,8 @@ namespace GPU
 			return ptrTBuffer();
 		}
 
-		static void UploadData(GPUBuffer& dest, const void* data, UINT dataSize, UINT offset)
-		{
+		static void UploadData(GPUBuffer& dest, const void* data, UINT dataSize, UINT offset);
+		/*{
 			// Always assume dest always in default heap
 			D3D12_HEAP_PROPERTIES heapProp;
 			dest.GetHeapProp(&heapProp, nullptr);
@@ -44,11 +41,11 @@ namespace GPU
 
 			// Copy it to dest
 			_CopyBuffer(dest, TempUploadBuffer);
-		}
+		}*/
 
 		// TODO still need to change this later
-		static void UploadTexure(Texturebuffer& dest, D3D12_SUBRESOURCE_DATA* textureData)
-		{	
+		static void UploadTexure(Texturebuffer& dest, D3D12_SUBRESOURCE_DATA* textureData);
+		/*{	
 			// Always assume dest always in default heap
 			D3D12_HEAP_PROPERTIES heapProp;
 			dest.GetHeapProp(&heapProp, nullptr);
@@ -72,12 +69,12 @@ namespace GPU
 			CopyHelper.ExecuteCommandList(&copycl);
 			CopyHelper.End();
 			CopyHelper.Start();
-		}
+		}*/
 
 	private:
 
-		static void _CopyBuffer(GPUBuffer& dest, GPUBuffer& src)  
-		{
+		static void _CopyBuffer(GPUBuffer& dest, GPUBuffer& src);
+		/*{
 			UINT size = src.GetBufferSize();
 			UINT destSize = dest.GetBufferSize();
 			UINT destOffset = dest.MemAlloc(0);
@@ -89,7 +86,7 @@ namespace GPU
 			CopyHelper.ExecuteCommandList(&copycl);
 			CopyHelper.End();
 			CopyHelper.Start();
-		}
+		}*/
 	};
 
 

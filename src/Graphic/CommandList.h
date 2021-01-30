@@ -89,7 +89,7 @@ namespace Graphic {
 		inline void SetScissorRects(const CD3DX12_RECT* scissorRect) { m_commandList->RSSetScissorRects(1, scissorRect); }
 		
 		// GPU memory 
-		inline void ResourceBarrier(const GPU::GPUMemory& gpumem, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) { m_commandList->ResourceBarrier(1, &(gpumem.Barrier(before, after))); }
+		inline void ResourceBarrier(GPU::GPUMemory& gpumem, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) { m_commandList->ResourceBarrier(1, &(gpumem.Barrier(before, after))); }
 		
 		inline void CopyBufferRegion(GPU::GPUMemory& dest, UINT destOffset, GPU::GPUMemory& src, UINT srcOffset, UINT sizeBytes)  {
 			m_commandList->CopyBufferRegion(dest.GetResource(), destOffset, src.GetResource(), srcOffset, sizeBytes); 

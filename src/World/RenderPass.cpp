@@ -22,10 +22,12 @@ namespace Game {
 	
 
 		// Creata CBV 
+		/*
 		const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(DefaultRenderPass::ConstBufferData));
 		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
 		m_CBV = new Graphic::ConstantBuffer(gpumem, cbvSize); // Bind at slot 0
 		m_CBV->CreateView(*m_DescriptorTable, 0);
+		*/
 
 		// The other textures needed is binded outside by render engine
 	}

@@ -25,7 +25,9 @@ namespace Game {
 			const UINT indexBufferSize = index.size() * sizeof(UINT);
 
 			// Allocate memory from gpu to store vertex buffer and index buffer
-			ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(vertexBufferSize + indexBufferSize);
+			ptrGBuffer gpumem = GPU::MemoryManager::CreateGBuffer();
+			gpumem->Initialize(vertexBufferSize + indexBufferSize);
+			
 			m_VertexBuffer = std::make_shared<Graphic::VertexBuffer>(gpumem, vertexBufferSize, sizeof(Vertex));
 			m_VertexBuffer->copyData(&vertex[0]);
 		
@@ -69,7 +71,7 @@ namespace Game {
 
 	};
 
-	// Class that store point, used for particle system
+	/*// Class that store point, used for particle system
 	class PointMesh : public Mesh {
 	public:
 		template <class Vertex>
@@ -87,6 +89,6 @@ namespace Game {
 		static const D3D_PRIMITIVE_TOPOLOGY TopologyType = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
 	protected:
 		ptrVertexBuffer m_VertexBuffer;
-	};
+	};*/
 
 }

@@ -75,7 +75,6 @@ namespace Graphic {
 
 		m_buffer = GPU::MemoryManager::CreateGBuffer();
 		m_buffer->Initialize(m_totalSize);
-		// CreateViews();
 	}
 
 	TextureBuffer::TextureBuffer(UINT totalSize) : 
@@ -89,66 +88,44 @@ namespace Graphic {
 
 	void TextureBuffer::CreateCBV(DescriptorTable* table, UINT tableIndex) 
 	{
-		if (!m_CBV) {
+		/*if (!m_CBV) {
 			m_CBV = new ConstantBuffer(m_buffer, m_totalSize);
 		}
 		if (table) {
 			m_CBV->CreateView(*table, tableIndex);
 		} else {
 			m_CBV->CreateRootView();
-		}
+		}*/
 	}
 
 	void TextureBuffer::CreateSRV(DescriptorTable* table, UINT tableIndex) 
 	{
-		if (!m_SRV) {
-			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-			srvDesc.Buffer.FirstElement = 0;
-			srvDesc.Buffer.NumElements = m_elementNum;
-			srvDesc.Buffer.StructureByteStride = m_stride;
-			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-			m_SRV = new ShaderResource(m_buffer, srvDesc);
-		}
-		if (table) {
-			m_SRV->CreateView(*table, tableIndex);
-		} else {
-			m_SRV->CreateRootView();
-		}
+	
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		srvDesc.Buffer.FirstElement = 0;
+		srvDesc.Buffer.NumElements = m_elementNum;
+		srvDesc.Buffer.StructureByteStride = m_stride;
+		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		
+		m_SRV.CreateView(table, tableIndex, m_buffer->GetResource(), &srvDesc);
 	}
 
 	void TextureBuffer::CreateUAV(DescriptorTable* table, UINT tableIndex) 
 	{
-		if (!m_UAV) {
-			D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-			uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-			uavDesc.Buffer.FirstElement = 0;
-			uavDesc.Buffer.NumElements = m_elementNum;
-			uavDesc.Buffer.StructureByteStride = m_stride;
-			uavDesc.Buffer.CounterOffsetInBytes = 0;
-			uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-			m_UAV = new UnorderedAccess(m_buffer, uavDesc);
-		}
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+		uavDesc.Buffer.FirstElement = 0;
+		uavDesc.Buffer.NumElements = m_elementNum;
+		uavDesc.Buffer.StructureByteStride = m_stride;
+		uavDesc.Buffer.CounterOffsetInBytes = 0;
+		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 
-		if (table) {
-			m_UAV->CreateView(*table, tableIndex);
-		} else {
-			m_UAV->CreateRootView();
-		}
+		m_UAV.CreateView(table, tableIndex, m_buffer->GetResource(), &uavDesc);
 	}
-
-	//void TextureBuffer::CreateDSV(DescriptorTable* table, UINT tableIndex) 
-	//{
-	//	assert(false && "Not implementend!");
-	//}
-
-	//void TextureBuffer::CreateRTV(DescriptorTable* table, UINT tableIndex) 
-	//{
-	//	assert(false && "Not implementend!");
-	//}
 
 	Texture2D::Texture2D(UINT width, UINT height, UINT type, bool loadChessBoard)
 		: Texture(type)
@@ -160,7 +137,7 @@ namespace Graphic {
 			std::vector<UINT8> data;
 			LoadChessBoard(width, height, 4, data);
 			D3D12_SUBRESOURCE_DATA textureData = 
-			CreateTextureData({ (int)m_textureDesc.Width, (int)m_textureDesc.Height, 4, 4}, data);
+			CreateTextureData({ (int)m_textureDesc.Width, (int)m_textureDesc.Height, 4, 4}, &data[0]);
 			UploadTexture(&textureData);
 		}
 	}
@@ -203,6 +180,7 @@ namespace Graphic {
 
 	void Texture2D::Initialize() 
 	{
+		m_buffer = GPU::MemoryManager::CreateTBuffer();
 		if (m_Type & TEXTURE_DSV) {
 			// Change Texture format to D32
 			m_textureDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -216,16 +194,12 @@ namespace Graphic {
 			clearValue.DepthStencil.Depth = 1.0f;
 			clearValue.DepthStencil.Stencil = 0;
 
-			m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc, clearValue, D3D12_HEAP_TYPE_DEFAULT, initState);
-			// Emmmmm Hack here TODO Format
-			// Since SRV only use R32 not D32
+			m_buffer->Initialize(&m_textureDesc, &clearValue);
+			// Change back to R32 from D32
 			m_textureDesc.Format = DXGI_FORMAT_R32_FLOAT;
-		} else {
-			m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
-		}
 
-		if (m_Type & TEXTURE_RTV) {
-			throw std::runtime_error("Not Implemented!");
+		} else {
+			m_buffer->Initialize(&m_textureDesc);
 		}
 	}
 
@@ -243,10 +217,6 @@ namespace Graphic {
 		// LoadWICTextureFromFile()
 	}
 
-	/*void Texture2D::CreateCBV(DescriptorTable* table, UINT tableIndex) {
-		assert(FALSE && "Why Creating 2d CBV? ");
-	}*/
-
 	void Texture2D::CreateSRV(DescriptorTable* table, UINT tableIndex)  
 	{
 		// Describe SRV
@@ -256,17 +226,7 @@ namespace Graphic {
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
 
-		// Create SRV
-		ID3D12Device* device = Engine::GetDevice();
-		if(table) {
-			D3D12_CPU_DESCRIPTOR_HANDLE handle = table->GetSlot(tableIndex);
-			device->CreateShaderResourceView(m_buffer->GetResource(), &srvDesc, handle);
-		} else {
-			DescriptorHeap* initheap = Engine::GetInitHeap();
-			UINT RootHeapIndex = initheap->MallocHeap();
-			D3D12_CPU_DESCRIPTOR_HANDLE handle = initheap->GetCPUHandle(RootHeapIndex);
-			device->CreateShaderResourceView(m_buffer->GetResource(), &srvDesc, handle);
-		}
+		m_SRV.CreateView(table, tableIndex, m_buffer->GetResource(), &srvDesc);
 	}
 
 	/*void Texture2D::CreateUAV(DescriptorTable* table, UINT tableIndex)  {
@@ -280,12 +240,8 @@ namespace Graphic {
 		dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
 		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-		m_DSV = new DepthStencil(m_buffer, dsvDesc, Engine::GetDSVHeap());
-		m_DSV->CreateRootView();
-		}	
-		else {
-			std::cout << "WARNGING, Creating a DSV Twice"<<std::endl;
-		}
+
+		m_DSV.CreateView(m_buffer->GetResource(), &dsvDesc);
 	}
 
 	void Texture2D::CreateRTV()  
@@ -294,16 +250,7 @@ namespace Graphic {
 		//rtvDesc.Format = m_textureDesc.Format;
 		//rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 		throw std::runtime_error("Not Implemented!");
-		//m_RTV = new RenderTarget(m_gpuMem, rtvDesc, Engine::GetRTVHeap());
-		if (!m_RTV) {
-			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = { };
-			rtvDesc.Format = m_textureDesc.Format;
-			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-			m_RTV = new RenderTarget(m_buffer, rtvDesc, Engine::GetRTVHeap());
-		} else {
-			std::cout << "WARNING, Creating a RTV twice" << std::endl;
-		}
-		
+		//m_RTV = new RenderTarget(m_gpuMem, rtvDesc, Engine::GetRTVHeap())		
 	}
 
 	TextureCube::TextureCube(UINT resolution, UINT type) 
@@ -329,33 +276,18 @@ namespace Graphic {
 
 	void TextureCube::Initialize()
 	{
-		m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
+		// m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
 	}
 
 	void TextureCube::CreateSRV(DescriptorTable* table, UINT tableIndex)
 	{
-		if (!m_SRV) {
-			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			srvDesc.Format = m_textureDesc.Format;
-			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-			srvDesc.Texture2D.MipLevels = 1;
-			m_SRV = new ShaderResource(m_gpuMem, srvDesc);
-		}
-
-		if(table) {
-			m_SRV->CreateView(*table, tableIndex);
-		} else {
-			m_SRV->CreateRootView();
-		}
+		
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc.Format = m_textureDesc.Format;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+		srvDesc.Texture2D.MipLevels = 1;
+		
 	}
 	
-	/*
-	void Texture3D::TextureDescHelper() 
-	{
-		// DirectX::LoadWICTextureFromMemory();
-
-	} */
-
-
 }

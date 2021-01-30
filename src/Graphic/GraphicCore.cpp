@@ -72,7 +72,7 @@ void Engine::EnableDebug()
 }	
 
 
-Graphic::GPU::MemoryAllocator Engine::MemoryAllocator;
+// Graphic::GPU::MemoryAllocator Engine::MemoryAllocator;
 Graphic::CommandManager CopyHelper(1);
 Graphic::CommandManager GraphicsCommandManager(2);
 

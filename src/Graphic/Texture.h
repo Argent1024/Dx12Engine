@@ -1,6 +1,6 @@
 #pragma once
 #include "Descriptor.h"
-
+#include "GPUMemManager.h"
 
 #define ptrTexture std::shared_ptr<Graphic::Texture>
 
@@ -85,6 +85,12 @@ namespace Graphic {
 		{
 			
 		} */
+
+		// ConstantBuffer  m_CBV;
+		ShaderResource  m_SRV;
+		UnorderedAccess m_UAV;
+		RenderTarget    m_RTV;
+		DepthStencil    m_DSV;
 
 	protected:
 		// Create the SRV & UAV at the table at tableIndex
@@ -172,7 +178,7 @@ namespace Graphic {
 
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		// void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateRTV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
+		void CreateRTV() override;
 
 	};
 

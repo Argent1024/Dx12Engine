@@ -87,7 +87,7 @@ namespace GPU {
 	};
 
 
-
+	// TODO Same name with Texture.h
 	class Texturebuffer : public GPUMemory
 	{
 	public:

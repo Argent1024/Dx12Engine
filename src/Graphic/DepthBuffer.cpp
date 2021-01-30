@@ -13,6 +13,6 @@ namespace Graphic
 	{
 		//  TODO TEST
 		m_depthTexture.CreateView(TEXTURE_DSV);
-		m_dsvHandle = m_depthTexture.GetDepthStencilView()->GetDSVCPUHandle();
+		m_dsvHandle = m_depthTexture.m_DSV.GetHandle();
 	}
 }

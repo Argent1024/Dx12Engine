@@ -20,11 +20,11 @@ namespace Game {
 	{
 		m_LightsTable = new Graphic::DescriptorTable(LightTableSize);
 
-		UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneLightsInfo));
+		/*UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneLightsInfo));
 		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
 		// Create CBV at slot 0 of the lightTable
 		m_LightsCBV = new Graphic::ConstantBuffer(gpumem, cbvSize);
-		m_LightsCBV->CreateView(*m_LightsTable, 0);
+		m_LightsCBV->CreateView(*m_LightsTable, 0);*/
 		
 		// Other Textures should be bind outside
 	}

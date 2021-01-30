@@ -1,13 +1,15 @@
 #pragma once
 
-#include "GPUMemManager.h"
+#include "GPUBuffer.h"
 #include "DescriptorHeap.h"
 
 #define ptrVertexBuffer std::shared_ptr<Graphic::VertexBuffer>
 #define ptrIndexBuffer std::shared_ptr<Graphic::IndexBuffer>
 #define ptrCBV std::shared_ptr<Graphic::ConstantBuffer>
-#define ptrSRV std::shared_ptr<Graphic::ShaderResource>
-#define ptrUAV std::shared_ptr<Graphic::UnorderedAccess>
+
+using ptrGMem = std::shared_ptr<GPU::GPUMemory>;
+using ptrGBuffer = std::shared_ptr<GPU::GPUBuffer>;
+using ptrTBuffer = std::shared_ptr<GPU::Texturebuffer>;
 
 namespace Graphic {
 	// Only bind srv_uav_cbv
@@ -96,8 +98,7 @@ namespace Graphic {
 		BufferDescriptor(ptrGBuffer gpubuffer, const UINT bufferSize)
 			: m_Buffer(gpubuffer), m_BufferSize(bufferSize) {}
 
-		inline void copyData(const void* data, UINT size) 
-		{ GPU::MemoryManager::UploadData(*m_Buffer, data, size, m_Offset); }
+		void copyData(const void* data, UINT size);
 
 		inline void copyData(const void* data) { copyData(data, m_BufferSize); }
 
@@ -110,32 +111,24 @@ namespace Graphic {
 	};
 
 
-	// Base class for those view who use descriptor heap to bind 
-	class HeapDescriptor : public Descriptor {
+	class HeapDescriptor {
 	public:
-		HeapDescriptor(ptrTBuffer gpubuffer)
-			: m_Buffer(gpubuffer), m_RootHeapIndex(-1) {}
+		HeapDescriptor() { m_handle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_NULL; }
 
-		inline void CopyTexture(D3D12_SUBRESOURCE_DATA* textureData)
-		{
-			GPU::MemoryManager::UploadTexure(*m_Buffer, textureData);
-		}
+		D3D12_CPU_DESCRIPTOR_HANDLE GetHandle() const { return m_handle; }
 
-		// Simple Bind function, just bind one descriptor to InUse heap (Use Graphics::BindMultiDescriptor instead)
-		// Copy this descriptor to the in use descriptor heap for rendering
-		// This function should be called only when we are using the descriptor as root descriptor
-		inline void BindDescriptor(UINT destIndex) const
+		bool IsCreated() { return  m_handle.ptr != D3D12_GPU_VIRTUAL_ADDRESS_NULL;  }
+
+		// Bind Root descriptor, not sure if useful
+		/*inline void BindDescriptor(UINT destIndex) const
 		{
 			assert(m_RootHeapIndex != -1 && "Descriptor not created");
 			BindMultiDescriptor(m_RootHeapIndex, 1, destIndex);
-		}
+		}*/
 
 	protected:
-		ptrTBuffer m_Buffer;
-		UINT m_RootHeapIndex; // If we are using this descriptor as root signature, store it's location in the init heap
-							  // Or in DSV / RTV this is used to store the descriptor
+		D3D12_CPU_DESCRIPTOR_HANDLE m_handle;
 	};
-
 
 /*****************************************************************
 
@@ -202,66 +195,75 @@ namespace Graphic {
 	};
 
 
-	class ShaderResource : HeapDescriptor {
+	class ShaderResource : public HeapDescriptor
+	{
 	public:
-		ShaderResource(ptrTBuffer gpubuffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& desc);
-
-		void CreateView(DescriptorTable& table, UINT slot) override;
-
-		void CreateRootView() override;
-
-	private:
-		D3D12_SHADER_RESOURCE_VIEW_DESC m_srvDesc;
-	};
-
-
-
-	class UnorderedAccess : public HeapDescriptor {
-	public:
-		UnorderedAccess(ptrTBuffer gpubuffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& desc);
-	
-		void CreateView(DescriptorTable& table, UINT slot) override;
-
-		void CreateRootView() override;
-
-	private:
-		D3D12_UNORDERED_ACCESS_VIEW_DESC m_uavDesc;
-	};
-
-	
-	class RenderTarget : public HeapDescriptor {
-	public:
-		RenderTarget(ptrTBuffer gpubuffer, const D3D12_RENDER_TARGET_VIEW_DESC& desc, DescriptorHeap* descriptorHeap);
-
-		void CreateView(DescriptorTable& table, UINT slot) override 
-		{ assert(FALSE && "RTV should not call this function"); };
-
-		void CreateRootView() override;
-
-	private:
-		D3D12_RENDER_TARGET_VIEW_DESC m_rtvDesc;
-		DescriptorHeap* m_DescriptorHeap;
-	};
-
-
-	class DepthStencil : public HeapDescriptor {
-	public:
-		DepthStencil(ptrTBuffer gpubuffer, const D3D12_DEPTH_STENCIL_VIEW_DESC & desc, DescriptorHeap* descriptorHeap);
-
-		void CreateView(DescriptorTable& table, UINT slot) override 
-		{ assert(FALSE && "DSV should not call this function"); };
-
-		void CreateRootView() override;
-
-		inline CD3DX12_CPU_DESCRIPTOR_HANDLE GetDSVCPUHandle() const 
+		void CreateView(DescriptorTable* table, UINT tableIndex, ID3D12Resource* resource, D3D12_SHADER_RESOURCE_VIEW_DESC* desc) 
 		{
-			assert(m_RootHeapIndex != -1 && "dsv not init yet");
-			return m_dsvHandle; 
+			ID3D12Device* device = Engine::GetDevice();
+			if(table) {
+				m_handle = table->GetSlot(tableIndex);
+				device->CreateShaderResourceView(resource, desc, m_handle);
+			} else {
+				DescriptorHeap* initheap = Engine::GetInitHeap();
+				UINT RootHeapIndex = initheap->MallocHeap();
+				m_handle = initheap->GetCPUHandle(RootHeapIndex);
+				device->CreateShaderResourceView(resource, desc, m_handle);
+			}
+		}
+	};
+
+
+	class UnorderedAccess : public HeapDescriptor
+	{
+	public:
+		void CreateView(DescriptorTable* table, UINT tableIndex, ID3D12Resource* resource, D3D12_UNORDERED_ACCESS_VIEW_DESC* desc) 
+		{
+			ID3D12Device* device = Engine::GetDevice();
+			if(table) {
+				m_handle = table->GetSlot(tableIndex);
+				device->CreateUnorderedAccessView(resource, nullptr, desc, m_handle);
+			} else {
+				DescriptorHeap* initheap = Engine::GetInitHeap();
+				UINT RootHeapIndex = initheap->MallocHeap();
+				m_handle = initheap->GetCPUHandle(RootHeapIndex);
+				device->CreateUnorderedAccessView(resource, nullptr, desc, m_handle);
+			}
+		}
+	};
+
+
+	class RenderTarget : public HeapDescriptor
+	{
+	public:
+		void CreateView(ID3D12Resource* resource, D3D12_RENDER_TARGET_VIEW_DESC* desc)
+		{
+			DescriptorHeap* heap = Engine::GetRTVHeap();
+			ID3D12Device* device = Engine::GetDevice();
+
+			UINT RootHeapIndex = heap->MallocHeap();
+			m_handle = heap->GetCPUHandle(RootHeapIndex);
+
+			device->CreateRenderTargetView(resource, desc, m_handle);
 		}
 
-	private:
-		DescriptorHeap* m_DescriptorHeap;
-		D3D12_DEPTH_STENCIL_VIEW_DESC m_dsvDesc;
-		CD3DX12_CPU_DESCRIPTOR_HANDLE m_dsvHandle;
+		D3D12_CPU_DESCRIPTOR_HANDLE m_handle;
 	};
+
+	
+	class DepthStencil : public HeapDescriptor
+	{
+	public:
+		void CreateView(ID3D12Resource* resource, D3D12_DEPTH_STENCIL_VIEW_DESC* desc)
+		{
+			DescriptorHeap* heap = Engine::GetDSVHeap();
+			ID3D12Device* device = Engine::GetDevice();
+
+			UINT RootHeapIndex = heap->MallocHeap();
+			m_handle = heap->GetCPUHandle(RootHeapIndex);
+
+			device->CreateDepthStencilView(resource, desc, m_handle);
+		}
+	};
+
 }
