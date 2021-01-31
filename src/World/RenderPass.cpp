@@ -22,12 +22,15 @@ namespace Game {
 	
 
 		// Creata CBV 
-		/*
+		
 		const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(DefaultRenderPass::ConstBufferData));
-		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
-		m_CBV = new Graphic::ConstantBuffer(gpumem, cbvSize); // Bind at slot 0
-		m_CBV->CreateView(*m_DescriptorTable, 0);
-		*/
+		
+		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
+		buffer->Initialize(cbvSize);	// TODO need upload? or default is fine?
+
+		m_CBV.Initialze(buffer, cbvSize);
+		m_CBV.CreateView(m_DescriptorTable, 0);
+		
 
 		// The other textures needed is binded outside by render engine
 	}
@@ -46,7 +49,7 @@ namespace Game {
 		XMStoreFloat3(&m_CBVData.CameraPos, cameraPos);
 		
 		// Copy to CBV
-		m_CBV->copyData(&m_CBVData);//, sizeof(CameraBufferData));
+		m_CBV.copyData(&m_CBVData);//, sizeof(CameraBufferData));
 	}
 
 	void DefaultRenderPass::Render(Graphic::CommandList& commandList, Scene& scene) {

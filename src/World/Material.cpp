@@ -4,15 +4,17 @@
 namespace Game {
 
 	PrincipleMaterial::PrincipleMaterial() 
-		:	m_MatCBV(Engine::MemoryAllocator.CreateCommittedBuffer(MatCBVSize), MatCBVSize)
 	{
 		assert(sizeof(PrincipleMaterial::MatData) % 16 == 0);
 
+		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
+		buffer->Initialize(MatCBVSize);
+		m_MatCBV.Initialze(buffer, MatCBVSize);
 	}
 
 	void PrincipleMaterial::BindMaterialAt(Graphic::DescriptorTable& table) 
 	{
-		m_MatCBV.CreateView(table, MatCBV);
+		m_MatCBV.CreateView(&table, MatCBV);
 
 		if (m_MatData.CTexture) { BindTexture(DiffuseTex, table); }
 		if (m_MatData.NTexture) { BindTexture(NormalTex, table); }

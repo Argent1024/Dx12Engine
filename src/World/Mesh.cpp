@@ -15,20 +15,20 @@ namespace Game {
 	void TriangleMesh::Draw(Graphic::CommandList& commandList) {
 		// TODO modify
 		// Index buffer store UINT so, num of index == buffersize / sizeof(UINT)
-		UINT IndexCountPerINstance = m_IndexBuffer->GetSize() / sizeof(UINT);
+		UINT IndexCountPerINstance = m_IndexBuffer->Size() / sizeof(UINT);
 		commandList.DrawIndexedInstanced(IndexCountPerINstance, 1, 0, 0, 0);
 	}
 
-	void PointMesh::UseMesh(Graphic::CommandList& commandList) {
-		commandList.SetPrimitiveTopology(TopologyType);
-		commandList.SetVertexBuffer(*m_VertexBuffer);
-	}
+	//void PointMesh::UseMesh(Graphic::CommandList& commandList) {
+	//	commandList.SetPrimitiveTopology(TopologyType);
+	//	commandList.SetVertexBuffer(*m_VertexBuffer);
+	//}
 
-	void PointMesh::Draw(Graphic::CommandList& commandList) {
-		// Need vertex buffer stride size to get num of vertex
-		UINT pointSize = m_VertexBuffer->GetSize() / m_VertexBuffer->GetStrideSize();
-		commandList.DrawInstanced(pointSize, 1, 0, 0);
-	}
+	//void PointMesh::Draw(Graphic::CommandList& commandList) {
+	//	// Need vertex buffer stride size to get num of vertex
+	//	UINT pointSize = m_VertexBuffer->GetSize() / m_VertexBuffer->GetStrideSize();
+	//	commandList.DrawInstanced(pointSize, 1, 0, 0);
+	//}
 
 	ptrMesh TriangleMesh::GetXYPlane(UINT subdivision) 
 	{

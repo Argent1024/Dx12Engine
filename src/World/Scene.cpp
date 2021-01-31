@@ -20,12 +20,15 @@ namespace Game {
 	{
 		m_LightsTable = new Graphic::DescriptorTable(LightTableSize);
 
-		/*UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneLightsInfo));
-		ptrGPUMem gpumem = Engine::MemoryAllocator.CreateCommittedBuffer(cbvSize);
+		UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneLightsInfo));
+
+		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
+		buffer->Initialize(cbvSize);
+
 		// Create CBV at slot 0 of the lightTable
-		m_LightsCBV = new Graphic::ConstantBuffer(gpumem, cbvSize);
-		m_LightsCBV->CreateView(*m_LightsTable, 0);*/
-		
+		m_LightsCBV.Initialze(buffer, cbvSize);
+		m_LightsCBV.CreateView(m_LightsTable, 0);
+	
 		// Other Textures should be bind outside
 	}
 
@@ -59,7 +62,7 @@ namespace Game {
 	{
 		// UINT size = sizeof(SceneLightsInfo);
 		//TODO ERROR when only copying with size
-		m_LightsCBV->copyData(&m_LightInfo);// , sizeof(SceneLightsInfo));
+		m_LightsCBV.copyData(&m_LightInfo);// , sizeof(SceneLightsInfo));
 	}
 
 	void Scene::AddGameObj(GObject* obj) 

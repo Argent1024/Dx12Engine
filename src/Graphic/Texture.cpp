@@ -250,7 +250,7 @@ namespace Graphic {
 		//rtvDesc.Format = m_textureDesc.Format;
 		//rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 		throw std::runtime_error("Not Implemented!");
-		//m_RTV = new RenderTarget(m_gpuMem, rtvDesc, Engine::GetRTVHeap())		
+		//m_RTV = new RenderTargetView(m_gpuMem, rtvDesc, Engine::GetRTVHeap())		
 	}
 
 	TextureCube::TextureCube(UINT resolution, UINT type) 

@@ -68,7 +68,7 @@ namespace Game {
 
 	private:
 		ConstBufferData m_CBVData;
-		Graphic::ConstantBuffer* m_CBV;
+		Graphic::ConstantBuffer m_CBV;
 	};
 
 

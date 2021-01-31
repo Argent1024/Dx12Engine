@@ -5,14 +5,17 @@ namespace Game {
 	
 	GObject::GObject() 
 		: m_table(4), // TODO table size according to material
-		  m_CBV(Engine::MemoryAllocator.CreateCommittedBuffer(cbSize, D3D12_HEAP_TYPE_UPLOAD), 
-			    cbSize)
+		  m_CBV()
 	{
 		// TODO Fix this
 		m_state = new Physic::PState();
 
-		// slot 0 in the table is for const data
-		m_CBV.CreateView(m_table, 0);
+		// Slot 0 in the table is for const data
+		// Init CBV and put CBV to slot 0 in the descriptor table
+		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
+		buffer->Initialize(cbSize);	// TODO need upload? or default is fine?
+		m_CBV.Initialze(buffer, cbSize);
+		m_CBV.CreateView(&m_table, 0);
 	}
 
 	void GObject::RecordCommand(Graphic::CommandList& commandList) {

@@ -9,7 +9,7 @@
 
 using ptrGMem = std::shared_ptr<GPU::GPUMemory>;
 using ptrGBuffer = std::shared_ptr<GPU::GPUBuffer>;
-using ptrTBuffer = std::shared_ptr<GPU::Texturebuffer>;
+using ptrTBuffer = std::shared_ptr<GPU::TextureBuffer>;
 
 namespace Graphic {
 	// Only bind srv_uav_cbv
@@ -102,13 +102,22 @@ namespace Graphic {
 
 
 	// For 1d stuff: Constant, Vertex & index buffer
-	class BufferDescriptor : public Descriptor {
+	class BufferDescriptor {
 	public:
-		//void copyData(const void* data, UINT size);
+		BufferDescriptor() { }
 
-		//inline void copyData(const void* data) { copyData(data, m_BufferSize); }
+		BufferDescriptor(ptrGBuffer buffer) : m_Buffer(buffer) { } 
+
+		void copyData(const void* data, UINT size);
+
+		virtual UINT Size() = 0;
+		virtual bool IsCreated() = 0;
+
+		inline void copyData(const void* data) { copyData(data, Size()); }
 		UINT Offset() const { return m_Offset; }
+
 	protected:
+		ptrGBuffer m_Buffer;
 		UINT m_Offset;
 	};
 
@@ -122,16 +131,9 @@ namespace Graphic {
 
 	class VertexBuffer : public BufferDescriptor {
 	public:
-		VertexBuffer() { }
+		VertexBuffer(ptrGBuffer gpubuffer, const UINT bufferSize, const UINT stride);
 		
-		void CreateView(ptrGBuffer buffer, UINT size, UINT stride)
-		{
-			m_Offset = buffer->MemAlloc(size);
-			m_view.BufferLocation = buffer->GetGPUAddr() + m_Offset;
-			m_view.StrideInBytes = stride;
-			m_view.SizeInBytes = size;
-		}
-
+		UINT Size() override { return m_view.SizeInBytes; }
 		bool IsCreated() override { return m_view.SizeInBytes != 0; };
 
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
@@ -145,7 +147,7 @@ namespace Graphic {
 
 	class IndexBuffer : public BufferDescriptor  {
 	public:
-		IndexBuffer() { }
+		IndexBuffer(ptrGBuffer gpubuffer, const UINT bufferSize);
 
 		// TODO: Not working after some update... and this comment is outdated after another update
 		// Suballocate from a index buffer
@@ -155,14 +157,7 @@ namespace Graphic {
 		//      3. When rendering, we're going to use the m_start variable
 		// IndexBuffer(IndexBuffer& buffer, const UINT start, const UINT end);
 
-		void CreateView(ptrGBuffer buffer, const UINT size) 
-		{
-			m_Offset = buffer->MemAlloc(size);
-			m_view.BufferLocation = buffer->GetGPUAddr() + m_Offset;
-			m_view.Format = DXGI_FORMAT_R32_UINT;
-			m_view.SizeInBytes = size;
-		}
-
+		UINT Size() override { return m_view.SizeInBytes; }
 		bool IsCreated() override { return m_view.SizeInBytes != 0; };
 
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
@@ -172,22 +167,21 @@ namespace Graphic {
 		D3D12_INDEX_BUFFER_VIEW m_view;
 	};
 
-
-	class ConstantBuffer : public BufferDescriptor 
+	//************************** CBV, SRV, RTV, DSV ********************************//
+	class ConstantBufferView : public Descriptor
 	{
-	public:
-		// Create a CBV, descriptor Heap is nullptr if we are creating a normal cbv, 
-		// if provide decriptorHeap, we are creaing a root CBV
-		ConstantBuffer() { }
+	friend class ConstantBuffer;
 
-		void CreateView(DescriptorTable* table, UINT slot, ptrGBuffer buffer, UINT size)
+	public:
+
+		// Create view 
+		void CreateView(DescriptorTable* table, UINT slot, ptrGBuffer buffer, UINT size, UINT offset)
 		{	
-			size = CalculateConstantBufferByteSize(size);
-			assert(size % 256 == 0 && "Constant buffer size not aligned");
-			m_Offset = buffer->MemAlloc(size);
-			m_cbvDesc.BufferLocation = buffer->GetGPUAddr() + m_Offset;
+			assert(size % 256 == 0 && "Constant buffer size not aligned, did u called CalculateConstantBufferByteSize £¿");
+			// m_Offset = buffer->MemAlloc(size);
+			m_cbvDesc.BufferLocation = buffer->GetGPUAddr() + offset;
 			m_cbvDesc.SizeInBytes = size;
-			
+
 			ID3D12Device* device = Engine::GetDevice();
 			if (table) {
 				m_handle = table->GetSlot(slot);
@@ -200,18 +194,14 @@ namespace Graphic {
 				device->CreateConstantBufferView(&m_cbvDesc, m_handle);
 			}
 		}
-		// Method to use this CBV as a root CBV
-		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const 
-		{
-			// assert(m_isRootCBV && "CBV should be a root CBV to call this function");
-			return m_cbvDesc.BufferLocation; 
-		}
-	private:
+
+	protected:
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc;
 	};
 
 
-	class ShaderResource : public Descriptor
+
+	class ShaderResourceView : public Descriptor
 	{
 	public:
 		void CreateView(DescriptorTable* table, UINT tableIndex, ID3D12Resource* resource, D3D12_SHADER_RESOURCE_VIEW_DESC* desc) 
@@ -230,7 +220,7 @@ namespace Graphic {
 	};
 
 
-	class UnorderedAccess : public Descriptor
+	class UnorderedAccessView : public Descriptor
 	{
 	public:
 		void CreateView(DescriptorTable* table, UINT tableIndex, ID3D12Resource* resource, D3D12_UNORDERED_ACCESS_VIEW_DESC* desc) 
@@ -249,7 +239,7 @@ namespace Graphic {
 	};
 
 
-	class RenderTarget : public Descriptor
+	class RenderTargetView : public Descriptor
 	{
 	public:
 		void CreateView(ID3D12Resource* resource, D3D12_RENDER_TARGET_VIEW_DESC* desc)
@@ -267,7 +257,7 @@ namespace Graphic {
 	};
 
 	
-	class DepthStencil : public Descriptor
+	class DepthStencilView : public Descriptor
 	{
 	public:
 		void CreateView(ID3D12Resource* resource, D3D12_DEPTH_STENCIL_VIEW_DESC* desc)
@@ -281,5 +271,46 @@ namespace Graphic {
 			device->CreateDepthStencilView(resource, desc, m_handle);
 		}
 	};
+	//*****************************************************************************************
 
+	// Simple class that contain a cbv and it's GPUmemory
+	class ConstantBuffer : public BufferDescriptor, Descriptor
+	{
+	public:
+		// Simple constructor, call init later
+		ConstantBuffer() : m_Size(0) { }
+
+		// Create a CBV, descriptor Heap is nullptr if we are creating a normal cbv, 
+		// if provide decriptorHeap, we are creaing a root CBV
+		ConstantBuffer(ptrGBuffer buffer, UINT size)
+			: BufferDescriptor(buffer), Descriptor()
+		{
+			m_Size = CalculateConstantBufferByteSize(size);
+			m_Offset = buffer->MemAlloc(size);
+			// m_CBV.c
+		}
+
+		void Initialze(ptrGBuffer buffer, UINT size)
+		{
+			m_Buffer = buffer;
+			m_Size = CalculateConstantBufferByteSize(size);
+			m_Offset = buffer->MemAlloc(size);
+		}
+
+		UINT Size() override { return m_Size; }
+		bool IsCreated() override { return m_Size != 0; };
+
+		void CreateView(DescriptorTable* table, UINT slot);
+
+		// Method to use this CBV as a root CBV
+		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const 
+		{
+			// assert(m_isRootCBV && "CBV should be a root CBV to call this function");
+			return m_CBV.m_cbvDesc.BufferLocation; 
+		}
+
+	private:
+		UINT m_Size;
+		ConstantBufferView m_CBV;
+	};
 }

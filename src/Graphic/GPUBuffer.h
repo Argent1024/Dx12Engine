@@ -4,7 +4,7 @@
 
 namespace GPU {
 
-	D3D12_RESOURCE_STATES DefaultInitState(D3D12_HEAP_TYPE heapType) 
+	/*D3D12_RESOURCE_STATES DefaultInitState(D3D12_HEAP_TYPE heapType) 
 	{
 		D3D12_RESOURCE_STATES bufferState = D3D12_RESOURCE_STATE_GENERIC_READ;
 		switch (heapType)
@@ -25,7 +25,7 @@ namespace GPU {
 		}
 		return bufferState;
 	}
-
+*/
 		
 	class GPUBuffer : public GPUMemory
 	{
@@ -64,10 +64,10 @@ namespace GPU {
 			D3D12_RESOURCE_FLAGS resourceFlag=D3D12_RESOURCE_FLAG_NONE) 
 		{
 			D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(size);
-			m_MemSize = size;
-
 			DestoryAndCreateCommitted(&desc, heapType, initState, clear);
+
 			m_GPUAddr = m_Resource->GetGPUVirtualAddress();	// Will need GPU addr since this is a buffer
+			m_MemSize = size;
 		}
 
 		//***********************************************************************//
@@ -88,12 +88,12 @@ namespace GPU {
 
 
 	// TODO Same name with Texture.h
-	class Texturebuffer : public GPUMemory
+	class TextureBuffer : public GPUMemory
 	{
 	public:
-		Texturebuffer()  { }
+		TextureBuffer()  { }
 		
-		~Texturebuffer() { Destory(); }
+		~TextureBuffer() { Destory(); }
 
 		inline void Initialize(const D3D12_RESOURCE_DESC* resourceDesc, 
 			const D3D12_CLEAR_VALUE* clearValue = nullptr) 

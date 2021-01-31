@@ -39,7 +39,7 @@ void MemoryManager::UploadData(GPUBuffer& dest, const void* data, UINT dataSize,
 }
 
 // TODO still need to change this later
-void MemoryManager::UploadTexure(Texturebuffer& dest, D3D12_SUBRESOURCE_DATA* textureData)
+void MemoryManager::UploadTexure(TextureBuffer& dest, D3D12_SUBRESOURCE_DATA* textureData)
 {	
 	// Always assume dest always in default heap
 	D3D12_HEAP_PROPERTIES heapProp;

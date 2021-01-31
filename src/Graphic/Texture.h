@@ -87,10 +87,10 @@ namespace Graphic {
 		} */
 
 		// ConstantBuffer  m_CBV;
-		ShaderResource  m_SRV;
-		UnorderedAccess m_UAV;
-		RenderTarget    m_RTV;
-		DepthStencil    m_DSV;
+		ShaderResourceView  m_SRV;
+		UnorderedAccessView m_UAV;
+		RenderTargetView    m_RTV;
+		DepthStencilView    m_DSV;
 
 	protected:
 		// Create the SRV & UAV at the table at tableIndex
@@ -178,7 +178,8 @@ namespace Graphic {
 
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		// void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateRTV() override;
+		
+		//void CreateRTV() override;
 
 	};
 

@@ -80,7 +80,7 @@ namespace Game
 
 		// Bind Light Stuff
 		SceneLightsInfo m_LightInfo;
-		Graphic::ConstantBuffer* m_LightsCBV;	  // Store normal data of lights
+		Graphic::ConstantBuffer m_LightsCBV;	  // Store normal data of lights
 
 		Graphic::DescriptorTable* m_LightsTable;  // Store Shadow map
 
