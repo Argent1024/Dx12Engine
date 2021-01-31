@@ -76,7 +76,7 @@ namespace Game
 
 		// Main Camera Stuff
 		ProjectiveCamera m_Camera;
-		// Graphic::ConstantBuffer* m_MainCameraCBV;
+		Graphic::ConstantBuffer m_MainCameraCBV;
 
 		// Bind Light Stuff
 		SceneLightsInfo m_LightInfo;

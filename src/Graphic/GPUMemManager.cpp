@@ -31,7 +31,7 @@ void MemoryManager::UploadData(GPUBuffer& dest, const void* data, UINT dataSize,
 	UINT8* memDataBegin;
 	CD3DX12_RANGE readRange(0, 0);        // We do not intend to read from this resource on the CPU.
 	ThrowIfFailed(resource->Map(0, &readRange, reinterpret_cast<void**>(&memDataBegin)));
-	memcpy(memDataBegin + offset, data, dataSize);
+	memcpy(memDataBegin, data, dataSize);
 	resource->Unmap(0, nullptr);
 
 	// Copy it to dest
