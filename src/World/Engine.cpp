@@ -12,7 +12,7 @@ namespace Engine {
 		
 		// Control
 		Engine::InitializeInputManager(m_appHwnd);
-		m_GameControl = new VoidGameControl();
+		m_GameControl = new SimpleCameraControl();
 
 		m_RenderEngine = new RenderEngine(m_Setting.Width, m_Setting.Height);
 		m_RenderEngine->Initialize(m_appHwnd);
@@ -44,29 +44,31 @@ namespace Engine {
 			m_Material->SetData(mat);
 			m_Material->UploadCBV();
 		
-			/*MeshReader reader;
-			reader.ReadOBJ("D:\\work\\tEngine\\bunny.obj");
+			MeshReader reader;
+			reader.ReadOBJ("D://work/tEngine/airboat.obj");
+			//reader.ReadOBJ("D:\\banana.obj");
 
 			std::vector<DefaultVertex>& vertex = reader.m_vertex;
 			std::vector<UINT>& index = reader.m_index;
 
-			m_Mesh = std::make_shared<TriangleMesh>(vertex, index);*/
+			m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
 
-			// Texture test
-			m_Mesh = TriangleMesh::GetXYPlane();
-			std::string texpath = "D://work/tEngine/snow.png";
-			Graphic::Texture2D* tex = new Graphic::Texture2D(texpath);
+			//// Texture test
+			//m_Mesh = TriangleMesh::GetXYPlane();
+			//std::string texpath = "D://work/tEngine/snow.png";
+			//Graphic::Texture2D* tex = new Graphic::Texture2D(texpath);
 
-			m_Material->SetTexture(PrincipleMaterial::DiffuseTex, tex);
-			m_Material->UploadCBV();
-			// Texture Test end
+			//m_Material->SetTexture(PrincipleMaterial::DiffuseTex, tex);
+			//m_Material->UploadCBV();
+			//// Texture Test end
 
 
 			// TODO!! error C2338 aligin?
 			GObject* obj0 = new Game::GObject();
+			const float scale = 1.f;
 			obj0->SetMesh(m_Mesh);
 			obj0->SetMaterial(m_Material);
-			obj0->SetTransform(Transform({ 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, 0, 1.0 }, {0.0, 0.0, 0.0}));
+			obj0->SetTransform(Transform({ scale, 0, 0 }, { 0, scale, 0 }, { 0, 0, scale }, {0.0, 0.0, 0.0}));
 
 			m_Scene->AddGameObj(obj0);
 		}
@@ -82,7 +84,7 @@ namespace Engine {
 	void GameEngine::InputUpdate()
 	{
 		InputManager& input = Engine::GetInputManager();
-
+		input.Update();
 
 		auto kb = input.GetKeyboardState();
 		auto mouse = input.GetMouseState();
@@ -122,9 +124,12 @@ namespace Engine {
 				data.debugpos = true;
 			}
 		}
+		std::cout<<mouse.x << " " << mouse.y <<std::endl;
+		if (mouse.leftButton != 0) {
+			std::cout<<"moving!!"<<std::endl;
+		}
 		m_GameControl->UpdateScene(*m_Scene);
 
-		input.Update();
 		frame++;
 	}
 

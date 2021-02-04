@@ -13,14 +13,15 @@ namespace Game {
 	public:
 		virtual void Initialize() = 0;
 
-		//Prepare data for rendering(like put in the camera's data), 
-		// should be called in main thread
+		// Prepare data for rendering(like put in the camera's data), 
+		// RenderEngine will call this function in main thread TODO ?
 		virtual void PrepareData(Scene& scene) = 0;
 
 		// Record Commands for rendering
-		// Should in worker thread
+		// RenderEngine will call this function in worker thread
 		virtual void Render(Graphic::CommandList& commandList, Scene& scene) = 0;
 
+		// TODO maybe more than one table
 		Graphic::DescriptorTable* GetTable() { return m_DescriptorTable; }
 
 	protected:

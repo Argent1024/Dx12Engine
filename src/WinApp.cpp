@@ -76,6 +76,10 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		Mouse::ProcessMessage(message, wParam, lParam);
 		break;
 
+	case WM_MOUSEHOVER:
+		Mouse::ProcessMessage(message, wParam, lParam);
+		break;
+
 	case WM_KEYDOWN:
     case WM_KEYUP:
 	case WM_SYSKEYUP:	// Alt

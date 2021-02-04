@@ -52,6 +52,7 @@ cbuffer MaterialInfo : register (b3)
 	// TODO add texture stuff later
 }
 
+Texture2D Material_BaseColor : register(t0);
 // TODO Material Textures
 
 /********************** Object & Material Descriptor Table End ****************************/
@@ -166,11 +167,8 @@ float3 CalculateBRDF(float3 viewDir,
 // Pixel Shader
 float4 PSMain(PSInput input) : SV_TARGET
 {
-	// return float4(1.0, 0.0, 0.0, 1.0);
-
-	/*float cos_ln = max(dot(lightDir, normal), 0);
-	return float4(cos_ln * strength * BaseColor, 1.0f);*/
-
+	// return Material_BaseColor.Sample(g_sampler, input.uv);
+	
 	if (debugnormal) {
 		return (float4(input.normal, 1.0f) + 1.0f) / 2.0f;
 	}
@@ -194,10 +192,11 @@ float4 PSMain(PSInput input) : SV_TARGET
 	// Calculate surface material's data
 	IntersectionPoint isect;
 	isect.BaseColor = BaseColor;
+	//isect.BaseColor = Material_BaseColor.Sample(g_sampler, input.uv);
 	isect.Roughness = Roughness;
 	isect.Specular = Specular;
 	
 	float3 brdf = CalculateBRDF(viewDir, lightDir, normal, isect);
-	return 2 * float4(brdf + 0.2 * BaseColor, 1.0f);
-
+	return 2 * float4(brdf + 0.2 * isect.BaseColor, 1.0f);
+	
 }

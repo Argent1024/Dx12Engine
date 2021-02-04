@@ -40,7 +40,7 @@ namespace Game {
 		Camera& camera = scene.GetMainCamera();
 		const Transform& view = camera.GetView();
 		const Transform& proj = camera.GetToScreen();
-		Vector3 cameraPos = camera.GetPosition();
+		Vector3& cameraPos = camera.Position();
 
 		// Need to transpose
 		XMStoreFloat4x4(&m_CBVData.projection, XMMatrixTranspose((XMMATRIX)proj));

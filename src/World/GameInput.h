@@ -3,6 +3,7 @@
 #include "Utility/input.h"
 #include "Scene.h"
 
+
 namespace Game {
 
 	// How the Scene will behave under different input
@@ -11,9 +12,20 @@ namespace Game {
 		virtual void UpdateScene(Scene& scene) = 0;
 	};
 
-	class VoidGameControl : public GameControl {
+	
+	class SimpleCameraControl : public GameControl {
 	public:
-		void UpdateScene(Scene& scene) { };
+		void UpdateScene(Scene& scene) override;
 
+	private:
+		const float m_MouseSpeed = 0.1f;
+
+		const float m_RotationSpeed = 0.1f;
+
+		const float m_MoveSpeed = 0.1f;
+
+		const float m_ZoomSpeed = 0.1f;
+
+	//	static const char m_RotationKey = 0xa4; //Left Alt
 	};
 }

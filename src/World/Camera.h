@@ -54,12 +54,14 @@ namespace Game {
 		inline void SetNearZ(float z) { m_nearZ = z; }
 		inline void SetFarZ(float z) { m_farZ = z; }
 
-		inline Math::Vector3 GetPosition() const { return m_Position; }
-		inline void SetPosition(Math::Vector3& pos) { m_Position = pos; }
+		Math::Vector3& Position() { return m_Position; }
+		const Math::Vector3& Position() const { return m_Position; }
 
-		inline void SetDirection(Math::Vector3& dir) { m_Direction = dir; }
+		Math::Vector3& Direction() { return m_Direction; }
+		const Math::Vector3& Direction() const { return m_Direction; }
 
-		inline void SetWorldUp(Math::Vector3& up) { m_WorldUp = up;}
+		Math::Vector3& WorldUp() { return m_WorldUp; }
+		const Math::Vector3& WorldUp() const { return m_WorldUp; }
 
 		void LookAt(const Math::Vector3& Position, const Math::Vector3& Target, const Math::Vector3& WorldUp) 
 		{
@@ -114,7 +116,8 @@ namespace Game {
 			m_ToScreen = Math::Transform(Math::Matrix4(DirectX::XMMatrixPerspectiveFovRH(m_FOVAngleY, m_aspectRatio, m_nearZ, m_farZ)));
 		}
 
-		inline void SetViewAngle(float angle) { m_FOVAngleY = angle; }
+		float& FovY() { return m_FOVAngleY; }
+		const float& FovY() const { return m_FOVAngleY; }
 
 	private:
 		float m_FOVAngleY = 3.14f / 6.0f;

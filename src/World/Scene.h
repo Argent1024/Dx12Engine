@@ -37,7 +37,7 @@ namespace Game
 		virtual void Initialize();
 
 		// TODO const camera, edit Camera class
-		inline Camera& GetMainCamera() { return m_Camera; }
+		inline ProjectiveCamera& GetMainCamera() { return m_Camera; }
 		// inline Graphic::ConstantBuffer* GetMainCameraCBV() { return m_MainCameraCBV; }
 
 		//TODO

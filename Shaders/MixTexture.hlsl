@@ -1,5 +1,5 @@
 SamplerState g_sampler : register(s0);
-Texture2D g_texture : register(t0);
+Texture2D g_texture : register(t1);
 
 // Store Camera Transformations
 cbuffer TextureInfo : register(b2) 
