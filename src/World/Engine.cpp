@@ -124,10 +124,6 @@ namespace Engine {
 				data.debugpos = true;
 			}
 		}
-		std::cout<<mouse.x << " " << mouse.y <<std::endl;
-		if (mouse.leftButton != 0) {
-			std::cout<<"moving!!"<<std::endl;
-		}
 		m_GameControl->UpdateScene(*m_Scene);
 
 		frame++;

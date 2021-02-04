@@ -73,7 +73,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	case WM_ACTIVATEAPP:
 
 		Keyboard::ProcessMessage(message, wParam, lParam);
-		Mouse::ProcessMessage(message, wParam, lParam);
+		//Mouse::ProcessMessage(message, wParam, lParam);
 		break;
 
 	case WM_MOUSEHOVER:
@@ -93,10 +93,10 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
         ...
     }*/
 		break;
-
 	// ************************* INPUT  END  ****************************//
 	}
-
+	
+	Mouse::ProcessMessage(message, wParam, lParam);
 	// Handle any messages switch statement didn't
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }

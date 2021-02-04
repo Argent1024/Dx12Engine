@@ -16,8 +16,8 @@ void SimpleCameraControl::UpdateScene(Scene& scene)
 
 	// Mouse Stuff
 	// TODO: Why?
-	if (mouse.positionMode == DirectX::Mouse::MODE_RELATIVE)
-	{
+	/*if (mouse.positionMode == DirectX::Mouse::MODE_RELATIVE)
+	{*/
 		Vector3 delta = Vector3(float(mouse.x), float(mouse.y), 0.f) * m_MouseSpeed;
 
 		// Zoom
@@ -42,7 +42,7 @@ void SimpleCameraControl::UpdateScene(Scene& scene)
 
 		}
 
-	}
+	//}
 	// Update Camera data
 	camera.Look();
 }
