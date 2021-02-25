@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "RenderPass.h"
 #include "../Utility/MeshReader.h"
 

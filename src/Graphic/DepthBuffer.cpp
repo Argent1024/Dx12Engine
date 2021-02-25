@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "DepthBuffer.h"
 #include "Texture.h"
 
@@ -13,6 +14,6 @@ namespace Graphic
 	{
 		//  TODO TEST
 		m_depthTexture.CreateView(TEXTURE_DSV);
-		m_dsvHandle = m_depthTexture.m_DSV.GetHandle();
+		m_dsvHandle = m_depthTexture.DSV().GetHandle();
 	}
 }

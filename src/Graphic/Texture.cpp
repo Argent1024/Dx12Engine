@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Texture.h"
 #include "Utility/Logger.h"
 
@@ -59,7 +60,7 @@ namespace Graphic {
 
 
 	TextureBuffer::TextureBuffer(UINT elementNum, UINT stride, UINT type) 
-		:Texture(type), m_elementNum(elementNum), m_stride(stride), m_totalSize(m_elementNum * m_stride)
+		:TextureSingle(type), m_elementNum(elementNum), m_stride(stride), m_totalSize(m_elementNum * m_stride)
 	{
 		// TODO consider flags
 		D3D12_RESOURCE_FLAGS flag;
@@ -78,7 +79,7 @@ namespace Graphic {
 	}
 
 	TextureBuffer::TextureBuffer(UINT totalSize) : 
-		Texture(TEXTURE_CBV), m_totalSize(totalSize)
+		TextureSingle(TEXTURE_CBV), m_totalSize(totalSize)
 	{
 		D3D12_RESOURCE_FLAGS flag = D3D12_RESOURCE_FLAG_NONE;
 
@@ -128,7 +129,7 @@ namespace Graphic {
 	}
 
 	Texture2D::Texture2D(UINT width, UINT height, UINT type, bool loadChessBoard)
-		: Texture(type)
+		: TextureSingle(type)
 	{
 		TextureDescHelper(width, height);
 		Initialize();
@@ -143,7 +144,7 @@ namespace Graphic {
 	}
 
 	Texture2D::Texture2D(std::string& filename, UINT type) 
-		: Texture(type)
+		: TextureSingle(type)
 	{	
 		// Load Chess Board
 
@@ -276,7 +277,8 @@ namespace Graphic {
 
 	void TextureCube::Initialize()
 	{
-		// m_gpuMem = Engine::MemoryAllocator.CreateCommittedBuffer(m_textureDesc);
+		m_buffer = GPU::MemoryManager::CreateTBuffer();
+		m_buffer->Initialize(&m_textureDesc);
 	}
 
 	void TextureCube::CreateSRV(DescriptorTable* table, UINT tableIndex)
@@ -287,7 +289,20 @@ namespace Graphic {
 		srvDesc.Format = m_textureDesc.Format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 		srvDesc.Texture2D.MipLevels = 1;
-		
+
+		m_SRV.CreateView(table, tableIndex, m_buffer->GetResource(), &srvDesc);
 	}
 	
+	void TextureCube::CreateRTV()
+	{
+		
+		D3D12_RENDER_TARGET_VIEW_DESC  rtvDesc = {};
+		rtvDesc.Format = m_textureDesc.Format;
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+		rtvDesc.Texture2DArray.MipSlice = 0;
+		rtvDesc.Texture2DArray.ArraySize = 6;
+		// TODO ..
+
+		m_RTV.CreateView(m_buffer->GetResource(), &rtvDesc);
+	}
 }

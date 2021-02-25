@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "GPUHeap.h"
 
 namespace Graphic {	

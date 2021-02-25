@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "RenderEngine.h"
 
 namespace Engine {

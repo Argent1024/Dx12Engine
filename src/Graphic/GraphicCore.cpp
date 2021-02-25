@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "GraphicCore.h"
 #include "GPUMemory.h"
 #include "DescriptorHeap.h"

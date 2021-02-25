@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "GPUMemory.h"
 #include "GPUBuffer.h"
 #include "CommandQueue.h"

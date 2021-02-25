@@ -86,12 +86,6 @@ namespace Graphic {
 			
 		} */
 
-		// ConstantBuffer  m_CBV;
-		ShaderResourceView  m_SRV;
-		UnorderedAccessView m_UAV;
-		RenderTargetView    m_RTV;
-		DepthStencilView    m_DSV;
-
 	protected:
 		// Create the SRV & UAV at the table at tableIndex
 		virtual void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "CBV not implemented!"); }
@@ -108,9 +102,36 @@ namespace Graphic {
 		D3D12_RESOURCE_DESC m_textureDesc;
 	};
 
+	class TextureSingle : public Texture {
+	public:
+		TextureSingle(UINT type) : Texture(type) { }
 
-	// Texture 
-	class TextureBuffer : public Texture {
+		const DepthStencilView& DSV() const { return m_DSV; }
+		DepthStencilView& DSV() { return m_DSV; }
+		
+
+	protected:
+		// ConstantBuffer  m_CBV;
+		ShaderResourceView  m_SRV;
+		UnorderedAccessView m_UAV;
+		RenderTargetView    m_RTV;
+		DepthStencilView    m_DSV;
+	};
+
+	/*template<UINT N>
+	class TextureArray : public Texture 
+	{
+	public:
+		TextureArray(UINT type) : Texture(type) { }
+	private:
+
+	};*/
+
+
+	// ******************************************************************************************** //
+	// ************************************ Implementation below ********************************** //
+	// ******************************************************************************************** //
+	class TextureBuffer : public TextureSingle {
 	public:
 		// TODO better way to express type?
 		TextureBuffer(UINT elementNum, UINT stride, UINT type=TEXTURE_SRV);
@@ -122,7 +143,7 @@ namespace Graphic {
 		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		
+
 		ptrGBuffer m_buffer;
 
 		UINT m_elementNum;
@@ -131,7 +152,7 @@ namespace Graphic {
 	};
 
 	// TODO dont use stb_image, only support 8-bit's channel
-	class Texture2D : public Texture {
+	class Texture2D : public TextureSingle {
 	public:
 		// TODO better way to express type?
 		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV, bool loadChessBoard=false);
@@ -160,7 +181,6 @@ namespace Graphic {
 		void CreateDSV() override;
 		void CreateRTV() override;
 	};
-
 	
 	// Cube map helper
 	class TextureCube : public Texture
@@ -177,10 +197,12 @@ namespace Graphic {
 		ImageMetadata LoadFromImage(std::string& filename, unsigned char*& data);
 
 		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		// void CreateDSV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
 		
-		//void CreateRTV() override;
+		void CreateRTV() override;
 
+		ptrTBuffer m_buffer;
+		ShaderResourceView m_SRV;
+		RenderTargetView m_RTV;
 	};
 
 

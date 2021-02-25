@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MeshReader.h"
 
 void MeshReader::CreateVertex(std::vector<DirectX::XMFLOAT3>& pos_list,

@@ -73,22 +73,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <SourcePath>$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(ProjectDir)src;$(SourcePath)</SourcePath>
-    <IncludePath>$(ProjectDir)src\;$(ProjectDir)src\ext;$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)src\Math;$(ProjectDir)src\Graphic;$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\ext;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)src\Math;$(ProjectDir)src\Graphic;$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\ext;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)src\;$(ProjectDir)src\ext;$(ProjectDir)src\Graphic;$(ProjectDir)src\Math;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)src\Math;$(ProjectDir)src\Graphic;$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\ext;$(IncludePath)</IncludePath>
+    <SourcePath>$(ProjectDir)src;$(ProjectDir)src\Math;$(ProjectDir)src\Graphic;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)src\Math;$(ProjectDir)src\Graphic;$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\ext;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
@@ -104,13 +106,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,13 +129,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,21 +149,24 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\ext\stb\stb_image.h" />
     <ClInclude Include="src\ext\stb\stb_image_write.h" />
     <ClInclude Include="src\Graphic\DepthBuffer.h" />
+    <ClInclude Include="src\Graphic\GPUMemManager.h" />
     <ClInclude Include="src\Physic\BoundingVolume.h" />
     <ClInclude Include="src\Physic\CollisionDetection.h" />
+    <ClInclude Include="src\Physic\FFTOcean.h" />
     <ClInclude Include="src\Physic\PhysicState.h" />
     <ClInclude Include="src\World\Engine.h" />
     <ClInclude Include="src\World\GameInput.h" />
@@ -209,7 +215,7 @@
     <ClCompile Include="src\Graphic\DepthBuffer.cpp" />
     <ClCompile Include="src\Graphic\RootSignature.cpp" />
     <ClCompile Include="src\Graphic\Texture.cpp" />
-    <ClCompile Include="src\Graphic\GPUMemory.cpp" />
+    <ClCompile Include="src\Graphic\GPUMemManager.cpp" />
     <ClCompile Include="src\Physic\BoundingVolume.cpp" />
     <ClCompile Include="src\Utility\Input.cpp" />
     <ClCompile Include="src\Utility\MeshReader.cpp" />
@@ -218,13 +224,18 @@
     <ClCompile Include="src\Graphic\CommandQueue.cpp" />
     <ClCompile Include="src\Graphic\Descriptor.cpp" />
     <ClCompile Include="src\Graphic\GPUHeap.cpp" />
-    <ClCompile Include="src\Graphic\GPUBuffer.cpp" />
     <ClCompile Include="src\Graphic\GraphicCore.cpp" />
     <ClCompile Include="src\Graphic\PipelineState.cpp" />
-    <ClCompile Include="src\stdafx.cpp" />
+    <ClCompile Include="src\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\WinApp.cpp" />
     <ClCompile Include="src\Graphic\SwapChain.cpp" />
     <ClCompile Include="src\World\Engine.cpp" />
+    <ClCompile Include="src\World\GameInput.cpp" />
     <ClCompile Include="src\World\GObject.cpp" />
     <ClCompile Include="src\World\Light.cpp" />
     <ClCompile Include="src\World\Material.cpp" />

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "CommandList.h"
 
 namespace Graphic {

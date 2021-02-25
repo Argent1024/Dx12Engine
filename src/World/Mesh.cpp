@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Mesh.h"
 #include "MathLib.h"
 #include "Utility/MeshReader.h"

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "GameInput.h"
 
 using namespace Game;
