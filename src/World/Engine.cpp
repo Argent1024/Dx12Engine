@@ -38,6 +38,19 @@ namespace Engine {
 			m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {0.0, 1.0, 0.0} });
 			m_Material = std::make_shared<PrincipleMaterial>();
 
+
+			m_Ocean = new FFTOcean();
+			m_Ocean->Initialize();
+
+			GObject* ocean_obj = new Game::GObject();
+			const float scale = 1.f;
+			ocean_obj->SetMesh(m_Ocean->GetMesh());
+			ocean_obj->SetMaterial(m_Ocean->GetMaterial());
+			ocean_obj->SetTransform(Transform({ scale, 0, 0 }, { 0, scale, 0 }, { 0, 0, scale }, {0.0, 0.0, 0.0}));
+			m_Scene->AddGameObj(ocean_obj);
+
+			// Normal mesh stuff
+			/*
 			PrincipleMaterial::MatData mat;
 			DirectX::XMStoreFloat3(&mat.BaseColor, Vector3(1.0, 0.0, 0.0));
 			mat.Roughness = 0.15f;
@@ -53,6 +66,7 @@ namespace Engine {
 			std::vector<UINT>& index = reader.m_index;
 
 			m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
+			*/
 
 			//// Texture test
 			//m_Mesh = TriangleMesh::GetXYPlane();
@@ -64,14 +78,15 @@ namespace Engine {
 			//// Texture Test end
 
 
-			// TODO!! error C2338 aligin?
-			GObject* obj0 = new Game::GObject();
+			// TODO error C2338 aligin
+			/*GObject* obj0 = new Game::GObject();
 			const float scale = 1.f;
 			obj0->SetMesh(m_Mesh);
 			obj0->SetMaterial(m_Material);
 			obj0->SetTransform(Transform({ scale, 0, 0 }, { 0, scale, 0 }, { 0, 0, scale }, {0.0, 0.0, 0.0}));
 
 			m_Scene->AddGameObj(obj0);
+			*/
 		}
 
 

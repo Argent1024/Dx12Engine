@@ -24,6 +24,8 @@ namespace Game {
 		// TODO maybe more than one table
 		Graphic::DescriptorTable* GetTable() { return m_DescriptorTable; }
 
+		ptrRootSignature GetRootSignature() { return m_rootSignature; }
+
 	protected:
 		ptrRootSignature m_rootSignature;
 		ptrPSO m_PSO;

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "RenderPass.h"
 #include "../Utility/MeshReader.h"
+#include "FFTOcean.h"
 
 namespace Game {
 	using namespace Math;
@@ -11,7 +12,9 @@ namespace Game {
 		m_rootSignature = std::make_shared<Graphic::RootSignature>();
 		m_rootSignature->Initialize();
 
-		m_PSO = std::make_shared<Graphic::DefaultPSO>();
+		// TODO move pso to material
+		// m_PSO = std::make_shared<Graphic::DefaultPSO>();
+		m_PSO = std::make_shared<OceanPSO>();
 		m_PSO->SetRootSigature(m_rootSignature->GetRootSignature());
 		m_PSO->Initialize();
 

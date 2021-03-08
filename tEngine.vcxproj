@@ -164,11 +164,13 @@
     <ClInclude Include="src\ext\stb\stb_image_write.h" />
     <ClInclude Include="src\Graphic\DepthBuffer.h" />
     <ClInclude Include="src\Graphic\GPUMemManager.h" />
+    <ClInclude Include="src\Math\MathLib.h" />
     <ClInclude Include="src\Physic\BoundingVolume.h" />
     <ClInclude Include="src\Physic\CollisionDetection.h" />
     <ClInclude Include="src\Physic\FFTOcean.h" />
     <ClInclude Include="src\Physic\PhysicState.h" />
     <ClInclude Include="src\World\Engine.h" />
+    <ClInclude Include="src\World\FFTOcean.h" />
     <ClInclude Include="src\World\GameInput.h" />
     <ClInclude Include="src\World\RenderEngine.h" />
     <ClInclude Include="src\World\RenderPass.h" />
@@ -235,6 +237,7 @@
     <ClCompile Include="src\WinApp.cpp" />
     <ClCompile Include="src\Graphic\SwapChain.cpp" />
     <ClCompile Include="src\World\Engine.cpp" />
+    <ClCompile Include="src\World\FFTOcean.cpp" />
     <ClCompile Include="src\World\GameInput.cpp" />
     <ClCompile Include="src\World\GObject.cpp" />
     <ClCompile Include="src\World\Light.cpp" />

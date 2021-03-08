@@ -26,13 +26,13 @@ void SimpleCameraControl::UpdateScene(Scene& scene)
 		{
 			// TODO Be better to write these min,max setting in camera class
 			float& fov = camera.FovY();
-			float dfov = abs(mouse.scrollWheelValue) * m_ZoomSpeed;
+			float dfov = std::max(m_ZoomSpeed, fov/2.0f);
 
 			if (mouse.scrollWheelValue > 0) {
-				fov = std::max(Math::PI, fov + dfov);
+				fov = std::max(Math::PI / 20.0f, fov - dfov);
 			}
 			else {
-				fov = std::min(Math::PI / 6.0f, fov - dfov);
+				fov = std::min(Math::PI, fov + dfov);
 			}
 		}
 

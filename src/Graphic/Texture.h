@@ -155,7 +155,8 @@ namespace Graphic {
 	class Texture2D : public TextureSingle {
 	public:
 		// TODO better way to express type?
-		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV, bool loadChessBoard=false);
+		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV, 
+			DXGI_FORMAT format=DXGI_FORMAT_R8G8B8A8_UNORM, bool loadChessBoard=false);
 
 		Texture2D(std::string& filename, UINT type=TEXTURE_SRV);
 
@@ -168,7 +169,7 @@ namespace Graphic {
 	private:
 		ptrTBuffer m_buffer;
 
-		void TextureDescHelper(UINT width, UINT height);
+		void TextureDescHelper(UINT width, UINT height, DXGI_FORMAT format);
 
 		// After we have m_textureDesc and m_Type Allocate GPU memory and create texture
 		void Initialize();

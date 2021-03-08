@@ -30,7 +30,17 @@ namespace Math {
 		return Vector3(DirectX::XMVector3Normalize(v));
 	}
 
+	INLINE Vector2 Normalize(const Vector2& v) 
+	{
+		return Vector2(DirectX::XMVector3Normalize(v));
+	}
+
 	INLINE Scalar Dot(const Vector3& a, const Vector3& b) 
+	{
+		return Scalar(DirectX::XMVector3Dot(a, b));
+	}
+
+	INLINE Scalar Dot(const Vector2& a, const Vector2& b) 
 	{
 		return Scalar(DirectX::XMVector3Dot(a, b));
 	}
@@ -40,8 +50,28 @@ namespace Math {
 		return Scalar(DirectX::XMVector3LengthSq(v));
 	}
 
+	INLINE Scalar Length2(const Vector2& v) 
+	{
+		return Scalar(DirectX::XMVector2LengthSq(v));
+	}
+
 	INLINE Scalar Length(const Vector3& v) 
 	{
 		return Scalar((DirectX::XMVector3Length(v)));
+	}
+
+	template <class T>
+	INLINE T Sqrt(const T& v) {
+		return T(DirectX::XMVectorSqrt(v));
+	}
+
+	template <class T>
+	INLINE T Exp(const T& v) {
+		return T(DirectX::XMVectorExpE(v));
+	}
+
+	template <class T>
+	INLINE T Pow(const T& v, const T& p) {
+		return T(DirectX::XMVectorPow(v, p));
 	}
 }

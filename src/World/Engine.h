@@ -1,6 +1,7 @@
 #pragma once
 #include "RenderEngine.h"
 #include "GameInput.h"
+#include "FFTOcean.h"
 
 namespace Engine {
 
@@ -44,6 +45,9 @@ namespace Engine {
 		// TODO Resource Manager
 		std::shared_ptr<Game::Mesh> m_Mesh;
 		std::shared_ptr<Game::PrincipleMaterial> m_Material;
+
+		FFTOcean* m_Ocean;
+
 
 		void Render();
 

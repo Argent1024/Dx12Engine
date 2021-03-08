@@ -128,10 +128,10 @@ namespace Graphic {
 		m_UAV.CreateView(table, tableIndex, m_buffer->GetResource(), &uavDesc);
 	}
 
-	Texture2D::Texture2D(UINT width, UINT height, UINT type, bool loadChessBoard)
+	Texture2D::Texture2D(UINT width, UINT height, UINT type, DXGI_FORMAT format, bool loadChessBoard)
 		: TextureSingle(type)
 	{
-		TextureDescHelper(width, height);
+		TextureDescHelper(width, height, format);
 		Initialize();
 
 		if (loadChessBoard) {
@@ -155,7 +155,7 @@ namespace Graphic {
 		metadata.pixelSize = 4;
 
 		D3D12_SUBRESOURCE_DATA texData = CreateTextureData(metadata, data);
-		TextureDescHelper(metadata.width, metadata.height);
+		TextureDescHelper(metadata.width, metadata.height, DXGI_FORMAT_R8G8B8A8_UNORM);
 		Initialize();
 		UploadTexture(&texData);
 
@@ -165,11 +165,11 @@ namespace Graphic {
 		
 	}
 	
-	void Texture2D::TextureDescHelper(UINT width, UINT height) 
+	void Texture2D::TextureDescHelper(UINT width, UINT height, DXGI_FORMAT format) 
 	{
 		m_textureDesc = {};
 		m_textureDesc.MipLevels = 1;
-		m_textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		m_textureDesc.Format = format;
 		m_textureDesc.Width = width;
 		m_textureDesc.Height = height;
 		m_textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;

@@ -24,7 +24,7 @@ namespace Game {
 
 		const float m_MoveSpeed = 0.1f;
 
-		const float m_ZoomSpeed = 0.1f;
+		const float m_ZoomSpeed = 0.001f;
 
 	//	static const char m_RotationKey = 0xa4; //Left Alt
 	};

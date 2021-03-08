@@ -12,6 +12,7 @@ namespace Game {
 		// Bind views, textures to the descriptor table
 		virtual void BindMaterialAt(Graphic::DescriptorTable& table) = 0;
 
+		// TODO not every material need one ?
 		// Copy data to cbv
 		virtual void UploadCBV() = 0;
 	};
