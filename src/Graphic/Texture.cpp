@@ -138,7 +138,7 @@ namespace Graphic {
 			std::vector<UINT8> data;
 			LoadChessBoard(width, height, 4, data);
 			D3D12_SUBRESOURCE_DATA textureData = 
-			CreateTextureData({ (int)m_textureDesc.Width, (int)m_textureDesc.Height, 4, 4}, &data[0]);
+			CreateTextureData({ (UINT)m_textureDesc.Width, (UINT)m_textureDesc.Height, 4, 1}, &data[0]);
 			UploadTexture(&textureData);
 		}
 	}
@@ -152,7 +152,7 @@ namespace Graphic {
 		
 		ImageMetadata metadata = LoadFromImage(filename, data);
 		metadata.channel = 4;
-		metadata.pixelSize = 4;
+		metadata.channelSize = 1;
 
 		D3D12_SUBRESOURCE_DATA texData = CreateTextureData(metadata, data);
 		TextureDescHelper(metadata.width, metadata.height, DXGI_FORMAT_R8G8B8A8_UNORM);
@@ -208,12 +208,12 @@ namespace Graphic {
 	{
 		// stb image only support 8 bit
 		ImageMetadata metadata = {};
-		data = stbi_load(filename.c_str(), &metadata.width, &metadata.height, &metadata.channel, 4);
+		data = stbi_load(filename.c_str(), (int*)&metadata.width, (int*)&metadata.height,(int*) &metadata.channel, 4);
 		if (data == nullptr) {
 			std::string errormsg = "ERROR when reading image " + filename;
 			Logger::Log(errormsg);
 		}
-		metadata.pixelSize = metadata.channel; // Store pixel size in Byte
+		metadata.channel = metadata.channel; // Store pixel size in Byte
 		return metadata;
 		// LoadWICTextureFromFile()
 	}

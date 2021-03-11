@@ -6,12 +6,48 @@
 #include "Camera.h"
 
 #include <complex>
+#include <random>
 
 using namespace Game;
 using namespace Math;
 
 // TODO maybe don't use std complex
-using Complex = std::complex<float>;
+using Complex = std::complex<double>;
+
+
+const UINT OceanResolution = 256;
+
+// How to reverse bits
+// http://graphics.stanford.edu/~seander/bithacks.html#BitReverseTable
+// https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
+// wooooow! 
+static const unsigned char BitReverseTable256[256] = 
+{
+#   define R2(n)     n,     n + 2*64,     n + 1*64,     n + 3*64
+#   define R4(n) R2(n), R2(n + 2*16), R2(n + 1*16), R2(n + 3*16)
+#   define R6(n) R4(n), R4(n + 2*4 ), R4(n + 1*4 ), R4(n + 3*4 )
+	R6(0), R6(2), R6(1), R6(3)
+};
+
+
+inline UINT bitReverse256(UINT n) {
+	return BitReverseTable256[n];
+}
+
+inline UINT bitReverse512(UINT n) {
+	return BitReverseTable256[n & 0xff]<<8 | (n & 256);
+}
+
+// Reverse bits end
+
+
+// Fast Fourire Transform 
+std::vector<Complex> BitReverseCopy(const std::vector<Complex>& v);
+
+// Calculate coeff[i] * w^i
+// Where w^n = 1
+std::vector<Complex> FFT(const std::vector<Complex>& coeff);
+
 
 
 class OceanPSO : public Graphic::GraphicsPSO {
@@ -71,10 +107,9 @@ class FFTOcean {
 
 public:
 	// res: how many pixel the texture will have, vertices number = (res+1)^2
-	FFTOcean(UINT res = 64) : m_ResX(res), m_ResY(res)
-	{ 
-		// TODO m_Random
-	};
+	FFTOcean(UINT res = OceanResolution) : 
+		m_ResX(res), m_ResY(res)
+	{ };
 
 	void Update();
 
@@ -84,17 +119,35 @@ public:
 
 
 	void Initialize() {
-		UINT size = (m_ResX + 1) * (m_ResY + 1);
+		
+
+		UINT size = m_ResX * m_ResY;
 		m_Displacement = std::vector<Vector3>(size);
+		m_coeff = std::vector<std::vector<Complex>>(m_ResX, std::vector<Complex>(m_ResY));
+		m_A =  std::vector<std::vector<Complex>>(m_ResX, std::vector<Complex>(m_ResY));
+		
+		// Create random for each point
+		m_Random = std::vector<std::vector<Complex>>(m_ResX, std::vector<Complex>(m_ResY));
+		std::default_random_engine generator;
+		std::normal_distribution<double> distribution(0.0,1.0);
+		for (int n = 0; n < m_ResX; ++n) {
+			for (int m = 0; m < m_ResY; ++m) {
+				double r = distribution(generator);
+				double i = distribution(generator);
+				m_Random[n][m] = Complex(r, i) / std::sqrt(2.0);
+			}
+		}
+
 
 		// Create Texture
-		DXGI_FORMAT format = DXGI_FORMAT_R32G32B32_FLOAT;
+		// XMVECTOR 4 x 16 byte
+		DXGI_FORMAT format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		m_DisplacementTexture = new Graphic::Texture2D(m_ResX, m_ResY, Graphic::TEXTURE_SRV, format);
 		m_NormalTexture = new Graphic::Texture2D(m_ResX, m_ResY, Graphic::TEXTURE_SRV, DXGI_FORMAT_R8G8B8A8_UNORM, TRUE);
 		
 
 		// Create Mesh
-		//m_Mesh = TriangleMesh::GetXYPlane();
+		// m_Mesh = TriangleMesh::GetXYPlane();
 		InitOceanMesh();
 
 		OceanMaterial::MatData materialData;
@@ -104,21 +157,45 @@ public:
 		m_Material->m_Displacement = m_DisplacementTexture;
 		m_Material->m_Normal = m_NormalTexture;
 		m_Material->UploadCBV();
+
+		// Test FFT
+		
+		/*std::vector<Complex> c(256, 1);
+		std::vector<Complex> res = FFT(c);*/
+
 	}
 	
 private:
 
-	Scalar Spectrum(const Vector2 k) const 
+	inline double Spectrum(const Vector2 k) const 
 	{
-		Scalar k2 = Length2(k);
-		Scalar kw2 = Pow(Dot(k, W_dir), Scalar(2.0));
-		return A * Exp(-Scalar(1.0) / (k2 * L2)) * kw2 / (k2 * k2);
+		double k2 = Length2(k);
+		double kw2 = std::pow((double)Dot(k, W_dir), 2.0);
+		return A * std::exp(-1.0 / (k2 * L2)) * kw2 / (k2 * k2);
 	}
 
-	Complex AmplitedeBase(const Vector2 k) 
+	inline Complex H0(const Vector2 k, const Complex R) const {
+		return R * Complex(std::sqrt(Spectrum(k)));
+	}
+
+	Complex Amplitede(UINT x, UINT y) 
 	{
-		Scalar p = Sqrt(Spectrum(k));
-		return m_Random * (float)p / sqrtf(2);
+		if (x == m_ResX/2 && y == m_ResY/2) { return Complex(0.0, 0.0); }
+		/*Vector2 k(1.0f * x / m_ResX - 0.5f, 1.0f * y / m_ResY - 0.5f);
+		k *= 2 * PI * 530;*/
+
+		Vector2 k(1.0f * (x - m_ResX/2) , 1.0f * (y - m_ResY/2));
+		k *= 2 * PI / 500.f;
+
+		Complex R = m_Random[x][y];
+
+		Complex h1 = H0(k, R);
+		Complex h2 = std::conj(H0(-k, R));
+		
+		Complex w = Complex(0.0, std::sqrt(g * (double)Length(k)));
+		
+		Complex h = h1 * std::exp(w) + h2 * std::exp(-w);
+		return h;
 	}
 
 	void InitOceanMesh();
@@ -129,20 +206,20 @@ private:
 	Graphic::Texture* m_NormalTexture;
 	std::vector<Vector3> m_Displacement;
 
+	std::vector<std::vector<Complex>> m_Random;
+	std::vector<std::vector<Complex>> m_coeff;
+	std::vector<std::vector<Complex>> m_A; // Store 1d fft
+
 	UINT m_ResX, m_ResY;
-	Complex m_Random;
 
 	// Constants used for calculating the height
-	const Scalar g = 9.8;
-	const Scalar A = 1.0;
-	const Scalar V = 10.0;	// Wind speed 
+	const double g = 9.8;
+	const double A = 2.0;
+	const double V = 1.32;	// Wind speed 
 
-	const Scalar L = V * V / g;
-	const Scalar L2 = L * L;
+	const double L = V * V / g;
+	const double L2 = L * L;
 
 	const Vector2 W_dir = Normalize(Vector2(1.0, 1.0));
 
 };
-
-
-

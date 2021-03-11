@@ -60,6 +60,11 @@ namespace Math {
 		return Scalar((DirectX::XMVector3Length(v)));
 	}
 
+	INLINE Scalar Length(const Vector2& v) 
+	{
+		return Scalar((DirectX::XMVector2Length(v)));
+	}
+
 	template <class T>
 	INLINE T Sqrt(const T& v) {
 		return T(DirectX::XMVectorSqrt(v));

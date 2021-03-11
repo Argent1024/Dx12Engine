@@ -50,6 +50,19 @@ void FFTOcean::InitOceanMesh()
 		DirectX::XMUINT2 texcoor;
 		DirectX::XMFLOAT2 fuv;
 	};
+	
+	// Test texture
+	/*std::vector<VertexData> triangleVertices =
+	{
+		{ { 1.0f,  1.0f, 0.0f }, { 1, 0 }, { 1.0f, 0.0f  } },
+		{ { 1.0f, -1.0f, 0.0f }, { 1, 1 }, { 1.0f, 1.0f } },
+		{ { -1.0f, 1.0f, 0.0f }, { 0, 0 }, { 0.0f, 0.0f } },
+		{ { -1.0f, -1.0f, 0.0f }, { 0, 1}, { 0.0f, 1.0f } }
+	};
+	std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
+	m_Mesh = std::make_shared<TriangleMesh>(triangleVertices, index_list);*/
+
+
 
 	UINT vertexSize = (m_ResX + 1) * (m_ResY + 1);
 	std::vector<VertexData> vertices(vertexSize);
@@ -57,7 +70,7 @@ void FFTOcean::InitOceanMesh()
 	UINT pixelSize = m_ResX * m_ResY;
 	std::vector<UINT> index;
 
-	float dx = 2.0 / m_ResX;
+	const float dx = 2.0f / m_ResX;
 
 	for (int x = 0; x < m_ResX + 1; ++x) {
 		for (int y = 0; y < m_ResY + 1; ++y) {
@@ -88,6 +101,74 @@ void FFTOcean::InitOceanMesh()
 	m_Mesh = std::make_shared<TriangleMesh>(vertices, index);
 }
 
+
 void FFTOcean::Update() {
-	return;
+	// calculate coeff
+	for (int n = 0; n < m_ResX; ++n) {
+		for (int m = 0; m < m_ResY; ++m) {
+			Complex h = Amplitede(n, m);
+			m_coeff[n][m] = h;
+
+			float s = 2.0 * h.real() + 0.5;
+			int index = n * m_ResY + m;
+			m_Displacement[index] = Vector3(s, s, 0);
+		}
+	}
+
+
+	// FFT
+	for (int n = 0; n < m_ResX; ++n) {
+		std::vector<Complex> An = FFT(m_coeff[n]);
+		for (int i = 0; i < An.size(); ++i) {
+			m_A[i][n] = An[i];
+		}
+	}
+
+	for (int m = 0; m < m_ResY; ++m) {
+		std::vector<Complex> hm = FFT(m_A[m]);
+		for (int n = 0; n < hm.size(); ++n) {
+			float h = hm[n].real();
+			int index = n * m_ResY + m;
+			m_Displacement[index] = Vector3(h, h, h);
+		}
+	}
+	
+	D3D12_SUBRESOURCE_DATA textureData = 
+	Graphic::Texture::CreateTextureData({ m_ResX, m_ResY, 4, 4}, (const unsigned char*)&m_Displacement[0]);
+	m_DisplacementTexture->UploadTexture(&textureData);
+}
+
+
+std::vector<Complex> BitReverseCopy(const std::vector<Complex>& v) {
+	int n = v.size();
+	std::vector<Complex> A(n);
+	for (int i = 0; i < n; i++) {
+		A[bitReverse256(i)] = v[i];
+	}
+	return A;
+}
+
+
+std::vector<Complex> FFT(const std::vector<Complex>& coeff) {
+	int n = coeff.size();
+	int lgN = 8; // Assume 256 = 2^8 for simplicity
+
+	// Bit reverse copy
+	std::vector<Complex> A = BitReverseCopy(coeff);
+
+	for (int i = 1; i <= lgN; ++i) {
+		int m = 1<<i;
+		Complex Wm = std::exp(Complex{0, 2 * PI / m});
+		for (int k = 0; k < n; k += m) {
+			Complex W{1.0, 0.0};
+			for (int j = 0; j < m / 2; ++j) {
+				Complex t = W * A[k + j + m/2];
+				Complex u = A[k + j];
+				A[k + j] = u + t;
+				A[k + j + m/2] = u - t;
+				W = W * Wm;
+			}
+		}
+	}
+	return A;
 }

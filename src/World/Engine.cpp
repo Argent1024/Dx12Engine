@@ -89,11 +89,11 @@ namespace Engine {
 			*/
 		}
 
-
+		m_Ocean->Update();
 	}
 
 	void GameEngine::Render() 
-	{
+	{	
 		m_RenderEngine->Render(*m_Scene);
 	}
 

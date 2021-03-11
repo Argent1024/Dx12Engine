@@ -17,10 +17,10 @@ namespace Graphic {
 
 	struct ImageMetadata
 	{
-		int width;
-		int height;
-		int channel;
-		int pixelSize;	// In Byte
+		UINT width;
+		UINT height;
+		UINT channel;
+		UINT channelSize;	// In Byte
 	};
 
 	void LoadChessBoard(const UINT width, const UINT height, const UINT pixelSize, std::vector<UINT8>& data);
@@ -74,8 +74,8 @@ namespace Graphic {
 			D3D12_SUBRESOURCE_DATA textureData = {};
 			// Set infomation to m_textureData
 			textureData.pData = data;
-			textureData.RowPitch = metadata.width * metadata.pixelSize;
-			textureData.SlicePitch = textureData.RowPitch * metadata.height;
+			textureData.RowPitch = metadata.width * metadata.channel * metadata.channelSize;
+			textureData.SlicePitch = metadata.height;
 			return textureData;
 		}
 
@@ -85,6 +85,11 @@ namespace Graphic {
 		{
 			
 		} */
+
+		virtual void UploadTexture(D3D12_SUBRESOURCE_DATA* data) 
+		{
+			assert(FALSE && "Not implemented");
+		}
 
 	protected:
 		// Create the SRV & UAV at the table at tableIndex
@@ -162,7 +167,7 @@ namespace Graphic {
 
 		// Write texture data to gpu memory
 		// Only need to upload once since all views point to the same memory!
-		inline void UploadTexture(D3D12_SUBRESOURCE_DATA* data) {
+		inline void UploadTexture(D3D12_SUBRESOURCE_DATA* data) override {
 			GPU::MemoryManager::UploadTexure(*m_buffer, data);
 		}
 
