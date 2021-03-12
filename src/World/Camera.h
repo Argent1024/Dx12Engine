@@ -66,7 +66,7 @@ namespace Game {
 		void LookAt(const Math::Vector3& Position, const Math::Vector3& Target, const Math::Vector3& WorldUp) 
 		{
 			m_Position = Position;
-			m_Direction = Target - m_Position;
+			m_Direction = Normalize(Target - m_Position);
 			m_WorldUp = WorldUp;
 			Look();
 		}
@@ -120,7 +120,7 @@ namespace Game {
 		const float& FovY() const { return m_FOVAngleY; }
 
 	private:
-		float m_FOVAngleY = 3.14f / 6.0f;
+		float m_FOVAngleY = 3.14f / 3.0f;
 	};
 
 	class OrthonormalCamera : public Camera {

@@ -51,17 +51,18 @@ void FFTOcean::InitOceanMesh()
 		DirectX::XMFLOAT2 fuv;
 	};
 
-	UINT vertexSize = (m_ResX + 1) * (m_ResY + 1);
-	std::vector<VertexData> vertices(vertexSize);
+	UINT vertexX = m_ResX + 1;
+	UINT vertexY = m_ResY + 1;
+	UINT vertexSize = vertexX * vertexY;
 
-	UINT pixelSize = m_ResX * m_ResY;
+	std::vector<VertexData> vertices(vertexSize);
 	std::vector<UINT> index;
 
-	const float dx = 2.0f / m_ResX;
+	const float dx = 2.0f / vertexX;
 
-	for (int x = 0; x < m_ResX + 1; ++x) {
-		for (int y = 0; y < m_ResY + 1; ++y) {
-			int i = x * (m_ResY + 1) + y;
+	for (int x = 0; x < vertexX; ++x) {
+		for (int y = 0; y < vertexY; ++y) {
+			int i = x * vertexY + y;
 			VertexData& v = vertices[i];
 			v.position = DirectX::XMFLOAT3(dx*x - 1.0f, dx*y - 1.0f, 0.0f);
 			v.texcoor = DirectX::XMUINT2(x, y);
@@ -71,10 +72,10 @@ void FFTOcean::InitOceanMesh()
 
 	for (int x = 0; x < m_ResX; ++x) {
 		for (int y = 0; y < m_ResY; ++y) {
-			UINT a = x * (m_ResY + 1) + y;
-			UINT b = (x+1) * (m_ResY + 1) + y;
-			UINT c = x * (m_ResY + 1) + (y+1);
-			UINT d = (x+1) * (m_ResY + 1) + (y+1);
+			UINT a = x * vertexY + y;
+			UINT b = (x+1) * vertexY + y;
+			UINT c = x * vertexY + (y+1);
+			UINT d = (x+1) * vertexY + (y+1);
 			index.push_back(a);
 			index.push_back(b);
 			index.push_back(c);
@@ -145,7 +146,7 @@ void FFTOcean::ShiftUpdate() {
 			m_Displacement[index].SetX(x);
 			m_Displacement[index].SetY(y);
 		}
-	}
+	}	
 }
 
 
@@ -208,17 +209,17 @@ std::vector<Complex> BitReverseCopy(const std::vector<Complex>& v) {
 
 std::vector<Complex> FFT(const std::vector<Complex>& coeff) {
 	int n = coeff.size();
-	int lgN = 8; // Assume 256 = 2^8 for simplicity
+	int lgN = logOceanResolution;
 
 	// Bit reverse copy
 	std::vector<Complex> A = BitReverseCopy(coeff);
 
 	for (int i = 1; i <= lgN; ++i) {
 		int m = 1<<i;
-		Complex Wm = std::exp(Complex{0, 2 * PI / m});
-		for (int k = 0; k < n; k += m) {
+		Complex Wm = std::exp(Complex{0, 2.0 * PI / m});
+		for (int k = 0; k <= n - 1; k += m) {
 			Complex W{1.0, 0.0};
-			for (int j = 0; j < m / 2; ++j) {
+			for (int j = 0; j <= m / 2 - 1; ++j) {
 				Complex t = W * A[k + j + m/2];
 				Complex u = A[k + j];
 				A[k + j] = u + t;

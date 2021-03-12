@@ -15,7 +15,9 @@ using namespace Math;
 using Complex = std::complex<double>;
 
 
-const UINT OceanResolution = 256;
+
+const UINT logOceanResolution = 8;
+const UINT OceanResolution = 1<<logOceanResolution;
 
 // How to reverse bits
 // http://graphics.stanford.edu/~seander/bithacks.html#BitReverseTable
@@ -34,8 +36,9 @@ inline UINT bitReverse256(UINT n) {
 	return BitReverseTable256[n];
 }
 
+// TODO not working
 inline UINT bitReverse512(UINT n) {
-	return BitReverseTable256[n & 0xff]<<8 | (n & 256);
+	return BitReverseTable256[n & 0xff]<<1 | (n >> 8)&1;
 }
 
 // Reverse bits end
@@ -131,6 +134,7 @@ public:
 		// Create random for each point
 		m_Random = std::vector<std::vector<Complex>>(m_ResX, std::vector<Complex>(m_ResY));
 		std::default_random_engine generator;
+		generator.seed(20210312);
 		std::normal_distribution<double> distribution(0.0,1.0);
 		for (int n = 0; n < m_ResX; ++n) {
 			for (int m = 0; m < m_ResY; ++m) {
@@ -139,7 +143,7 @@ public:
 				m_Random[n][m] = Complex(r, i) / std::sqrt(2.0);
 			}
 		}
-
+		W_dir = Normalize(Vector2(distribution(generator), distribution(generator)));
 
 		// Create Texture
 		// XMVECTOR 4 x 16 byte
@@ -161,16 +165,15 @@ public:
 		m_Material->UploadCBV();
 
 		// Test FFT
-		/*std::vector<Complex> c(256, 1);
-		std::vector<Complex> res = FFT(c);*/
-
+		std::vector<Complex> v(OceanResolution, 1);
+		std::vector<Complex> res = FFT(v);
 	}
 	
 private:
 
 	inline Vector2 WaveK(UINT n, UINT m) const {
 		Vector2 k(1.0f * (n - m_ResX/2) , 1.0f * (m - m_ResY/2));
-		k *= 2 * PI / 500.f;
+		k *=  PI / m_ResX ;
 		return k;
 	}
 
@@ -225,15 +228,15 @@ private:
 
 	// Constants used for calculating the height
 	const double g = 9.8;
-	const double A = 2.0;
+	const double A = 0.1;
 	const double V = 1.32;	// Wind speed 
 
 	const double L = V * V / g;
 	const double L2 = L * L;
 
-	const double m_VerticalShift = 0.35;	
+	const double m_VerticalShift = 1.0;	
 
 
-	const Vector2 W_dir = Normalize(Vector2(1.0, 1.0));
+	Vector2 W_dir;
 
 };

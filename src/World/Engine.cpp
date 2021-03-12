@@ -35,7 +35,7 @@ namespace Engine {
 			// Load light
 			DirectionLight* m_Light = new DirectionLight();
 			m_Scene->AddLight(*m_Light);
-			m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {0.0, 1.0, 0.0} });
+			m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {0.0, 1.0, 1.0} });
 			m_Material = std::make_shared<PrincipleMaterial>();
 
 			// FFT Ocean Part
@@ -43,14 +43,18 @@ namespace Engine {
 			m_Ocean->Initialize();
 
 			GObject* ocean_obj = new Game::GObject();
-			const float scale = 1.f;
+			const float scale = 5.f;
 			ocean_obj->SetMesh(m_Ocean->GetMesh());
 			ocean_obj->SetMaterial(m_Ocean->GetMaterial());
 			ocean_obj->SetTransform(Transform({ scale, 0, 0 }, { 0, scale, 0 }, { 0, 0, scale }, {0.0, 0.0, 0.0}));
 			m_Scene->AddGameObj(ocean_obj);
 
 			ProjectiveCamera& camera = m_Scene->GetMainCamera();
-
+			// Vector3 position(5.2, 0.0, 0.2);
+			Vector3 position(10.2, 0.0, 2.2);
+			Vector3 origin(0., 0., 0.);
+			Vector3 worldUp(0., 0., 1.0);
+			camera.LookAt(position, origin, worldUp);
 
 			// Normal mesh stuff
 			/*
@@ -118,6 +122,12 @@ namespace Engine {
 
 			// press f2 to show normal
 			if (input.IsKeyPressed(Keyboard::F2)) {
+				// Reset camera for FFT ocean
+				ProjectiveCamera& camera = m_Scene->GetMainCamera();
+				Vector3 position(0.0f, 0.0f, 10.f);
+				Vector3 origin(0.0f, 0.0f, 0.0f);
+				Vector3 worldUp(0.0f, 1.0f, 0.0f);
+				camera.LookAt(position, origin, worldUp);
 
 				RenderEngine::RenderConfiguration& renderSetting = m_RenderEngine->GetRenderSetting();
 

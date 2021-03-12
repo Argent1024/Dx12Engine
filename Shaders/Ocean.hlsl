@@ -82,7 +82,7 @@ PSInput VSMain(VSInput input)
 {
     PSInput result;
 	
-	float3 shift = DisplacementTex[input.uv].xyz / 20.0;
+	float3 shift = DisplacementTex[input.uv].xyz / 10.0;
 	float4 pos = float4(input.position + shift, 1.0f);
 
 	pos = mul(pos, modelTransformation);
@@ -103,11 +103,45 @@ PSInput VSMain(VSInput input)
 
 // Pixel Shader
 float4 PSMain(PSInput input) : SV_TARGET
-{
-	
+{	
+	const float PI = 3.14159265;
 	float2 uv = float2(input.uv);
-	float shift = 0.5;
-	//float3 ans = DisplacementTex.Sample(g_sampler, uv).xyz + shift;
-	float3 ans = NormalTex.Sample(g_sampler, uv).xyz + shift;
-	return float4(ans, 1.0);
+	float3 normal = normalize(NormalTex.Sample(g_sampler, uv).xyz);
+	if (debugnormal) {
+		// return (float4(normal, 1.0f) + 1.0f) / 2.0f;
+		float3 shift = DisplacementTex.Sample(g_sampler, uv).xyz;
+		return shift.z;
+	}
+
+	// Only consider the direction light, which will be at SceneLight[0]
+	float3 viewDir = normalize(CameraPos - input.worldpos.xyz);
+	float3 lightDir = normalize(SceneLights[0].direction.xyz);
+	float3 halfVec = normalize(viewDir + lightDir);
+
+	float3 strength = SceneLights[0].strength.xyz;
+	
+
+	float cosL = max(0.0, dot(lightDir, normal));
+	float cosV = max(0.0, dot(viewDir, normal));
+	float cosLV = max(0.0, dot(viewDir, lightDir));
+	float cosD = max(0.0, dot(halfVec, lightDir));
+	
+	// Subsurface scattering
+	float subsurfaceBase = 1.0;
+	float subsurfaceSun  = 3.0;
+	float towardSun = pow(cosV, 5.0);
+	float ssIntensity = 20.5 * max(0.00, input.worldpos.z); // TODO normalize this
+	float subsurface = (subsurfaceBase + subsurfaceSun * towardSun) * ssIntensity;
+
+	const float3 water0 = float3(0.1, 0.1, 0.8);
+	const float3 water1 = float3(0.4, 0.6, 0.98);
+	
+	// return float4(cosL * water0 * 10.0 + 1.0 * cosV * water1, 1.0);
+	float3 deepCol = water0 *(0.02 + cosD) * strength;
+	float3 scatterCol =  subsurface * water1 * strength;
+	
+	const float ior = 0.08;
+	float F = ior + (1.0 - ior) * pow(1.f - cosD, 5);
+	float3 reflection = F * cosL * strength / max(0.2, cosV) / 4.0;
+	return float4(scatterCol + reflection + deepCol, 1.0);
 }
