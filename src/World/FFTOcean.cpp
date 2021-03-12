@@ -50,19 +50,6 @@ void FFTOcean::InitOceanMesh()
 		DirectX::XMUINT2 texcoor;
 		DirectX::XMFLOAT2 fuv;
 	};
-	
-	// Test texture
-	/*std::vector<VertexData> triangleVertices =
-	{
-		{ { 1.0f,  1.0f, 0.0f }, { 1, 0 }, { 1.0f, 0.0f  } },
-		{ { 1.0f, -1.0f, 0.0f }, { 1, 1 }, { 1.0f, 1.0f } },
-		{ { -1.0f, 1.0f, 0.0f }, { 0, 0 }, { 0.0f, 0.0f } },
-		{ { -1.0f, -1.0f, 0.0f }, { 0, 1}, { 0.0f, 1.0f } }
-	};
-	std::vector<UINT> index_list = { 0, 1, 2, 3, 2, 1 };
-	m_Mesh = std::make_shared<TriangleMesh>(triangleVertices, index_list);*/
-
-
 
 	UINT vertexSize = (m_ResX + 1) * (m_ResY + 1);
 	std::vector<VertexData> vertices(vertexSize);
@@ -101,22 +88,19 @@ void FFTOcean::InitOceanMesh()
 	m_Mesh = std::make_shared<TriangleMesh>(vertices, index);
 }
 
-
-void FFTOcean::Update() {
-	// calculate coeff
+void FFTOcean::AmplitedeUpdate() {
+	// Calculate amplitede for every wave
 	for (int n = 0; n < m_ResX; ++n) {
 		for (int m = 0; m < m_ResY; ++m) {
 			Complex h = Amplitede(n, m);
 			m_coeff[n][m] = h;
-
-			float s = 2.0 * h.real() + 0.5;
-			int index = n * m_ResY + m;
-			m_Displacement[index] = Vector3(s, s, 0);
 		}
 	}
+}
 
 
-	// FFT
+void FFTOcean::HeightUpdate() {
+	// Solve 2d fft for height
 	for (int n = 0; n < m_ResX; ++n) {
 		std::vector<Complex> An = FFT(m_coeff[n]);
 		for (int i = 0; i < An.size(); ++i) {
@@ -129,13 +113,86 @@ void FFTOcean::Update() {
 		for (int n = 0; n < hm.size(); ++n) {
 			float h = hm[n].real();
 			int index = n * m_ResY + m;
-			m_Displacement[index] = Vector3(h, h, h);
+			m_Displacement[index].SetZ(h);
 		}
 	}
-	
+}
+
+
+void FFTOcean::ShiftUpdate() {
+	for (int n = 0; n < m_ResX; ++n) {
+		for (int m = 0; m < m_ResY; ++m) {
+			Complex h = Amplitede(n, m);
+			Vector2 k = Normalize(WaveK(n, m));
+			Complex ck ((double)k.GetY(), (double)-k.GetX());
+			m_coeff[n][m] = ck * h ;
+		}
+	}
+
+	for (int n = 0; n < m_ResX; ++n) {
+		std::vector<Complex> An = FFT(m_coeff[n]);
+		for (int i = 0; i < An.size(); ++i) {
+			m_A[i][n] = An[i];
+		}
+	}
+
+	for (int m = 0; m < m_ResY; ++m) {
+		std::vector<Complex> Dm = FFT(m_A[m]);
+		for (int n = 0; n < m_ResX; ++n) {
+			float x = Dm[n].real() * m_VerticalShift;
+			float y = Dm[n].imag() * m_VerticalShift;
+			int index = n * m_ResY + m;
+			m_Displacement[index].SetX(x);
+			m_Displacement[index].SetY(y);
+		}
+	}
+}
+
+
+void FFTOcean::NormalUpdate() {
+
+	for (int n = 0; n < m_ResX; ++n) {
+		for (int m = 0; m < m_ResY; ++m) {
+			Vector2 k = Normalize(WaveK(n, m));
+			double lenK = Length(k);
+			m_coeff[n][m] *= lenK;				// After calculating the shift m_coeff[n,m] = ik/|k|
+		}
+	}
+
+	// Calculate gradient and use that as normal
+	for (int n = 0; n < m_ResX; ++n) {
+		std::vector<Complex> An = FFT(m_coeff[n]);
+		for (int i = 0; i < An.size(); ++i) {
+			m_A[i][n] = An[i];
+		}
+	}
+
+	for (int m = 0; m < m_ResY; ++m) {
+		std::vector<Complex> gradm = FFT(m_A[m]);
+		for (int n = 0; n < gradm.size(); ++n) {
+			float x = gradm[n].real();
+			float y = gradm[n].imag();
+			int index = n * m_ResY + m;
+			m_Normals[index] = Normalize(Vector3(-x, -y, 1.0));
+		}
+	}
+}
+
+void FFTOcean::Update(double dt) {
+	m_Time += dt;
+
+	AmplitedeUpdate();
+	HeightUpdate();
+	ShiftUpdate();
+	NormalUpdate();
+
 	D3D12_SUBRESOURCE_DATA textureData = 
 	Graphic::Texture::CreateTextureData({ m_ResX, m_ResY, 4, 4}, (const unsigned char*)&m_Displacement[0]);
 	m_DisplacementTexture->UploadTexture(&textureData);
+
+	D3D12_SUBRESOURCE_DATA nData = 
+	Graphic::Texture::CreateTextureData({ m_ResX, m_ResY, 4, 4}, (const unsigned char*)&m_Normals[0]);
+	m_NormalTexture->UploadTexture(&nData);
 }
 
 

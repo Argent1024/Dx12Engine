@@ -2,20 +2,21 @@
 
 #include <windows.h>
 namespace Utility {
-
+	// TODO add second/microsecond parameters
 	class Timer {
 	public:
-		Timer() : {
+		Timer() {
 			QueryPerformanceFrequency(&Frequency);
 		}
 
 		void Start() {
-			QueryPerformanceFrequency(&mStart);
-			QueryPerformanceFrequency(&mPrevT);
+			QueryPerformanceCounter(&mStart);
+			QueryPerformanceCounter(&mPrevT);
+			mCurrT = mPrevT;
 		}
 
 		double GetDeltaTime() {
-			QueryPerformanceFrequency(&mCurrT);
+			QueryPerformanceCounter(&mCurrT);
 			LARGE_INTEGER ElapsedMicroseconds;
 			ElapsedMicroseconds.QuadPart = mCurrT.QuadPart - mPrevT.QuadPart;
 			mPrevT = mCurrT;
@@ -30,6 +31,9 @@ namespace Utility {
 			return ElapsedMicroseconds.QuadPart / Frequency.QuadPart;
 		}
 
+		double GetCurrent() {
+			return mCurrT.QuadPart * 1000000 / Frequency.QuadPart;
+		}
 
 	private:
 		LARGE_INTEGER Frequency;

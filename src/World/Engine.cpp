@@ -38,7 +38,7 @@ namespace Engine {
 			m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {0.0, 1.0, 0.0} });
 			m_Material = std::make_shared<PrincipleMaterial>();
 
-
+			// FFT Ocean Part
 			m_Ocean = new FFTOcean();
 			m_Ocean->Initialize();
 
@@ -48,6 +48,9 @@ namespace Engine {
 			ocean_obj->SetMaterial(m_Ocean->GetMaterial());
 			ocean_obj->SetTransform(Transform({ scale, 0, 0 }, { 0, scale, 0 }, { 0, 0, scale }, {0.0, 0.0, 0.0}));
 			m_Scene->AddGameObj(ocean_obj);
+
+			ProjectiveCamera& camera = m_Scene->GetMainCamera();
+
 
 			// Normal mesh stuff
 			/*
@@ -88,12 +91,13 @@ namespace Engine {
 			m_Scene->AddGameObj(obj0);
 			*/
 		}
-
-		m_Ocean->Update();
+		m_Timer.Start();
 	}
 
 	void GameEngine::Render() 
 	{	
+		double dt = m_Timer.GetDeltaTime()/ 1000000.0;
+		m_Ocean->Update(dt / 5.0);
 		m_RenderEngine->Render(*m_Scene);
 	}
 

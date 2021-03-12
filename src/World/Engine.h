@@ -2,6 +2,7 @@
 #include "RenderEngine.h"
 #include "GameInput.h"
 #include "FFTOcean.h"
+#include "Utility/Timer.h"
 
 namespace Engine {
 
@@ -32,11 +33,12 @@ namespace Engine {
 
 	protected:
 		UINT frame = 0;
-		
+		Utility::Timer m_Timer;
+
 		GameConfiguration m_Setting;
 
 		RenderEngine* m_RenderEngine;
-
+		
 		// Data
 		Game::Scene* m_Scene;
 		Game::GameControl* m_GameControl;

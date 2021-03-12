@@ -49,7 +49,7 @@ cbuffer MaterialInfo : register (b3)
 }
 
 Texture2D<float4> DisplacementTex : register(t0);
-Texture2D<float3> NormalTex : register(t1);
+Texture2D<float4> NormalTex : register(t1);
 SamplerState g_sampler : register(s0);
 
 
@@ -82,8 +82,7 @@ PSInput VSMain(VSInput input)
 {
     PSInput result;
 	
-	//float3 shift = DisplacementTex[input.uv].xyz / 20.0;
-	float3 shift = float3(0.0, 0.0, 0.0);
+	float3 shift = DisplacementTex[input.uv].xyz / 20.0;
 	float4 pos = float4(input.position + shift, 1.0f);
 
 	pos = mul(pos, modelTransformation);
@@ -108,6 +107,7 @@ float4 PSMain(PSInput input) : SV_TARGET
 	
 	float2 uv = float2(input.uv);
 	float shift = 0.5;
-	float3 ans = DisplacementTex.Sample(g_sampler, uv).xyz + shift;
+	//float3 ans = DisplacementTex.Sample(g_sampler, uv).xyz + shift;
+	float3 ans = NormalTex.Sample(g_sampler, uv).xyz + shift;
 	return float4(ans, 1.0);
 }

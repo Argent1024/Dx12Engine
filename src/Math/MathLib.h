@@ -32,7 +32,7 @@ namespace Math {
 
 	INLINE Vector2 Normalize(const Vector2& v) 
 	{
-		return Vector2(DirectX::XMVector3Normalize(v));
+		return Vector2(DirectX::XMVector2Normalize(v));
 	}
 
 	INLINE Scalar Dot(const Vector3& a, const Vector3& b) 

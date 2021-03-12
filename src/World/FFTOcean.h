@@ -108,10 +108,10 @@ class FFTOcean {
 public:
 	// res: how many pixel the texture will have, vertices number = (res+1)^2
 	FFTOcean(UINT res = OceanResolution) : 
-		m_ResX(res), m_ResY(res)
+		m_ResX(res), m_ResY(res), m_Time(0.0)
 	{ };
 
-	void Update();
+	void Update(double dt);
 
 	ptrMesh GetMesh() { return m_Mesh; }
 
@@ -123,6 +123,8 @@ public:
 
 		UINT size = m_ResX * m_ResY;
 		m_Displacement = std::vector<Vector3>(size);
+		m_Normals = std::vector<Vector3>(size);
+
 		m_coeff = std::vector<std::vector<Complex>>(m_ResX, std::vector<Complex>(m_ResY));
 		m_A =  std::vector<std::vector<Complex>>(m_ResX, std::vector<Complex>(m_ResY));
 		
@@ -143,7 +145,7 @@ public:
 		// XMVECTOR 4 x 16 byte
 		DXGI_FORMAT format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		m_DisplacementTexture = new Graphic::Texture2D(m_ResX, m_ResY, Graphic::TEXTURE_SRV, format);
-		m_NormalTexture = new Graphic::Texture2D(m_ResX, m_ResY, Graphic::TEXTURE_SRV, DXGI_FORMAT_R8G8B8A8_UNORM, TRUE);
+		m_NormalTexture = new Graphic::Texture2D(m_ResX, m_ResY, Graphic::TEXTURE_SRV, format);
 		
 
 		// Create Mesh
@@ -159,13 +161,18 @@ public:
 		m_Material->UploadCBV();
 
 		// Test FFT
-		
 		/*std::vector<Complex> c(256, 1);
 		std::vector<Complex> res = FFT(c);*/
 
 	}
 	
 private:
+
+	inline Vector2 WaveK(UINT n, UINT m) const {
+		Vector2 k(1.0f * (n - m_ResX/2) , 1.0f * (m - m_ResY/2));
+		k *= 2 * PI / 500.f;
+		return k;
+	}
 
 	inline double Spectrum(const Vector2 k) const 
 	{
@@ -178,37 +185,41 @@ private:
 		return R * Complex(std::sqrt(Spectrum(k)));
 	}
 
-	Complex Amplitede(UINT x, UINT y) 
+	Complex Amplitede(UINT n, UINT m) 
 	{
-		if (x == m_ResX/2 && y == m_ResY/2) { return Complex(0.0, 0.0); }
-		/*Vector2 k(1.0f * x / m_ResX - 0.5f, 1.0f * y / m_ResY - 0.5f);
-		k *= 2 * PI * 530;*/
-
-		Vector2 k(1.0f * (x - m_ResX/2) , 1.0f * (y - m_ResY/2));
-		k *= 2 * PI / 500.f;
-
-		Complex R = m_Random[x][y];
+		if (n == m_ResX/2 && m == m_ResY/2) { return Complex(0.0, 0.0); }
+		Vector2 k = WaveK(n, m);
+		Complex R = m_Random[n][m];
 
 		Complex h1 = H0(k, R);
 		Complex h2 = std::conj(H0(-k, R));
 		
 		Complex w = Complex(0.0, std::sqrt(g * (double)Length(k)));
 		
-		Complex h = h1 * std::exp(w) + h2 * std::exp(-w);
+		Complex h = h1 * std::exp(w * m_Time) + h2 * std::exp(-w * m_Time);
 		return h;
 	}
 
 	void InitOceanMesh();
 
+	void AmplitedeUpdate();
+	void HeightUpdate();
+	void ShiftUpdate();
+	void NormalUpdate();
+
 	ptrMesh m_Mesh;
 	std::shared_ptr<OceanMaterial> m_Material;
 	Graphic::Texture* m_DisplacementTexture;
 	Graphic::Texture* m_NormalTexture;
+
 	std::vector<Vector3> m_Displacement;
+	std::vector<Vector3> m_Normals;
 
 	std::vector<std::vector<Complex>> m_Random;
 	std::vector<std::vector<Complex>> m_coeff;
 	std::vector<std::vector<Complex>> m_A; // Store 1d fft
+
+	double m_Time;
 
 	UINT m_ResX, m_ResY;
 
@@ -219,6 +230,9 @@ private:
 
 	const double L = V * V / g;
 	const double L2 = L * L;
+
+	const double m_VerticalShift = 0.35;	
+
 
 	const Vector2 W_dir = Normalize(Vector2(1.0, 1.0));
 
