@@ -72,14 +72,13 @@ namespace Math
 		Vector2() {}
 		
 		INLINE Vector2(float x) { m_vec = XMVectorReplicate(x); }
-		INLINE Vector2(float x, float y) { m_vec = XMVectorSet(x, y, 0.0, 1.f); }
+		INLINE Vector2(float x, float y) { m_vec = XMVectorSet(x, y, 0.0, 0.f); }
 		INLINE Vector2(const Vector2& v) { m_vec = v; }
 		INLINE Vector2(const Scalar& s) { m_vec = s; }
 		INLINE explicit Vector2(const XMVECTOR v) { m_vec = v; }
-		INLINE explicit Vector2(ZeroTag) { m_vec = XMVectorSet(0.f, 0.f, 0.f, 1.f);}
-		INLINE explicit Vector2(XUnitVec) { m_vec = XMVectorSet(1.f, 0.f, 0.f, 1.f);}
-		INLINE explicit Vector2(YUnitVec) { m_vec = XMVectorSet(0.f, 1.f, 0.f, 1.f); }
-		INLINE explicit Vector2(ZUnitVec) { m_vec = XMVectorSet(0.f, 0.f, 1.f, 1.f); }
+		INLINE explicit Vector2(ZeroTag) { m_vec = XMVectorSet(0.f, 0.f, 0.f, 0.f);}
+		INLINE explicit Vector2(XUnitVec) { m_vec = XMVectorSet(1.f, 0.f, 0.f, 0.f);}
+		INLINE explicit Vector2(YUnitVec) { m_vec = XMVectorSet(0.f, 1.f, 0.f, 0.f); }
 
 
 		INLINE operator XMVECTOR() const { return m_vec; }

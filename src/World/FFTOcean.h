@@ -51,7 +51,8 @@ std::vector<Complex> BitReverseCopy(const std::vector<Complex>& v);
 // Where w^n = 1
 std::vector<Complex> FFT(const std::vector<Complex>& coeff);
 
-
+// Test if FFT is correct
+std::vector<Complex> StupidFT(const std::vector<Complex>& coeff);
 
 class OceanPSO : public Graphic::GraphicsPSO {
 public:
@@ -134,13 +135,13 @@ public:
 		// Create random for each point
 		m_Random = std::vector<std::vector<Complex>>(m_ResX, std::vector<Complex>(m_ResY));
 		std::default_random_engine generator;
-		generator.seed(20210313);
+		generator.seed(20210312);
 		std::normal_distribution<double> distribution(0.0,1.0);
 		for (int n = 0; n < m_ResX; ++n) {
 			for (int m = 0; m < m_ResY; ++m) {
 				double r = distribution(generator);
 				double i = distribution(generator);
-				m_Random[n][m] = Complex(r, i)	/ std::sqrt(2.0);
+				m_Random[n][m] = Complex(r, i) / std::sqrt(2.0);
 			}
 		}
 
@@ -167,47 +168,50 @@ public:
 		// Test FFT
 		std::vector<Complex> v(OceanResolution, 1);
 		std::vector<Complex> res = FFT(v);
-		
-		std::cout<<Amplitede(0,0) << std::endl;
-		std::cout<<Amplitede(255,255) << std::endl;
 	}
 	
 private:
 
 	inline Vector2 WaveK(UINT n, UINT m) const {
-		Vector2 k(((float)n - (float)m_ResX/2), ((float)m - (float)m_ResY/2));
+		Vector2 k(((float)n - (m_ResX - 1.0)/2), ((float)m - (m_ResY - 1.0)/2));
 		k *= 2.0 * PI / PatchSize;
 		return k;
 	}
 
 	inline double Spectrum(const Vector2 k) const 
 	{
-		double k2 = (double)Length2(k);
-		double kw2 = std::pow(abs((double)Dot(k, W_dir)), 2.0);
-		// if (kw2 < 0.9) { return 0.0; }
+		double k2 = Length2(k);
+		k2 = std::max(0.01, k2);
+
+		double kw2 = 1.0;// std::pow(abs((double)Dot(Normalize(k), W_dir)), 2.0);
+		/*double e = std::exp(-1.0 / (k2 * L2));
+		std::cout<<k2<<" " <<e<<std::endl;*/
 		return A * std::exp(-1.0 / (k2 * L2)) * kw2 / k2 / k2;
 	}
 
-	inline Complex H0(const Vector2 k, const Complex R) const {
+	/*inline Complex H0(const Vector2 k, const Complex R) const {
 		return R * Complex(std::sqrt(Spectrum(k)));
+	}*/
+
+	inline Complex H0(int n, int m) {
+		Complex R = m_Random[n][m];
+		Vector2 k = WaveK(n, m);
+		return R * std::sqrt(Spectrum(k));
 	}
 
-	Complex Amplitede(UINT n, UINT m) 
+	Complex Amplitede(int n, int m) 
 	{
-		if (n == m_ResX/2 && m == m_ResY/2) { return Complex(0.0, 0.0); }
-		UINT n1 = (m_ResX - n - 1);
-		UINT m1 = (m_ResY - m - 1);
-
+		
+		// if (n == m_ResX/2 && m == m_ResY/2) { return Complex(0.0, 0.0); }
 		Vector2 k = WaveK(n, m);
+		// Vector2 k2 = WaveK(m_ResX - 1 - n, m_ResY - 1 - m);
 
-		Complex R1 = m_Random[n][m];
-		Complex R2 = m_Random[n1][m1];
-
-		Complex h1 = H0(k, R1);
-		Complex h2 = std::conj(H0(-k, R2));
+		Complex h1 = H0(n, m);
+		Complex h2 = std::conj(H0(m_ResX - 1 - n, m_ResY - 1 - m));
 		
 		Complex w = Complex(0.0, std::sqrt(g * (double)Length(k)));
-		Complex h = h1 * std::exp(w * m_Time) ;// + h2 * std::exp(-w * m_Time);
+		
+		Complex h = h1 * std::exp(w * m_Time); //+ h2 * std::exp(-w * m_Time);
 		return h;
 	}
 
@@ -230,18 +234,19 @@ private:
 	std::vector<std::vector<Complex>> m_coeff;
 	std::vector<std::vector<Complex>> m_A; // Store 1d fft
 
-	double m_Time=2021;
+	double m_Time;
 
 	UINT m_ResX, m_ResY;
 
 	// Constants used for calculating the height
 	const double g = 9.8;
-	const double A = 1e-2;
-	const double PatchSize = 1000.0;
-	const double L2 = 10.0;//10.0f * 10.0f / 9.8; //1e6;
-	const double m_VerticalShift = 0.0;	
+	const double A = 2.0;
+	const double PatchSize = 128;
+	const double L = 10.0;
+	const double L2 = L * L;
+	const double m_VerticalShift = 2.0;	
 
 
-	Vector2 W_dir = Normalize(Vector2(0.0 , 1.0));
+	Vector2 W_dir = Normalize(Vector2(1.0 ,0.0));
 
 };

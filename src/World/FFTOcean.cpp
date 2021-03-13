@@ -98,17 +98,39 @@ void FFTOcean::AmplitedeUpdate() {
 
 			// Test
 			int index = n * m_ResY + m;
-			m_Displacement[index] = 2.0 * Vector3(h.real(), h.imag(), 0.0);
+			m_Displacement[index] = Vector3(10.0 * h.real(), 10.0 * h.imag(), 0.0);
 		}
 	}
 }
 
 
+std::vector<Complex> StupidFT(const std::vector<Complex>& coeff) {
+	std::vector<Complex> ans;
+	Complex w0 = std::exp(Complex());
+	
+
+	for (int n = 0; n < coeff.size(); ++n) {
+		Complex wn = std::exp(Complex(0, 2 * PI * n/ coeff.size()));
+		Complex a = 0.0;
+		Complex w = Complex(1.0, 0.0);
+		for (int u = 0; u <coeff.size(); ++u) {
+			double sign = 1 ? -1 : (n + u) % 2 == 0;
+			a += sign * w * coeff[u];
+			w *= wn;
+		}
+		ans.push_back(a);
+	}
+	return ans;
+}
+
 void FFTOcean::HeightUpdate() {
 	// Solve 2d fft for height
 	for (int n = 0; n < m_ResX; ++n) {
 		std::vector<Complex> An = FFT(m_coeff[n]);
+		//std::vector<Complex> test = StupidFT(m_coeff[n]);
+
 		for (int i = 0; i < An.size(); ++i) {
+			//std::cout<<An[i]-test[i]<<std::endl;
 			m_A[i][n] = An[i];
 		}
 	}
@@ -116,7 +138,7 @@ void FFTOcean::HeightUpdate() {
 	for (int m = 0; m < m_ResY; ++m) {
 		std::vector<Complex> hm = FFT(m_A[m]);
 		for (int n = 0; n < hm.size(); ++n) {
-			float h = hm[n].real();
+			float h = hm[n].real() / 256;
 			int index = n * m_ResY + m;
 			m_Displacement[index].SetZ(h);
 		}
@@ -188,8 +210,8 @@ void FFTOcean::Update(double dt) {
 
 	AmplitedeUpdate();
 	HeightUpdate();
-	/*ShiftUpdate();
-	NormalUpdate();*/
+	ShiftUpdate();
+	NormalUpdate();
 
 	D3D12_SUBRESOURCE_DATA textureData = 
 	Graphic::Texture::CreateTextureData({ m_ResX, m_ResY, 4, 4}, (const unsigned char*)&m_Displacement[0]);
@@ -205,7 +227,7 @@ std::vector<Complex> BitReverseCopy(const std::vector<Complex>& v) {
 	int n = v.size();
 	std::vector<Complex> A(n);
 	for (int i = 0; i < n; i++) {
-		double sign = 1.0 ? -1.0 : i %2 == 0;
+		double sign = (i % 2 == 0) ? 1.0 : -1.0;
 		A[bitReverse256(i)] =  sign * v[i];
 	}
 	return A;
@@ -236,7 +258,7 @@ std::vector<Complex> FFT(const std::vector<Complex>& coeff) {
 
 
 	for (int i = 0; i < n; i++) {
-		double sign = 1.0 ? -1.0 : i % 2 == 0;
+		double sign = (i % 2 == 0) ? 1.0 : -1.0;
 		A[i] =  sign * A[i];
 	}
 
