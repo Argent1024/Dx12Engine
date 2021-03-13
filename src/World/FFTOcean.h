@@ -134,13 +134,13 @@ public:
 		// Create random for each point
 		m_Random = std::vector<std::vector<Complex>>(m_ResX, std::vector<Complex>(m_ResY));
 		std::default_random_engine generator;
-		generator.seed(20210312);
+		generator.seed(20210313);
 		std::normal_distribution<double> distribution(0.0,1.0);
 		for (int n = 0; n < m_ResX; ++n) {
 			for (int m = 0; m < m_ResY; ++m) {
 				double r = distribution(generator);
 				double i = distribution(generator);
-				m_Random[n][m] = Complex(r, i) / std::sqrt(2.0);
+				m_Random[n][m] = Complex(r, i)	/ std::sqrt(2.0);
 			}
 		}
 
@@ -167,19 +167,22 @@ public:
 		// Test FFT
 		std::vector<Complex> v(OceanResolution, 1);
 		std::vector<Complex> res = FFT(v);
+		
+		std::cout<<Amplitede(0,0) << std::endl;
+		std::cout<<Amplitede(255,255) << std::endl;
 	}
 	
 private:
 
 	inline Vector2 WaveK(UINT n, UINT m) const {
 		Vector2 k(((float)n - (float)m_ResX/2), ((float)m - (float)m_ResY/2));
-		k *= 2.0 * PI / 10.0;
+		k *= 2.0 * PI / 65;
 		return k;
 	}
 
 	inline double Spectrum(const Vector2 k) const 
 	{
-		double k2 = Length2(k);
+		double k2 = (double)Length2(k);
 		double kw2 = std::pow(abs((double)Dot(k, W_dir)), 2.0);
 		// if (kw2 < 0.9) { return 0.0; }
 		return A * std::exp(-1.0 / (k2 * L2)) * kw2 / k2 / k2;
@@ -192,14 +195,18 @@ private:
 	Complex Amplitede(UINT n, UINT m) 
 	{
 		if (n == m_ResX/2 && m == m_ResY/2) { return Complex(0.0, 0.0); }
-		Vector2 k = WaveK(n, m);
-		Complex R = m_Random[n][m];
+		UINT n1 = (m_ResX - n - 1);
+		UINT m1 = (m_ResY - m - 1);
 
-		Complex h1 = H0(k, R);
-		Complex h2 = std::conj(H0(-k, R));
+		Vector2 k = WaveK(n, m);
+
+		Complex R1 = m_Random[n][m];
+		Complex R2 = m_Random[n1][m1];
+
+		Complex h1 = H0(k, R1);
+		Complex h2 = std::conj(H0(-k, R2));
 		
 		Complex w = Complex(0.0, std::sqrt(g * (double)Length(k)));
-		
 		Complex h = h1 * std::exp(w * m_Time) + h2 * std::exp(-w * m_Time);
 		return h;
 	}
@@ -223,18 +230,18 @@ private:
 	std::vector<std::vector<Complex>> m_coeff;
 	std::vector<std::vector<Complex>> m_A; // Store 1d fft
 
-	double m_Time;
+	double m_Time=2021;
 
 	UINT m_ResX, m_ResY;
 
 	// Constants used for calculating the height
-	const double g = 0.98;
-	const double A = 0.01;
+	const double g = 9.8;
+	const double A = 1e-5;
 	
-	const double L2 = 10.0;
-	const double m_VerticalShift = 0.9;	
+	const double L2 = 10.0;//10.0f * 10.0f / 9.8; //1e6;
+	const double m_VerticalShift = 0.0;	
 
 
-	Vector2 W_dir = Normalize(Vector2(1.0 ,0.0));
+	Vector2 W_dir = Normalize(Vector2(0.0 , 1.0));
 
 };

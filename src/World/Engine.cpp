@@ -46,7 +46,9 @@ namespace Engine {
 			const float scale = 5.f;
 			ocean_obj->SetMesh(m_Ocean->GetMesh());
 			ocean_obj->SetMaterial(m_Ocean->GetMaterial());
-			ocean_obj->SetTransform(Transform({ scale, 0, 0 }, { 0, scale, 0 }, { 0, 0, scale }, {0.0, 0.0, 0.0}));
+			ocean_obj->SetTransform(Transform({ scale, 0, 0 }, 
+											  { 0, scale, 0 }, 
+											  { 0, 0, scale }, {0.0, 0.0, 0.0}));
 			m_Scene->AddGameObj(ocean_obj);
 
 			ProjectiveCamera& camera = m_Scene->GetMainCamera();

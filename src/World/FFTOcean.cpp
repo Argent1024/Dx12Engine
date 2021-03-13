@@ -66,12 +66,12 @@ void FFTOcean::InitOceanMesh()
 			VertexData& v = vertices[i];
 			v.position = DirectX::XMFLOAT3(dx*x - 1.0f, dx*y - 1.0f, 0.0f);
 			v.texcoor = DirectX::XMUINT2(x, y);
-			v.fuv = DirectX::XMFLOAT2(float(x) / m_ResX, float(y) / m_ResY);
+			v.fuv = DirectX::XMFLOAT2(float(x) / (vertexX - 1), float(y) / (vertexY - 1));
 		}
 	}
 
-	for (int x = 0; x < m_ResX; ++x) {
-		for (int y = 0; y < m_ResY; ++y) {
+	for (int x = 0; x < (vertexX - 1); ++x) {
+		for (int y = 0; y < (vertexY - 1); ++y) {
 			UINT a = x * vertexY + y;
 			UINT b = (x+1) * vertexY + y;
 			UINT c = x * vertexY + (y+1);
@@ -95,6 +95,10 @@ void FFTOcean::AmplitedeUpdate() {
 		for (int m = 0; m < m_ResY; ++m) {
 			Complex h = Amplitede(n, m);
 			m_coeff[n][m] = h;
+
+			// Test
+			int index = n * m_ResY + m;
+			m_Displacement[index] = 2.0 * Vector3(h.real(), h.imag(), 0.0);
 		}
 	}
 }
@@ -180,7 +184,7 @@ void FFTOcean::NormalUpdate() {
 }
 
 void FFTOcean::Update(double dt) {
-	m_Time += dt;
+	m_Time += 3.0 * dt;
 
 	AmplitedeUpdate();
 	HeightUpdate();
@@ -232,7 +236,7 @@ std::vector<Complex> FFT(const std::vector<Complex>& coeff) {
 
 
 	for (int i = 0; i < n; i++) {
-		double sign = 1.0 ? -1.0 : i %2 == 0;
+		double sign = 1.0 ? -1.0 : i % 2 == 0;
 		A[i] =  sign * A[i];
 	}
 
