@@ -143,7 +143,7 @@ public:
 				m_Random[n][m] = Complex(r, i) / std::sqrt(2.0);
 			}
 		}
-		W_dir = Normalize(Vector2(distribution(generator), distribution(generator)));
+
 
 		// Create Texture
 		// XMVECTOR 4 x 16 byte
@@ -172,16 +172,17 @@ public:
 private:
 
 	inline Vector2 WaveK(UINT n, UINT m) const {
-		Vector2 k(1.0f * (n - m_ResX/2) , 1.0f * (m - m_ResY/2));
-		k *=  PI / m_ResX ;
+		Vector2 k(((float)n - (float)m_ResX/2), ((float)m - (float)m_ResY/2));
+		k *= 2.0 * PI / 10.0;
 		return k;
 	}
 
 	inline double Spectrum(const Vector2 k) const 
 	{
 		double k2 = Length2(k);
-		double kw2 = std::pow((double)Dot(k, W_dir), 2.0);
-		return A * std::exp(-1.0 / (k2 * L2)) * kw2 / (k2 * k2);
+		double kw2 = std::pow(abs((double)Dot(k, W_dir)), 2.0);
+		// if (kw2 < 0.9) { return 0.0; }
+		return A * std::exp(-1.0 / (k2 * L2)) * kw2 / k2 / k2;
 	}
 
 	inline Complex H0(const Vector2 k, const Complex R) const {
@@ -227,16 +228,13 @@ private:
 	UINT m_ResX, m_ResY;
 
 	// Constants used for calculating the height
-	const double g = 9.8;
-	const double A = 0.1;
-	const double V = 1.32;	// Wind speed 
-
-	const double L = V * V / g;
-	const double L2 = L * L;
-
-	const double m_VerticalShift = 1.0;	
+	const double g = 0.98;
+	const double A = 0.01;
+	
+	const double L2 = 10.0;
+	const double m_VerticalShift = 0.9;	
 
 
-	Vector2 W_dir;
+	Vector2 W_dir = Normalize(Vector2(1.0 ,0.0));
 
 };

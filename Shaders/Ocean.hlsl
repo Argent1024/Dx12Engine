@@ -82,7 +82,8 @@ PSInput VSMain(VSInput input)
 {
     PSInput result;
 	
-	float3 shift = DisplacementTex[input.uv].xyz / 10.0;
+	float3 shift = DisplacementTex[input.uv].xyz / 100.0;
+	// float3 shift = 0.0 ;
 	float4 pos = float4(input.position + shift, 1.0f);
 
 	pos = mul(pos, modelTransformation);
@@ -110,7 +111,7 @@ float4 PSMain(PSInput input) : SV_TARGET
 	if (debugnormal) {
 		// return (float4(normal, 1.0f) + 1.0f) / 2.0f;
 		float3 shift = DisplacementTex.Sample(g_sampler, uv).xyz;
-		return shift.z;
+		return 2.0 * shift.z ;
 	}
 
 	// Only consider the direction light, which will be at SceneLight[0]

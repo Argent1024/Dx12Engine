@@ -154,7 +154,7 @@ void FFTOcean::NormalUpdate() {
 
 	for (int n = 0; n < m_ResX; ++n) {
 		for (int m = 0; m < m_ResY; ++m) {
-			Vector2 k = Normalize(WaveK(n, m));
+			Vector2 k = WaveK(n, m);
 			double lenK = Length(k);
 			m_coeff[n][m] *= lenK;				// After calculating the shift m_coeff[n,m] = ik/|k|
 		}
@@ -201,7 +201,8 @@ std::vector<Complex> BitReverseCopy(const std::vector<Complex>& v) {
 	int n = v.size();
 	std::vector<Complex> A(n);
 	for (int i = 0; i < n; i++) {
-		A[bitReverse256(i)] = v[i];
+		double sign = 1.0 ? -1.0 : i %2 == 0;
+		A[bitReverse256(i)] =  sign * v[i];
 	}
 	return A;
 }
@@ -228,5 +229,12 @@ std::vector<Complex> FFT(const std::vector<Complex>& coeff) {
 			}
 		}
 	}
+
+
+	for (int i = 0; i < n; i++) {
+		double sign = 1.0 ? -1.0 : i %2 == 0;
+		A[i] =  sign * A[i];
+	}
+
 	return A;
 }

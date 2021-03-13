@@ -56,7 +56,7 @@ namespace Graphic {
         sampler.MaxLOD = D3D12_FLOAT32_MAX;
         sampler.ShaderRegister = 0;
         sampler.RegisterSpace = 0;
-        sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;//D3D12_SHADER_VISIBILITY_PIXEL;
 			
 		D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 			

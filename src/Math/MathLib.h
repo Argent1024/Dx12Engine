@@ -42,7 +42,7 @@ namespace Math {
 
 	INLINE Scalar Dot(const Vector2& a, const Vector2& b) 
 	{
-		return Scalar(DirectX::XMVector3Dot(a, b));
+		return Scalar(DirectX::XMVector2Dot(a, b));
 	}
 
 	INLINE Scalar Length2(const Vector3& v) 
