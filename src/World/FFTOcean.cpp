@@ -188,8 +188,8 @@ void FFTOcean::Update(double dt) {
 
 	AmplitedeUpdate();
 	HeightUpdate();
-	ShiftUpdate();
-	NormalUpdate();
+	/*ShiftUpdate();
+	NormalUpdate();*/
 
 	D3D12_SUBRESOURCE_DATA textureData = 
 	Graphic::Texture::CreateTextureData({ m_ResX, m_ResY, 4, 4}, (const unsigned char*)&m_Displacement[0]);

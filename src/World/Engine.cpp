@@ -145,6 +145,13 @@ namespace Engine {
 			// press f3 to show normal
 			if (input.IsKeyPressed(Keyboard::F3)) {
 
+				// Reset camera for FFT ocean
+				ProjectiveCamera& camera = m_Scene->GetMainCamera();
+				Vector3 position(0.0f, 0.0f, 10.f);
+				Vector3 origin(0.0f, 0.0f, 0.0f);
+				Vector3 worldUp(0.0f, 1.0f, 0.0f);
+				camera.LookAt(position, origin, worldUp);
+
 				RenderEngine::RenderConfiguration& renderSetting = m_RenderEngine->GetRenderSetting();
 
 				DefaultRenderPass& pass = m_RenderEngine->GetDefaultPass();

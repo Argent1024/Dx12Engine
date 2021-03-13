@@ -176,7 +176,7 @@ private:
 
 	inline Vector2 WaveK(UINT n, UINT m) const {
 		Vector2 k(((float)n - (float)m_ResX/2), ((float)m - (float)m_ResY/2));
-		k *= 2.0 * PI / 65;
+		k *= 2.0 * PI / PatchSize;
 		return k;
 	}
 
@@ -207,7 +207,7 @@ private:
 		Complex h2 = std::conj(H0(-k, R2));
 		
 		Complex w = Complex(0.0, std::sqrt(g * (double)Length(k)));
-		Complex h = h1 * std::exp(w * m_Time) + h2 * std::exp(-w * m_Time);
+		Complex h = h1 * std::exp(w * m_Time) ;// + h2 * std::exp(-w * m_Time);
 		return h;
 	}
 
@@ -236,8 +236,8 @@ private:
 
 	// Constants used for calculating the height
 	const double g = 9.8;
-	const double A = 1e-5;
-	
+	const double A = 1e-2;
+	const double PatchSize = 1000.0;
 	const double L2 = 10.0;//10.0f * 10.0f / 9.8; //1e6;
 	const double m_VerticalShift = 0.0;	
 
