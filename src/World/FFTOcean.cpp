@@ -51,8 +51,8 @@ void FFTOcean::InitOceanMesh()
 		DirectX::XMFLOAT2 fuv;
 	};
 
-	UINT vertexX = m_ResX + 1;
-	UINT vertexY = m_ResY + 1;
+	UINT vertexX = m_ResX ;
+	UINT vertexY = m_ResY ;
 	UINT vertexSize = vertexX * vertexY;
 
 	std::vector<VertexData> vertices(vertexSize);
@@ -138,7 +138,7 @@ void FFTOcean::HeightUpdate() {
 	for (int m = 0; m < m_ResY; ++m) {
 		std::vector<Complex> hm = FFT(m_A[m]);
 		for (int n = 0; n < hm.size(); ++n) {
-			float h = hm[n].real() / 256;
+			float h = hm[n].real();
 			int index = n * m_ResY + m;
 			m_Displacement[index].SetZ(h);
 		}
@@ -178,11 +178,12 @@ void FFTOcean::ShiftUpdate() {
 
 void FFTOcean::NormalUpdate() {
 
+	const float normalScale = 9.0;
 	for (int n = 0; n < m_ResX; ++n) {
 		for (int m = 0; m < m_ResY; ++m) {
 			Vector2 k = WaveK(n, m);
 			double lenK = Length(k);
-			m_coeff[n][m] *= lenK;				// After calculating the shift m_coeff[n,m] = ik/|k|
+			m_coeff[n][m] *= lenK * normalScale;				// After calculating the shift m_coeff[n,m] = ik/|k|
 		}
 	}
 
@@ -193,7 +194,7 @@ void FFTOcean::NormalUpdate() {
 			m_A[i][n] = An[i];
 		}
 	}
-
+	
 	for (int m = 0; m < m_ResY; ++m) {
 		std::vector<Complex> gradm = FFT(m_A[m]);
 		for (int n = 0; n < gradm.size(); ++n) {

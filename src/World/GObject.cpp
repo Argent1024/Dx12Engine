@@ -5,7 +5,7 @@ namespace Game {
 	using namespace Math;
 	
 	GObject::GObject() 
-		: m_table(4), // TODO table size according to material
+		: m_table(7), // TODO table size according to material
 		  m_CBV()
 	{
 		// TODO Fix this

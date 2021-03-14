@@ -29,8 +29,8 @@ namespace Graphic {
 
 		// Descriptor Table 2 for the object
 		ranges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 2, 2, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b2 b3, for object and material
-		ranges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t4
-		ranges[6].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 4, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // u0-u4
+		ranges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t4
+		ranges[6].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 8, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // u0-u4
 
 		// Descriptor table (Camera/Renderpass) : b0, t0 - t7 [Space 1]
 		//rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
@@ -39,7 +39,7 @@ namespace Graphic {
 		// Descriptor table (Lights) : b1, t8 - t24 [Space 1]
 		rootParameters[1].InitAsDescriptorTable(2, &ranges[2], D3D12_SHADER_VISIBILITY_ALL);
 
-		// Descriptor table (Object): b2, t0-t4, u0-u4 [Space 0]
+		// Descriptor table (Object): b2, t0-t8, u0-u8 [Space 0]
 		rootParameters[2].InitAsDescriptorTable(3, &ranges[4], D3D12_SHADER_VISIBILITY_ALL);
 
 		D3D12_STATIC_SAMPLER_DESC sampler = {};

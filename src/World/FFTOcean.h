@@ -54,6 +54,7 @@ std::vector<Complex> FFT(const std::vector<Complex>& coeff);
 // Test if FFT is correct
 std::vector<Complex> StupidFT(const std::vector<Complex>& coeff);
 
+
 class OceanPSO : public Graphic::GraphicsPSO {
 public:
 	void Initialize() override;
@@ -68,7 +69,9 @@ public:
 		MatCBV,	   // 1: useless
 
 		DisplacementTex, // 2
-		NormalTex // 3
+		NormalTex,// 3
+		ReflectionTex, // 4
+		FoamTex,	// 5
 	};
 
 	struct MatData {
@@ -97,10 +100,14 @@ public:
 		assert(m_Displacement != nullptr && "Haven't set texture for diffuse color");
 		m_Displacement->CreateView(Graphic::TEXTURE_SRV, &table, DisplacementTex);
 		m_Normal->CreateView(Graphic::TEXTURE_SRV, &table, NormalTex);
+		m_Reflection->CreateView(Graphic::TEXTURE_SRV, &table, ReflectionTex);
+		m_FoamTex->CreateView(Graphic::TEXTURE_SRV, &table, FoamTex);
 	}
 
 	Graphic::Texture* m_Displacement;
 	Graphic::Texture* m_Normal;
+	Graphic::Texture* m_Reflection;
+	Graphic::Texture* m_FoamTex;
 
 	MatData m_MatData;
 	Graphic::ConstantBuffer m_MatCBV;
@@ -152,6 +159,11 @@ public:
 		m_DisplacementTexture = new Graphic::Texture2D(m_ResX, m_ResY, Graphic::TEXTURE_SRV, format);
 		m_NormalTexture = new Graphic::Texture2D(m_ResX, m_ResY, Graphic::TEXTURE_SRV, format);
 		
+		std::string path1 = "D://work/tEngine/envmap.png";
+		m_EnvMapping = new Graphic::Texture2D(path1);
+
+		std::string path2 = "D://work/tEngine/foam.png";
+		m_FoamTexture = new Graphic::Texture2D(path2);
 
 		// Create Mesh
 		// m_Mesh = TriangleMesh::GetXYPlane();
@@ -163,6 +175,8 @@ public:
 		m_Material = std::make_shared<OceanMaterial>(materialData);
 		m_Material->m_Displacement = m_DisplacementTexture;
 		m_Material->m_Normal = m_NormalTexture;
+		m_Material->m_Reflection = m_EnvMapping;
+		m_Material->m_FoamTex = m_FoamTexture;
 		m_Material->UploadCBV();
 
 		// Test FFT
@@ -170,6 +184,8 @@ public:
 		std::vector<Complex> res = FFT(v);
 	}
 	
+	Graphic::Texture* m_EnvMapping;
+
 private:
 
 	inline Vector2 WaveK(UINT n, UINT m) const {
@@ -181,11 +197,9 @@ private:
 	inline double Spectrum(const Vector2 k) const 
 	{
 		double k2 = Length2(k);
-		k2 = std::max(0.01, k2);
+		k2 = std::max(0.001, k2);
 
-		double kw2 = 1.0;// std::pow(abs((double)Dot(Normalize(k), W_dir)), 2.0);
-		/*double e = std::exp(-1.0 / (k2 * L2));
-		std::cout<<k2<<" " <<e<<std::endl;*/
+		double kw2 = std::pow((double)Dot(Normalize(k), W_dir), 2.0);
 		return A * std::exp(-1.0 / (k2 * L2)) * kw2 / k2 / k2;
 	}
 
@@ -211,7 +225,7 @@ private:
 		
 		Complex w = Complex(0.0, std::sqrt(g * (double)Length(k)));
 		
-		Complex h = h1 * std::exp(w * m_Time); //+ h2 * std::exp(-w * m_Time);
+		Complex h = h1 * std::exp(w * m_Time) + h2 * std::exp(-w * m_Time);
 		return h;
 	}
 
@@ -226,6 +240,8 @@ private:
 	std::shared_ptr<OceanMaterial> m_Material;
 	Graphic::Texture* m_DisplacementTexture;
 	Graphic::Texture* m_NormalTexture;
+	
+	Graphic::Texture* m_FoamTexture;
 
 	std::vector<Vector3> m_Displacement;
 	std::vector<Vector3> m_Normals;
@@ -240,13 +256,13 @@ private:
 
 	// Constants used for calculating the height
 	const double g = 9.8;
-	const double A = 2.0;
-	const double PatchSize = 128;
+	const double A = 2*.00000000775f; //1.0;
+	const double PatchSize = 100;
 	const double L = 10.0;
 	const double L2 = L * L;
-	const double m_VerticalShift = 2.0;	
+	const double m_VerticalShift = 3.0;	
 
 
-	Vector2 W_dir = Normalize(Vector2(1.0 ,0.0));
+	Vector2 W_dir = Normalize(Vector2(1.0, 1.0));
 
 };

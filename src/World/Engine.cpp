@@ -35,26 +35,38 @@ namespace Engine {
 			// Load light
 			DirectionLight* m_Light = new DirectionLight();
 			m_Scene->AddLight(*m_Light);
-			m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {0.0, 1.0, 1.0} });
+			m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {1.0, 1.0, 2.5} });
 			m_Material = std::make_shared<PrincipleMaterial>();
 
 			// FFT Ocean Part
 			m_Ocean = new FFTOcean();
 			m_Ocean->Initialize();
 
-			GObject* ocean_obj = new Game::GObject();
-			const float scale = 5.f;
-			ocean_obj->SetMesh(m_Ocean->GetMesh());
-			ocean_obj->SetMaterial(m_Ocean->GetMaterial());
-			ocean_obj->SetTransform(Transform({ scale, 0, 0 }, 
-											  { 0, scale, 0 }, 
-											  { 0, 0, scale }, {0.0, 0.0, 0.0}));
-			m_Scene->AddGameObj(ocean_obj);
+			int n = 3;
+			float gridSize = 2.0 * (1.0 - 4.0 / OceanResolution);
+			for (int i = 0; i < n; ++i) {
+				for (int j = 0; j < n; ++j) {
+					GObject* ocean_obj = new Game::GObject();
+					
+					const float scale = 5.f;
+					Vector3 offset = scale * Vector3(gridSize * (i - n / 2), gridSize * (j-n / 2), 0.0);
+					ocean_obj->SetMesh(m_Ocean->GetMesh());
+					ocean_obj->SetMaterial(m_Ocean->GetMaterial());
+					ocean_obj->SetTransform(Transform({ scale, 0, 0 }, 
+													  { 0, scale, 0 }, 
+													  { 0, 0, scale }, offset));
+					m_Scene->AddGameObj(ocean_obj);				
+
+
+				}
+			}
+
 
 			ProjectiveCamera& camera = m_Scene->GetMainCamera();
 			// Vector3 position(5.2, 0.0, 0.2);
-			Vector3 position(10.2, 0.0, 2.2);
-			Vector3 origin(0., 0., 0.);
+			Vector3 position(7.2, 7.2, 2.2);
+
+			Vector3 origin(-3.0, 0., 0.);
 			Vector3 worldUp(0., 0., 1.0);
 			camera.LookAt(position, origin, worldUp);
 
