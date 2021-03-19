@@ -110,7 +110,7 @@ namespace Engine
 	UINT dxgiFactoryFlags;
 	// TODO read config file
 	// TODO some are using too much
-	UINT NumDescriptors = 128; //64;
+	UINT NumDescriptors = 256; //64;
 	UINT NumDSV = 10;
 	UINT NumRTV = 10;
 

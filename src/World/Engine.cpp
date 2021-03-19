@@ -60,11 +60,11 @@ namespace Engine {
 
 				}
 			}
-
+	
 
 			ProjectiveCamera& camera = m_Scene->GetMainCamera();
 			// Vector3 position(5.2, 0.0, 0.2);
-			Vector3 position(7.2, 7.2, 2.2);
+			Vector3 position(7.2, 7.2, 1.2);
 
 			Vector3 origin(-3.0, 0., 0.);
 			Vector3 worldUp(0., 0., 1.0);

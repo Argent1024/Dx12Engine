@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "RenderEngine.h"
+#include "FFTOcean.h"
 
 namespace Engine {
 	
 	RenderEngine::RenderEngine(const UINT width, const UINT height) 
 		: swapChain(width, height),
 		  depthBuffer(width, height, Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV),
-		  mixPass(4, width, height)
+		  mixPass(4, width, height),
+		  backgroundpass()
 	{
 	
 	}
@@ -14,13 +16,18 @@ namespace Engine {
 
 	void RenderEngine::Initialize(const HWND appHwnd) 
 	{
-		defalutpass.Initialize();
+		defalutpass.Initialize(std::make_shared<OceanPSO>());
+		
+
+		backgroundpass.Initialize(std::make_shared<Graphic::DefaultPSO>());
+		backgroundpass.m_ObjRenderType = 1; // Get background
+
 
 		swapChain.Initialize(GraphicsCommandManager.GetCommadnQueue(), appHwnd);
 		depthBuffer.Initialize();
 		
 		// If mix pass
-		mixPass.Initialize();
+		mixPass.Initialize(nullptr);
 		Graphic::DescriptorTable* mixTable = mixPass.GetTable();
 		Graphic::Texture& depthTex = depthBuffer.GetTexture();
 		// TODO avoid magic number
@@ -36,7 +43,7 @@ namespace Engine {
 
 		// Set Scene Data for Default Render Pass
 		defalutpass.PrepareData(scene);
-
+		backgroundpass.PrepareData(scene);
 		// TODO multi threading here
 
 		Graphic::CommandList ThreadCommandList;
@@ -46,6 +53,7 @@ namespace Engine {
 		ThreadCommandList.SetSwapChain(swapChain, depthBuffer);
 		ThreadCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		defalutpass.Render(ThreadCommandList, scene);
+		backgroundpass.Render(ThreadCommandList, scene);
 		ThreadCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		
 		GraphicsCommandManager.ExecuteCommandList(&ThreadCommandList);

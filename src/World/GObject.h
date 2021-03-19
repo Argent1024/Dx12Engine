@@ -23,6 +23,8 @@ namespace Game {
 
 		inline void SetMesh(ptrMesh mesh) { m_Mesh = mesh; }
 
+		inline ptrMaterial Material() { return m_Material; }
+
 		inline void SetPhyState(Physic::PState* state) { m_state = state; }
 
 		inline void SetTransform(const Math::Transform& T) { m_state->SetTransform(T); }

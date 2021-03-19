@@ -93,7 +93,7 @@ namespace Game {
 		// Camera's data
 		float m_aspectRatio;
 		float m_nearZ = 0.01f;
-		float m_farZ = 50.0f;
+		float m_farZ = 1000.0f;
 		Math::Vector3 m_Position = Math::Vector3(Math::kZero);
 		Math::Vector3 m_Direction = Math::Vector3(Math::kZUnitVec);
 		Math::Vector3 m_WorldUp = Math::Vector3(Math::kYUnitVec);

@@ -70,8 +70,8 @@ namespace Game {
 				float s = sqrtf(1 - z * z);
 				x = s * cosf(u);
 				y = s * sinf(u);
-
-				DefaultVertex vertex { {x, z, y}, {x, z, y}, {u, v} };
+				
+				DefaultVertex vertex { {x, z, y}, {x, z, y}, {v / Math::PI, u / (2.0f * Math::PI)} };
 				vertices.push_back(vertex);
 
 				// Pole

@@ -41,7 +41,12 @@ namespace Game
 		// inline Graphic::ConstantBuffer* GetMainCameraCBV() { return m_MainCameraCBV; }
 
 		//TODO
-		const std::vector<GObject*> GetGameObjects(UINT index) { return m_ObjList; }
+		const std::vector<GObject*>& GetGameObjects(UINT index) {
+			if (index == 1) {
+				return m_BackgroundList;
+			}
+			return m_ObjList; 
+		}
 
 		// TODO accel structure
 		virtual void AddGameObj(GObject* obj);
@@ -92,9 +97,8 @@ namespace Game
 		UINT iPoint;
 		UINT iSpot;
 
-		
-
 		// Game Objects
 		std::vector<GObject*> m_ObjList;
+		std::vector<GObject*> m_BackgroundList;
 	};
 }

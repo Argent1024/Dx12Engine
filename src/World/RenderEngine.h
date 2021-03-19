@@ -31,6 +31,7 @@ namespace Engine {
 
 		// Different pass
 		Game::DefaultRenderPass defalutpass;
+		Game::DefaultRenderPass backgroundpass;
 		Game::MixtureRenderPass mixPass;
 
 	private:

@@ -6,7 +6,7 @@
 namespace Game {
 	using namespace Math;
 
-	void DefaultRenderPass::Initialize() 
+	void DefaultRenderPass::Initialize(ptrPSO pso) 
 	{
 		// TODO Use only one root signature
 		m_rootSignature = std::make_shared<Graphic::RootSignature>();
@@ -14,7 +14,8 @@ namespace Game {
 
 		// TODO move pso to material
 		// m_PSO = std::make_shared<Graphic::DefaultPSO>();
-		m_PSO = std::make_shared<OceanPSO>();
+		// m_PSO = std::make_shared<OceanPSO>();
+		m_PSO = pso;
 		m_PSO->SetRootSigature(m_rootSignature->GetRootSignature());
 		m_PSO->Initialize();
 
@@ -88,7 +89,7 @@ namespace Game {
 		  m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 		 { m_DescriptorTable = new Graphic::DescriptorTable(num_texture); }
 
-	void MixtureRenderPass::Initialize() 
+	void MixtureRenderPass::Initialize(ptrPSO) 
 	{
 
 		// TODO Use only one root signature

@@ -31,6 +31,25 @@ namespace Game {
 		m_LightsCBV.CreateView(m_LightsTable, 0);
 	
 		// Other Textures should be bind outside
+
+		// TODO remove this
+		// Set background sphere
+		GObject* background = new Game::GObject();
+		const float scale = 900.f;
+		ptrMesh backgroundSphere = TriangleMesh::GetSphere(100, 100);
+		std::string path = "D://work/tEngine/envmap.png";
+		Graphic::Texture* tex = new Graphic::Texture2D(path);
+
+		std::shared_ptr<PrincipleMaterial> mat = std::make_shared<PrincipleMaterial>();
+		mat->SetTexture(PrincipleMaterial::SlotMaps::DiffuseTex, tex);
+
+		background->SetMesh(backgroundSphere);
+		background->SetMaterial(mat);
+		background->SetTransform(Transform({ scale, 0, 0 }, 
+										{ 0, scale, 0 }, 
+										{ 0, 0, scale }, {3.0, 3.0, 0}));
+		m_BackgroundList.push_back(background);
+
 	}
 
 	void Scene::AddLight(Light& light) 
