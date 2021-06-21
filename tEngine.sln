@@ -5,22 +5,44 @@ VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tEngine", "tEngine.vcxproj", "{57B52684-E6B9-4AE7-B76E-68B303860884}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshViewer", "Samples\MeshViewer\MeshViewer.vcxproj", "{022027A0-8320-4883-AA40-4575CAF5CAE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
+		Debug|ARM64 = Debug|ARM64
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|ARM = Release|ARM
+		Release|ARM64 = Release|ARM64
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{57B52684-E6B9-4AE7-B76E-68B303860884}.Debug|x64.ActiveCfg = Debug|Win32
-		{57B52684-E6B9-4AE7-B76E-68B303860884}.Debug|x64.Build.0 = Debug|Win32
+		{57B52684-E6B9-4AE7-B76E-68B303860884}.Debug|ARM.ActiveCfg = Debug|Win32
+		{57B52684-E6B9-4AE7-B76E-68B303860884}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{57B52684-E6B9-4AE7-B76E-68B303860884}.Debug|x64.ActiveCfg = Debug|x64
+		{57B52684-E6B9-4AE7-B76E-68B303860884}.Debug|x64.Build.0 = Debug|x64
 		{57B52684-E6B9-4AE7-B76E-68B303860884}.Debug|x86.ActiveCfg = Debug|Win32
 		{57B52684-E6B9-4AE7-B76E-68B303860884}.Debug|x86.Build.0 = Debug|Win32
+		{57B52684-E6B9-4AE7-B76E-68B303860884}.Release|ARM.ActiveCfg = Debug|Win32
+		{57B52684-E6B9-4AE7-B76E-68B303860884}.Release|ARM64.ActiveCfg = Debug|Win32
 		{57B52684-E6B9-4AE7-B76E-68B303860884}.Release|x64.ActiveCfg = Release|x64
 		{57B52684-E6B9-4AE7-B76E-68B303860884}.Release|x64.Build.0 = Release|x64
-		{57B52684-E6B9-4AE7-B76E-68B303860884}.Release|x86.ActiveCfg = Release|Win32
+		{57B52684-E6B9-4AE7-B76E-68B303860884}.Release|x86.ActiveCfg = Debug|Win32
 		{57B52684-E6B9-4AE7-B76E-68B303860884}.Release|x86.Build.0 = Release|Win32
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Debug|ARM.ActiveCfg = Debug|Win32
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Debug|x64.ActiveCfg = Debug|x64
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Debug|x64.Build.0 = Debug|x64
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Debug|x86.ActiveCfg = Debug|Win32
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Debug|x86.Build.0 = Debug|Win32
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Release|ARM.ActiveCfg = Debug|Win32
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Release|ARM64.ActiveCfg = Debug|Win32
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Release|x64.ActiveCfg = Release|x64
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Release|x64.Build.0 = Release|x64
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Release|x86.ActiveCfg = Debug|Win32
+		{022027A0-8320-4883-AA40-4575CAF5CAE5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

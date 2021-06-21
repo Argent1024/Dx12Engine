@@ -34,7 +34,7 @@ void WinApp::InitWindow(HINSTANCE hInst, Engine::GameEngine* t_engine)
 	// Create the window and store a handle to it.
 	m_hwnd = CreateWindow(
 		windowClass.lpszClassName,
-		GameSetting.Title,
+		GameSetting.Title.c_str(),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,

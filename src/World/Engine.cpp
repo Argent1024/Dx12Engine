@@ -22,6 +22,8 @@ namespace Engine {
 
 		// TODO should put into logic
 		LoadAssert();
+
+		m_Timer.Start();
 	}
 
 	void GameEngine::LoadAssert()
@@ -109,7 +111,6 @@ namespace Engine {
 			m_Scene->AddGameObj(obj0);
 			*/
 		}
-		m_Timer.Start();
 	}
 
 	void GameEngine::Render() 

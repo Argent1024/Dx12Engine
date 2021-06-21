@@ -1,19 +1,18 @@
 #pragma once
 #include "stdafx.h"
 #include "MathLib.h"
+#include "Ray.h"
 
-
-namespace Physic
+namespace Math
 {	// Store the isect info for two object
 	// ideally p1 should literarlly locates on obj 1 and p2 on obj2,
 	// n1 n2 are normals on obj1 obj2
 	struct Intersection {
-
 		bool intersect = false;
-		Math::Vector3 p1;
-		Math::Vector3 p2;
-		Math::Vector3 n1 = Math::Vector3(Math::kZero);
-		Math::Vector3 n2 = Math::Vector3(Math::kZero);
+		Vector3 p1;
+		Vector3 p2;
+		Vector3 n1 = Vector3(Math::kZero);
+		Vector3 n2 = Vector3(Math::kZero);
 		
 		inline void SwapOrder() { std::swap(n1, n2); }
 	};
@@ -35,6 +34,8 @@ namespace Physic
 		virtual Intersection CollideWith(const BoundingVolume& bv, bool noisect=false) const = 0;
 		
 		virtual void SetTransform(const Math::Transform& T) = 0;
+
+		virtual bool IntersectRay(Ray& ray) = 0;
 
 	protected:
 		virtual Intersection _CollideSphere(const BoundingSphere& sphere, bool noisect) const = 0;

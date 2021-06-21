@@ -2,10 +2,8 @@
 #include "BoundingVolume.h"
 #include "MathLib.h"
 
-namespace Physic 
+namespace Math 
 {
-	using namespace Math;
-
 	//****************** Sphere *********************//
 	BoundingSphere::BoundingSphere(Vector3 c,Scalar r) :
 		center(c), radius(r) { }

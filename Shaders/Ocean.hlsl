@@ -131,7 +131,7 @@ PSInput VSMain(VSInput input)
 float2 dir_env_coor(float3 dir) {
 	float v = asin(dir.z);
 	float u = atan2(dir.y / cos(v), dir.x / cos(v));
-	return float2(u / (2 * 3.1415926) + 0.5,v / 3.1415926);
+	return float2(u / (2 * 3.1415926) + 0.5, v / 3.1415926);
 }
 
 
@@ -197,7 +197,7 @@ float4 PSMain(PSInput input) : SV_TARGET
 
 	float f = 1/1.3;
 	float F = f + (1 - f) * pow(1.0 - cosV, 5);
-	float3 envCol = 0.2 * F * EnvMap.Sample(g_sampler, envUV).xyz;
+	float3 envCol = 0.2 * F * 1.3 * EnvMap.Sample(g_sampler, envUV).xyz;
 
 
 	float3 mixWaveTop = scatterCol + pow(input.foam+0.1, 2.0);

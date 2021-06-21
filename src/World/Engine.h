@@ -14,7 +14,8 @@ namespace Engine {
 		{
 			UINT Width = 1080;
 			UINT Height = 960;
-			LPCTSTR Title = L"playground";
+			std::wstring Title = L"helloword";
+			// LPCTSTR Title = L"playground";
 		};
 
 		void GameLoop() 

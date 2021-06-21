@@ -24,29 +24,30 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>tEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <ProjectName>EngineCore</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -141,7 +142,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -165,17 +166,18 @@
     <ClInclude Include="src\Graphic\DepthBuffer.h" />
     <ClInclude Include="src\Graphic\GPUMemManager.h" />
     <ClInclude Include="src\Math\MathLib.h" />
-    <ClInclude Include="src\Physic\BoundingVolume.h" />
+    <ClInclude Include="src\Math\BoundingVolume.h" />
+    <ClInclude Include="src\Math\Ray.h" />
     <ClInclude Include="src\Physic\CollisionDetection.h" />
     <ClInclude Include="src\Physic\FFTOcean.h" />
     <ClInclude Include="src\Physic\PhysicState.h" />
+    <ClInclude Include="src\Utility\ResourceMangement.h" />
     <ClInclude Include="src\World\Engine.h" />
     <ClInclude Include="src\World\FFTOcean.h" />
     <ClInclude Include="src\World\GameInput.h" />
     <ClInclude Include="src\World\RenderEngine.h" />
     <ClInclude Include="src\World\RenderPass.h" />
     <ClInclude Include="src\Graphic\Texture.h" />
-    <ClInclude Include="src\Math\BoundingVolume.h" />
     <ClInclude Include="src\Math\MathCommon.h" />
     <ClInclude Include="src\Physic\PhysicSystem.h" />
     <ClInclude Include="src\Utility\Input.h" />
@@ -218,7 +220,7 @@
     <ClCompile Include="src\Graphic\RootSignature.cpp" />
     <ClCompile Include="src\Graphic\Texture.cpp" />
     <ClCompile Include="src\Graphic\GPUMemManager.cpp" />
-    <ClCompile Include="src\Physic\BoundingVolume.cpp" />
+    <ClCompile Include="src\Math\BoundingVolume.cpp" />
     <ClCompile Include="src\Utility\Input.cpp" />
     <ClCompile Include="src\Utility\MeshReader.cpp" />
     <ClCompile Include="src\World\Camera.cpp" />
@@ -249,13 +251,14 @@
     <ClCompile Include="tEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="readme.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\directxtex_desktop_win10.2020.11.12.1\build\native\directxtex_desktop_win10.targets" Condition="Exists('packages\directxtex_desktop_win10.2020.11.12.1\build\native\directxtex_desktop_win10.targets')" />
-    <Import Project="packages\Microsoft.XAudio2.Redist.1.2.4\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('packages\Microsoft.XAudio2.Redist.1.2.4\build\native\Microsoft.XAudio2.Redist.targets')" />
     <Import Project="packages\directxtk12_desktop_2017.2020.11.12.1\build\native\directxtk12_desktop_2017.targets" Condition="Exists('packages\directxtk12_desktop_2017.2020.11.12.1\build\native\directxtk12_desktop_2017.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -263,7 +266,6 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\directxtex_desktop_win10.2020.11.12.1\build\native\directxtex_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\directxtex_desktop_win10.2020.11.12.1\build\native\directxtex_desktop_win10.targets'))" />
-    <Error Condition="!Exists('packages\Microsoft.XAudio2.Redist.1.2.4\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.XAudio2.Redist.1.2.4\build\native\Microsoft.XAudio2.Redist.targets'))" />
     <Error Condition="!Exists('packages\directxtk12_desktop_2017.2020.11.12.1\build\native\directxtk12_desktop_2017.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\directxtk12_desktop_2017.2020.11.12.1\build\native\directxtk12_desktop_2017.targets'))" />
   </Target>
 </Project>
