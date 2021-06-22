@@ -55,11 +55,6 @@ namespace Engine {
 		// Data
 		Game::Scene* m_Scene;
 		Game::GameControl* m_GameControl;
-		// Game::GameLogic* m_Logic;
-
-		// TODO Resource Manager
-		/*std::shared_ptr<Game::Mesh> m_Mesh;
-		std::shared_ptr<Game::PrincipleMaterial> m_Material;*/
 
 		virtual void Render() {
 			m_RenderEngine->Render(*m_Scene);

@@ -238,7 +238,6 @@
     </ClCompile>
     <ClCompile Include="src\WinApp.cpp" />
     <ClCompile Include="src\Graphic\SwapChain.cpp" />
-    <ClCompile Include="src\World\Engine.cpp" />
     <ClCompile Include="src\World\FFTOcean.cpp" />
     <ClCompile Include="src\World\GameInput.cpp" />
     <ClCompile Include="src\World\GObject.cpp" />
@@ -248,7 +247,6 @@
     <ClCompile Include="src\World\RenderEngine.cpp" />
     <ClCompile Include="src\World\RenderPass.cpp" />
     <ClCompile Include="src\World\Scene.cpp" />
-    <ClCompile Include="tEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

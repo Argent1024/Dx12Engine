@@ -242,9 +242,6 @@
     <ClCompile Include="src\Utility\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graphic\GPUMemManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -255,9 +252,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Math\BoundingVolume.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
