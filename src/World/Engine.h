@@ -25,10 +25,10 @@ namespace Engine {
 			InputUpdate();
 		}
 
-		void Initialize(const HWND appHwnd);
+		virtual void Initialize(const HWND appHwnd);
 
 		// (TODO) Load assert from file, create m_Scene, m_GameControl
-		void LoadAssert();
+		virtual void LoadAssert();
 
 		GameConfiguration& GetSetting() { return m_Setting; }
 
@@ -52,9 +52,9 @@ namespace Engine {
 		FFTOcean* m_Ocean;
 
 
-		void Render();
+		virtual void Render();
 
-		void InputUpdate();
+		virtual void InputUpdate();
 
 		// void LogicUpdate();
 	};
