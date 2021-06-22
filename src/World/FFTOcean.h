@@ -144,7 +144,7 @@ public:
 		std::default_random_engine generator;
 		generator.seed(20210312);
 		std::normal_distribution<double> distribution(0.0,1.0);
-		for (int n = 0; n < m_ResX; ++n) {
+		for (UINT n = 0; n < m_ResX; ++n) {
 			for (int m = 0; m < m_ResY; ++m) {
 				double r = distribution(generator);
 				double i = distribution(generator);
