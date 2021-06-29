@@ -14,8 +14,7 @@ namespace Engine {
 		{
 			UINT Width = 1080;
 			UINT Height = 960;
-			std::wstring Title = L"helloword";
-			// LPCTSTR Title = L"playground";
+			std::wstring Title = L"playground";
 		};
 
 		virtual void GameLoop() 
@@ -31,13 +30,19 @@ namespace Engine {
 
 			Engine::InitializeInputManager(appHwnd);
 
-			m_RenderEngine = new RenderEngine(m_Setting.Width, m_Setting.Height);
-			m_RenderEngine->Initialize(appHwnd);
-
+			InitRenderEngine(appHwnd);
 			LoadAssert();
 
 			m_Timer.Start();
 		}
+
+		
+		// Create a default RenderEngine
+		virtual void InitRenderEngine(const HWND appHwnd) {  	
+			m_RenderEngine = new RenderEngine(m_Setting.Width, m_Setting.Height);
+			m_RenderEngine->Initialize(appHwnd);
+		}
+
 
 		// (TODO) Load assert from file, create m_Scene, m_GameControl
 		virtual void LoadAssert() = 0;
@@ -70,55 +75,7 @@ namespace Engine {
 
 			auto kb = input.GetKeyboardState();
 			auto mouse = input.GetMouseState();
-			// Change Render Setting
-			{
-				// Press f1 to show depth texture
-				if (input.IsKeyPressed(Keyboard::F1)) {
-					RenderEngine::RenderConfiguration& renderSetting = m_RenderEngine->GetRenderSetting();
-					renderSetting.mixpass = !renderSetting.mixpass;
-				}
-
-				// press f2 to show normal
-				if (input.IsKeyPressed(Keyboard::F2)) {
-					// Reset camera for FFT ocean
-					ProjectiveCamera& camera = m_Scene->GetMainCamera();
-					Vector3 position(0.0f, 0.0f, 10.f);
-					Vector3 origin(0.0f, 0.0f, 0.0f);
-					Vector3 worldUp(0.0f, 1.0f, 0.0f);
-					camera.LookAt(position, origin, worldUp);
-
-					RenderEngine::RenderConfiguration& renderSetting = m_RenderEngine->GetRenderSetting();
-
-					Game::DefaultRenderPass& pass = m_RenderEngine->GetDefaultPass();
-					Game::DefaultRenderPass::ConstBufferData& data = pass.GetCBVData();
-
-					renderSetting.mixpass = false;
-					data.debugnormal = true;
-					data.debugpos = false;
-
-				}
-
-				// press f3 to show normal
-				if (input.IsKeyPressed(Keyboard::F3)) {
-
-					// Reset camera for FFT ocean
-					ProjectiveCamera& camera = m_Scene->GetMainCamera();
-					Vector3 position(0.0f, 0.0f, 10.f);
-					Vector3 origin(0.0f, 0.0f, 0.0f);
-					Vector3 worldUp(0.0f, 1.0f, 0.0f);
-					camera.LookAt(position, origin, worldUp);
-
-					RenderEngine::RenderConfiguration& renderSetting = m_RenderEngine->GetRenderSetting();
-
-					DefaultRenderPass& pass = m_RenderEngine->GetDefaultPass();
-					DefaultRenderPass::ConstBufferData& data = pass.GetCBVData();
-
-
-					renderSetting.mixpass = false;
-					data.debugnormal = false;
-					data.debugpos = true;
-				}
-			}
+			
 			if (m_GameControl) {
 				m_GameControl->UpdateScene(*m_Scene);
 			}

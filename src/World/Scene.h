@@ -7,10 +7,8 @@
 #include "Camera.h"
 #include "Light.h"
 
-
 namespace Game
 {
-
 	struct SceneLightsInfo
 	{
 		// TODO check memory?
@@ -26,6 +24,8 @@ namespace Game
 
 	class Scene
 	{
+	using GameObjectTable = std::map<UINT, std::vector<GObject*>>;
+
 	public:
 
 		Scene(const UINT width, const UINT height);
@@ -37,24 +37,26 @@ namespace Game
 		virtual void Initialize();
 
 		// TODO const camera, edit Camera class
-		inline ProjectiveCamera& GetMainCamera() { return m_Camera; }
+		const ProjectiveCamera& GetMainCamera() const { return m_Camera; }
+		ProjectiveCamera& GetMainCamera() { return m_Camera; }
 		// inline Graphic::ConstantBuffer* GetMainCameraCBV() { return m_MainCameraCBV; }
 
-		//TODO
-		const std::vector<GObject*>& GetGameObjects(UINT index) {
-			if (index == 1) {
-				return m_BackgroundList;
+		const std::vector<GObject*>& GetGameObjects(UINT renderType) const {
+			const auto it = m_GameObjectTable.find(renderType);
+			if (it == m_GameObjectTable.end()) {
+				return { };
 			}
-			return m_ObjList; 
+			return it->second;
 		}
 
 		// TODO accel structure
-		virtual void AddGameObj(GObject* obj);
+		virtual void AddGameObj(GObject* obj, UINT renderType=0);
 		virtual void DeleteGameObj(GObject* obj) {}
 
 		// Light Stuff
 		
-		inline Graphic::DescriptorTable* GetLightsTable() { return m_LightsTable; }
+		const Graphic::DescriptorTable* GetLightsTable() const { return m_LightsTable; }
+		Graphic::DescriptorTable* GetLightsTable()  { return m_LightsTable; }
 
 		virtual void AddLight(Light& light);
 
@@ -98,7 +100,6 @@ namespace Game
 		UINT iSpot;
 
 		// Game Objects
-		std::vector<GObject*> m_ObjList;
-		std::vector<GObject*> m_BackgroundList;
+		GameObjectTable m_GameObjectTable;
 	};
 }

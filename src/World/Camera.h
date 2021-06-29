@@ -18,7 +18,7 @@ namespace Game {
 			 m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 		{ }
 		
-		virtual void UseCamera(Graphic::CommandList& commandList)
+		virtual void UseCamera(Graphic::CommandList& commandList) const
 		{
 			commandList.SetViewPorts(&m_Viewport);
 			commandList.SetScissorRects(&m_ScissorRect);

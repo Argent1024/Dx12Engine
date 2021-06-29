@@ -6,77 +6,51 @@ namespace Engine {
 	
 	RenderEngine::RenderEngine(const UINT width, const UINT height) 
 		: swapChain(width, height),
-		  depthBuffer(width, height, Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV),
-		  mixPass(4, width, height),
-		  backgroundpass()
+		  depthBuffer(width, height, Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV)
 	{
 	
 	}
 
 
-	void RenderEngine::Initialize(const HWND appHwnd) 
-	{
-		defalutpass.Initialize(std::make_shared<OceanPSO>());
-		
-
-		backgroundpass.Initialize(std::make_shared<Graphic::DefaultPSO>());
-		backgroundpass.m_ObjRenderType = 1; // Get background
-
-
+	void RenderEngine::Initialize(const HWND appHwnd, RenderPassesTable& passes) 
+	{	
 		swapChain.Initialize(GraphicsCommandManager.GetCommadnQueue(), appHwnd);
 		depthBuffer.Initialize();
-		
-		// If mix pass
-		mixPass.Initialize(nullptr);
-		Graphic::DescriptorTable* mixTable = mixPass.GetTable();
-		Graphic::Texture& depthTex = depthBuffer.GetTexture();
-		// TODO avoid magic number
-		depthTex.CreateView(Graphic::TEXTURE_SRV, mixTable, 2);
+
+		for (const auto& pass_i : passes) {
+			ptrRenderPass pass = pass_i.first;
+			ptrPSO pso = pass_i.second;
+			m_RenderPasses.push_back(pass);
+			m_EnabledPasses.push_back(TRUE);
+
+			pass->Initialize(pso);
+		}
+
+		PostInitialize();
 	}
 
 
 	void RenderEngine::Render(Game::Scene& scene) 
 	{
 		BeginRender();
-
 		scene.PrepareLights();
+	
+		// Multi Threading maybe
+		Graphic::CommandList commandlist;
+		GraphicsCommandManager.InitCommandList(&commandlist);
+		for (ptrRenderPass& pass : m_RenderPasses) {
+			pass->PrepareData(scene);
+			commandlist.SetSwapChain(swapChain, depthBuffer);
+			commandlist.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-		// Set Scene Data for Default Render Pass
-		defalutpass.PrepareData(scene);
-		backgroundpass.PrepareData(scene);
-		// TODO multi threading here
-
-		Graphic::CommandList ThreadCommandList;
-		GraphicsCommandManager.InitCommandList(&ThreadCommandList);
-		
-		// Main Render Pass
-		ThreadCommandList.SetSwapChain(swapChain, depthBuffer);
-		ThreadCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		defalutpass.Render(ThreadCommandList, scene);
-		backgroundpass.Render(ThreadCommandList, scene);
-		ThreadCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		
-		GraphicsCommandManager.ExecuteCommandList(&ThreadCommandList);
-		
-		// Mix Render Pass
-		if (Setting.mixpass) 
-		{
-			Graphic::CommandList MixCommandList;
-			GraphicsCommandManager.InitCommandList(&MixCommandList);
-			MixCommandList.SetSwapChain(swapChain);
-
-			MixCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-			const float ClearColor[] = { 0.0, 0.0, 0.0, 0.0 };
-			MixCommandList.ClearSwapChain(swapChain, ClearColor);
-			mixPass.Render(MixCommandList, scene);
-			MixCommandList.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-			GraphicsCommandManager.ExecuteCommandList(&MixCommandList);
+			pass->Render(commandlist, scene);
+			
+			commandlist.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+			GraphicsCommandManager.ExecuteCommandList(&commandlist);
 		}
-		
 		// Multithreading join here
 
 		EndRender();
-
 	}
 	
 	void RenderEngine::BeginRender() 

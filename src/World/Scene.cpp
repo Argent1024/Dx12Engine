@@ -32,7 +32,7 @@ namespace Game {
 	
 		// Other Textures should be bind outside
 
-		// TODO remove this
+	/*	// TODO remove this
 		// Set background sphere
 		GObject* background = new Game::GObject();
 		const float scale = 900.f;
@@ -49,7 +49,7 @@ namespace Game {
 										{ 0, scale, 0 }, 
 										{ 0, 0, scale }, {3.0, 3.0, 0}));
 		m_BackgroundList.push_back(background);
-
+	*/
 	}
 
 	void Scene::AddLight(Light& light) 
@@ -85,8 +85,8 @@ namespace Game {
 		m_LightsCBV.copyData(&m_LightInfo);// , sizeof(SceneLightsInfo));
 	}
 
-	void Scene::AddGameObj(GObject* obj) 
+	void Scene::AddGameObj(GObject* obj, UINT renderType) 
 	{
-		m_ObjList.push_back(obj);
+		m_GameObjectTable[renderType].push_back(obj);
 	}
 }

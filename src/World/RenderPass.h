@@ -15,11 +15,11 @@ namespace Game {
 
 		// Prepare data for rendering(like put in the camera's data), 
 		// RenderEngine will call this function in main thread TODO ?
-		virtual void PrepareData(Scene& scene) = 0;
+		virtual void PrepareData(const Scene& scene) = 0;
 
 		// Record Commands for rendering
 		// RenderEngine will call this function in worker thread
-		virtual void Render(Graphic::CommandList& commandList, Scene& scene) = 0;
+		virtual void Render(Graphic::CommandList& commandList, const Scene& scene) = 0;
 
 		// TODO maybe more than one table
 		Graphic::DescriptorTable* GetTable() { return m_DescriptorTable; }
@@ -27,6 +27,7 @@ namespace Game {
 		ptrRootSignature GetRootSignature() { return m_rootSignature; }
 
 		UINT m_ObjRenderType; // Record the render needed game objects' position in the scene class
+
 	protected:
 		ptrRootSignature m_rootSignature;
 		ptrPSO m_PSO;
@@ -62,9 +63,9 @@ namespace Game {
 
 		void Initialize(ptrPSO pso) override;
 
-		void PrepareData(Scene& scene) override;
+		void PrepareData(const Scene& scene) override;
 
-		void Render(Graphic::CommandList& commandList, Scene& scene) override;
+		void Render(Graphic::CommandList& commandList,const Scene& scene) override;
 
 		// Settings of the renderpass
 		ConstBufferData& GetCBVData() { return m_CBVData; }
@@ -83,9 +84,9 @@ namespace Game {
 
 		void Initialize(ptrPSO) override;
 		
-		void PrepareData(Scene& scene) override { } 
+		void PrepareData(const Scene& scene) override { } 
 
-		void Render(Graphic::CommandList& commandList, Scene& scene) override;
+		void Render(Graphic::CommandList& commandList, const Scene& scene) override;
 
 	private:
 		CD3DX12_VIEWPORT m_Viewport;

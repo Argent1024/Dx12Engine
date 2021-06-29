@@ -40,12 +40,12 @@ namespace Game {
 		// The other textures needed is binded outside by render engine
 	}
 
-	void DefaultRenderPass::PrepareData(Scene& scene)
+	void DefaultRenderPass::PrepareData(const Scene& scene)
 	{
-		Camera& camera = scene.GetMainCamera();
+		const Camera& camera = scene.GetMainCamera();
 		const Transform& view = camera.GetView();
 		const Transform& proj = camera.GetToScreen();
-		Vector3& cameraPos = camera.Position();
+		const Vector3& cameraPos = camera.Position();
 
 		// Need to transpose
 		XMStoreFloat4x4(&m_CBVData.projection, XMMatrixTranspose((XMMATRIX)proj));
@@ -57,7 +57,7 @@ namespace Game {
 		m_CBV.copyData(&m_CBVData);//, sizeof(CameraBufferData));
 	}
 
-	void DefaultRenderPass::Render(Graphic::CommandList& commandList, Scene& scene) {
+	void DefaultRenderPass::Render(Graphic::CommandList& commandList, const Scene& scene) {
 		
 		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
 		commandList.SetPipelineState(m_PSO);
@@ -68,14 +68,14 @@ namespace Game {
 		// Slot 0 in root signature is for camera
 		commandList.SetGraphicsRootDescriptorTable(0, cameraTableHandle);
 		
-		Graphic::DescriptorTable* lightTable = scene.GetLightsTable();
+		const Graphic::DescriptorTable* lightTable = scene.GetLightsTable();
 		CD3DX12_GPU_DESCRIPTOR_HANDLE lightTableHandle = lightTable->BindDescriptorTable();
 		commandList.SetGraphicsRootDescriptorTable(1, lightTableHandle);
 
-		Camera& camera = scene.GetMainCamera();
+		const Camera& camera = scene.GetMainCamera();
 		camera.UseCamera(commandList);
 
-		const std::vector<GObject*> objList = scene.GetGameObjects(m_ObjRenderType);
+		const std::vector<GObject*>& objList = scene.GetGameObjects(m_ObjRenderType);
 		for (auto const& g_obj : objList)
 		{
 			g_obj->RecordCommand(commandList);
@@ -115,7 +115,7 @@ namespace Game {
 
 	}
 
-	void MixtureRenderPass::Render(Graphic::CommandList& commandList, Scene& scene) 
+	void MixtureRenderPass::Render(Graphic::CommandList& commandList, const Scene& scene) 
 	{
 		commandList.SetViewPorts(&m_Viewport);
 		commandList.SetScissorRects(&m_ScissorRect);

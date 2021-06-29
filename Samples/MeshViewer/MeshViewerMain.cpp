@@ -45,8 +45,7 @@ namespace Engine {
 			m_Material->UploadCBV();
 
 			MeshReader reader;
-			reader.ReadOBJ("D://work/tEngine/airboat.obj");
-			//reader.ReadOBJ("D:\\banana.obj");
+			reader.ReadOBJ("D://work/tEngine/bunny.obj");
 
 			std::vector<DefaultVertex>& vertex = reader.m_vertex;
 			std::vector<UINT>& index = reader.m_index;

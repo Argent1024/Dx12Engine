@@ -6,15 +6,8 @@ template <class Key,  class Type>
 class ResourceManager
 {
 public:
-	Type* Find(Key k) {
-		auto result = m_Table.find(k);
-		if (result == m_Table.end()) { return nullptr; }
-		return result->second;
-	}
+	Type& operator[] ( const Key& key ){
 
-	void Register(Key k, Type* type) {
-		assert(Find(k) == nullptr && "Key already exist");
-		m_Table[Key] = type;
 	}
 
 	void Erase(Key k) { 
@@ -25,7 +18,7 @@ public:
 	void Clear() { m_Table = std::map<Key, Type*>(); }
 
 private:
-	std::map<Key, Type*> m_Table;
+	std::map<Key, Type> m_Table;
 
 };
 
