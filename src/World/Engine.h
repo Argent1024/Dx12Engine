@@ -12,8 +12,8 @@ namespace Engine {
 	public:
 		struct GameConfiguration 
 		{
-			UINT Width = 1080;
-			UINT Height = 960;
+			UINT Width = 1920;
+			UINT Height = 1080;
 			std::wstring Title = L"playground";
 		};
 

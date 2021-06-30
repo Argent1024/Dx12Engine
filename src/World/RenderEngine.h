@@ -13,7 +13,7 @@ namespace Engine {
 
 		struct RenderConfig
 		{
-	
+			
 		};
 
 
