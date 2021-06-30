@@ -2,6 +2,7 @@
 
 #include "Math/MathLib.h"
 #include "Graphic/Texture.h"
+#include "SimpleUI.h"
 
 namespace Game {
 		
@@ -77,4 +78,8 @@ namespace Game {
 		Graphic::ConstantBuffer m_MatCBV;
 		Graphic::Texture* m_DiffuseTex;
 	};
+}
+
+namespace UI {
+	void PrincipleMaterialUIWindow(std::shared_ptr<Game::PrincipleMaterial> mat, const std::string window_name);
 }

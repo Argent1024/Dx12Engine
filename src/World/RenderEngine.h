@@ -39,6 +39,9 @@ namespace Engine {
 		const RenderConfig& GetRenderSetting() const { return m_Setting; }
 		RenderConfig& GetRenderSetting() { return m_Setting; }
 
+		const ptrUiEngine& GetUIEngine() const { return m_UiEngine; }
+		ptrUiEngine& GetUIEngine() { return m_UiEngine; }
+
 	protected:
 		// Bind texture to some render pass maybe
 		virtual void PostInitialize() { };
@@ -46,6 +49,9 @@ namespace Engine {
 		RenderConfig m_Setting;
 		std::vector<ptrRenderPass> m_RenderPasses;
 		std::vector<bool> m_EnabledPasses;
+
+
+		ptrUiEngine m_UiEngine;
 
 	private:
 

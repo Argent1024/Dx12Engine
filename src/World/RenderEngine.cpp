@@ -2,19 +2,20 @@
 #include "RenderEngine.h"
 #include "FFTOcean.h"
 
+
 namespace Engine {
 	
 	RenderEngine::RenderEngine(const UINT width, const UINT height) 
 		: swapChain(width, height),
 		  depthBuffer(width, height, Graphic::TEXTURE_DSV | Graphic::TEXTURE_SRV)
 	{
-	
+		m_UiEngine = std::make_shared<SimpleUIEngine>();
 	}
 
 
 	void RenderEngine::Initialize(const HWND appHwnd, RenderPassesTable& passes) 
 	{	
-		UiEngine::Initialize(appHwnd);
+		if(m_UiEngine) m_UiEngine->Initialize(appHwnd);
 
 		swapChain.Initialize(GraphicsCommandManager.GetCommadnQueue(), appHwnd);
 		depthBuffer.Initialize();
@@ -55,6 +56,7 @@ namespace Engine {
 		GraphicsCommandManager.ExecuteCommandList(&commandlist);
 
 		// UI
+		if(m_UiEngine)
 		{
 			Graphic::DescriptorHeap* uiheap = Engine::GetUIHeap();
 			Graphic::CommandList uiCtx;
@@ -62,10 +64,11 @@ namespace Engine {
 			uiCtx.SetSwapChain(swapChain);
 			uiCtx.SetDescriptorHeap(*uiheap);
 			uiCtx.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-			UiEngine::Render(uiCtx);
+			m_UiEngine->Render(uiCtx);
 			uiCtx.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 			GraphicsCommandManager.ExecuteCommandList(&uiCtx);
 		}
+
 		EndRender();
 	}
 	

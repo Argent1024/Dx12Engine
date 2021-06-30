@@ -269,7 +269,6 @@
     <ClCompile Include="src\World\RenderEngine.cpp" />
     <ClCompile Include="src\World\RenderPass.cpp" />
     <ClCompile Include="src\World\Scene.cpp" />
-    <ClCompile Include="src\World\SimpleUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

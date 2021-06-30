@@ -18,6 +18,22 @@ namespace Engine {
 		// TODO Resource Manager
 		std::shared_ptr<Game::Mesh> m_Mesh;
 		std::shared_ptr<Game::PrincipleMaterial> m_Material;
+		std::shared_ptr<Engine::UiEngine> m_UIengine;
+	};
+
+	class MeshViewerUI : public UiEngine {
+	public:
+		MeshViewerUI(std::shared_ptr<Game::PrincipleMaterial> mat) : m_Material(mat) {
+			
+		}
+
+		void UpdateUIWindows() override {
+			UI::PrincipleMaterialUIWindow(m_Material, "Material");
+		}
+
+	private:
+		std::shared_ptr<Game::PrincipleMaterial> m_Material;
+
 	};
 
 
@@ -34,9 +50,12 @@ namespace Engine {
 			m_Light->SetLightData({ {1.0, 1.0, 1.0}, {0.0 , 10.0, 0.0}, {1.0, 1.0, 2.5} });
 			m_Material = std::make_shared<PrincipleMaterial>();
 
+			// Create UI for the material
+			m_UIengine = std::make_shared<MeshViewerUI>(m_Material);
+			m_RenderEngine->GetUIEngine() = m_UIengine;
+
 
 			// Normal mesh stuff
-			
 			PrincipleMaterial::MatData mat;
 			DirectX::XMStoreFloat3(&mat.BaseColor, Vector3(1.0, 0.0, 0.0));
 			mat.Roughness = 0.15f;

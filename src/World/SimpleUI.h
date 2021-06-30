@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Graphic/PipelineState.h"
 #include "Graphic/RootSignature.h"
 #include "Graphic/CommandList.h"
@@ -6,13 +8,13 @@
 #include "ext/imgui/backends/imgui_impl_win32.h"
 #include "ext/imgui/backends/imgui_impl_dx12.h"
 
-
 namespace Engine {
 	class UiEngine {
-	public:
-		static void Initialize(const HWND appHwnd) {
-			show_demo_window = true;
+	private:
+		bool show_demo_window = true;
 
+	public:
+		virtual void Initialize(const HWND appHwnd) {
 			// Setup Dear ImGui context
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
@@ -30,10 +32,8 @@ namespace Engine {
 				uiheap->GetCPUHandle(0),
 				uiheap->GetGPUHandle(0));
 		}
-		
-		static void Render(Graphic::CommandList& ctx) {
-			ImGuiIO& io = ImGui::GetIO(); (void)io;
 
+		virtual void Render(Graphic::CommandList& ctx) {
 			ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
@@ -41,42 +41,35 @@ namespace Engine {
 			if (show_demo_window)
 				ImGui::ShowDemoWindow(&show_demo_window);
 
-			{
-				f = 0.0f;
-				counter = 0;
-
-				ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-				ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-
-				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-				// ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-				if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-					counter++;
-				ImGui::SameLine();
-				ImGui::Text("counter = %d", counter);
-
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-				ImGui::End();
-			}
-
-
+			UpdateUIWindows();
+			
 			// Rendering
 			ImGui::Render();
 
 			// Render using graphics
 			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), ctx.GetCommandList());
 			
-			// TODO fence stuff
 		}
 
-		static bool show_demo_window;
-		static float f;
-		static int counter;
-
+		virtual void UpdateUIWindows() = 0;
 	};
 
 
+	class SimpleUIEngine : public UiEngine {
+		void UpdateUIWindows() override { }
+	};
+
 }
+
+//namespace UI {
+//	/***********************  Some simple ui uitility   ************************/
+//	void ColorEdit3(const std::string& name, DirectX::XMFLOAT3& col) {
+//		 ImGui::ColorEdit3(name.c_str(), (float*)&col); 
+//	}
+//
+//	void SliderFloat(const std::string& name, FLOAT& f, const FLOAT m=0.0f, const FLOAT M=1.0f) {
+//		ImGui::SliderFloat("float", &f, m, M);    
+//	}
+//}
+
+using ptrUiEngine = std::shared_ptr<Engine::UiEngine>;

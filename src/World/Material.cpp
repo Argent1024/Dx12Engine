@@ -65,3 +65,20 @@ namespace Game {
 		}
 	}
 }
+
+
+void UI::PrincipleMaterialUIWindow(std::shared_ptr<Game::PrincipleMaterial> mat, const std::string window_name) {
+		Game::PrincipleMaterial::MatData& data = mat->GetData();
+		ImGui::Begin(window_name.c_str());
+		bool update = false;
+
+		update = update | ImGui::ColorEdit3("BaseColor", (float*)&data.BaseColor); 
+		update = update | ImGui::SliderFloat("Roughness", &data.Roughness, 0.0, 1.0); 
+		update = update | ImGui::SliderFloat("Metallic", &data.Metallic, 0.0, 1.0); 
+		update = update | ImGui::SliderFloat("Specular", &data.Specular, 0.0, 1.0); 
+
+		if (update) { mat->UploadCBV(); }
+         
+
+		ImGui::End();
+}
