@@ -82,6 +82,9 @@ namespace Engine {
 	// Return the descriptor heap for creating views
 	inline Graphic::DescriptorHeap* GetInitHeap() { return &InitHeap; }
 	inline Graphic::DescriptorHeap* GetInUseHeap() { return &InUseHeap;}
+
+	inline Graphic::DescriptorHeap* GetUIHeap() { return &UIHeap;}
+
 	inline Graphic::DescriptorHeap* GetDSVHeap() { return &DSVHeap; }
 	inline Graphic::DescriptorHeap* GetRTVHeap() { return &RTVHeap; }
 };

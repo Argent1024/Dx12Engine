@@ -1,5 +1,6 @@
 #pragma once
 #include "RenderPass.h"
+#include "SimpleUI.h"
 
 namespace Engine {
 

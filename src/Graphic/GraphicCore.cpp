@@ -96,8 +96,14 @@ void Engine::InitializeEngine() {
 
 	Graphic::DescriptorHeap* rtvHeap = Engine::GetRTVHeap();
 	rtvHeap->Initialize();
+
+	Graphic::DescriptorHeap* uiheap = Engine::GetUIHeap();
+	uiheap->Initialize();
+
 	// **** Graphic Stuff End ******//
 
+
+	//TODO why this is in graphic core...
 	// ***** Utility stuff start *******//
 	Logger::Initialize();
 }
@@ -119,4 +125,8 @@ namespace Engine
 	
 	Graphic::DescriptorHeap DSVHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, NumDSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 	Graphic::DescriptorHeap RTVHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, NumRTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+
+	// A heap with only one slot for the ui code
+	// And we won't reset this during the frame
+	Graphic::DescriptorHeap UIHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 }

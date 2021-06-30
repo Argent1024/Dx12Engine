@@ -20,7 +20,7 @@ namespace Engine {
 		virtual void GameLoop() 
 		{
 			Render();
-			InputUpdate();
+			// InputUpdate();
 			GameUpdate();
 			frame++;
 		}
@@ -28,12 +28,13 @@ namespace Engine {
 		void Initialize(const HWND appHwnd) {
 			Engine::InitializeEngine();
 
-			Engine::InitializeInputManager(appHwnd);
+			// Engine::InitializeInputManager(appHwnd);
 
 			InitRenderEngine(appHwnd);
 			LoadAssert();
 
 			m_Timer.Start();
+			initialized = true;
 		}
 
 		
@@ -48,6 +49,8 @@ namespace Engine {
 		virtual void LoadAssert() = 0;
 
 		GameConfiguration& GetSetting() { return m_Setting; }
+
+		bool initialized = false;
 
 	protected:
 		UINT frame = 0;

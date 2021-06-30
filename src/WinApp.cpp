@@ -51,7 +51,8 @@ void WinApp::InitWindow(HINSTANCE hInst, Engine::GameEngine* t_engine)
 }
 
 LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-	 GameEngine* t_engine = reinterpret_cast<GameEngine*> (GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam);
+	GameEngine* t_engine = reinterpret_cast<GameEngine*> (GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	switch (message) 
 	{
 	case WM_CREATE: 
@@ -63,7 +64,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	   return 0;
 
 	case WM_PAINT:
-		t_engine->GameLoop();
+		// t_engine->GameLoop();
 		return 0;
 
 	case WM_DESTROY:
@@ -71,24 +72,24 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		return 0;
 
 	//************************** INPUT BELOW ***************************//
-	case WM_ACTIVATEAPP:
+	//case WM_ACTIVATEAPP:
 
-		Keyboard::ProcessMessage(message, wParam, lParam);
-		//Mouse::ProcessMessage(message, wParam, lParam);
-		break;
+	//	Keyboard::ProcessMessage(message, wParam, lParam);
+	//	//Mouse::ProcessMessage(message, wParam, lParam);
+	//	break;
 
-	case WM_MOUSEHOVER:
-		Mouse::ProcessMessage(message, wParam, lParam);
-		break;
+	//case WM_MOUSEHOVER:
+	//	Mouse::ProcessMessage(message, wParam, lParam);
+	//	break;
 
-	case WM_KEYDOWN:
-    case WM_KEYUP:
-	case WM_SYSKEYUP:	// Alt
-		Keyboard::ProcessMessage(message, wParam, lParam);
-		break;
+	//case WM_KEYDOWN:
+ //   case WM_KEYUP:
+	//case WM_SYSKEYUP:	// Alt
+	//	Keyboard::ProcessMessage(message, wParam, lParam);
+	//	break;
 
-	case WM_SYSKEYDOWN:
-		Keyboard::ProcessMessage(message, wParam, lParam);
+	//case WM_SYSKEYDOWN:
+	//	Keyboard::ProcessMessage(message, wParam, lParam);
     /*if (wParam == VK_RETURN && (lParam & 0x60000000) == 0x20000000)
     {
         ...
@@ -96,8 +97,8 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		break;
 	// ************************* INPUT  END  ****************************//
 	}
-	
-	Mouse::ProcessMessage(message, wParam, lParam);
+
+	// Mouse::ProcessMessage(message, wParam, lParam);
 	// Handle any messages switch statement didn't
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }

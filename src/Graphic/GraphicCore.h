@@ -45,6 +45,9 @@ namespace Engine
 	extern Graphic::DescriptorHeap DSVHeap;
 	extern Graphic::DescriptorHeap RTVHeap;
 
+	// lazy( just create a descriptor for the ui stuff
+	extern Graphic::DescriptorHeap UIHeap;
+
 	inline ID3D12Device* GetDevice() { return dxDevice.Get(); }
 	inline IDXGIFactory4* GetFactory() { return dxFactory.Get(); }
 	void EnableDebug();

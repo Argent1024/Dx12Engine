@@ -14,6 +14,8 @@ namespace Engine {
 
 	void RenderEngine::Initialize(const HWND appHwnd, RenderPassesTable& passes) 
 	{	
+		UiEngine::Initialize(appHwnd);
+
 		swapChain.Initialize(GraphicsCommandManager.GetCommadnQueue(), appHwnd);
 		depthBuffer.Initialize();
 
@@ -38,6 +40,8 @@ namespace Engine {
 		// Multi Threading maybe
 		Graphic::CommandList commandlist;
 		GraphicsCommandManager.InitCommandList(&commandlist);
+
+		// Scene
 		for (ptrRenderPass& pass : m_RenderPasses) {
 			pass->PrepareData(scene);
 			commandlist.SetSwapChain(swapChain, depthBuffer);
@@ -46,10 +50,22 @@ namespace Engine {
 			pass->Render(commandlist, scene);
 			
 			commandlist.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-			GraphicsCommandManager.ExecuteCommandList(&commandlist);
 		}
 		// Multithreading join here
+		GraphicsCommandManager.ExecuteCommandList(&commandlist);
 
+		// UI
+		{
+			Graphic::DescriptorHeap* uiheap = Engine::GetUIHeap();
+			Graphic::CommandList uiCtx;
+			GraphicsCommandManager.InitCommandList(&uiCtx);
+			uiCtx.SetSwapChain(swapChain);
+			uiCtx.SetDescriptorHeap(*uiheap);
+			uiCtx.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			UiEngine::Render(uiCtx);
+			uiCtx.ResourceBarrier(swapChain, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+			GraphicsCommandManager.ExecuteCommandList(&uiCtx);
+		}
 		EndRender();
 	}
 	

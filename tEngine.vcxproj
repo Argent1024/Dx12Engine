@@ -78,7 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)src;$(ProjectDir)src\Math;$(ProjectDir)src\Graphic;$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\ext;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)src\Math;$(ProjectDir)src\Graphic;$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\ext\imgui;$(ProjectDir)src\ext;$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -87,7 +88,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)src;$(ProjectDir)src\Math;$(ProjectDir)src\Graphic;$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\ext;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)src\Math;$(ProjectDir)src\Graphic;$(ProjectDir)src\Physic;$(ProjectDir)src\World;$(ProjectDir)src\ext\imgui;$(ProjectDir)src\ext;$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -114,6 +116,8 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,6 +155,8 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,6 +167,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\ext\imgui\backends\imgui_impl_dx12.h" />
+    <ClInclude Include="src\ext\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="src\ext\imgui\imconfig.h" />
+    <ClInclude Include="src\ext\imgui\imgui.h" />
+    <ClInclude Include="src\ext\imgui\imgui_internal.h" />
+    <ClInclude Include="src\ext\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\ext\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\ext\imgui\imstb_truetype.h" />
     <ClInclude Include="src\ext\stb\stb_image.h" />
     <ClInclude Include="src\ext\stb\stb_image_write.h" />
     <ClInclude Include="src\Graphic\DepthBuffer.h" />
@@ -212,10 +226,18 @@
     <ClInclude Include="src\World\Mesh.h" />
     <ClInclude Include="src\World\GObject.h" />
     <ClInclude Include="src\World\Scene.h" />
+    <ClInclude Include="src\World\SimpleUI.h" />
     <ClInclude Include="src\World\World.h" />
     <ClInclude Include="src\Graphic\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ext\imgui\backends\imgui_impl_dx12.cpp" />
+    <ClCompile Include="src\ext\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="src\ext\imgui\imgui.cpp" />
+    <ClCompile Include="src\ext\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\ext\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\ext\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\ext\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Graphic\DepthBuffer.cpp" />
     <ClCompile Include="src\Graphic\RootSignature.cpp" />
     <ClCompile Include="src\Graphic\Texture.cpp" />
@@ -247,6 +269,7 @@
     <ClCompile Include="src\World\RenderEngine.cpp" />
     <ClCompile Include="src\World\RenderPass.cpp" />
     <ClCompile Include="src\World\Scene.cpp" />
+    <ClCompile Include="src\World\SimpleUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

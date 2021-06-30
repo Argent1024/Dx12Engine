@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "World/Engine.h"
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 class WinApp {
 public:
 	WinApp() {}
@@ -27,6 +29,8 @@ public:
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
+			t_engine->GameLoop();
+			// ImGui::EndFrame();
 		}
 
 		// Return this part of the WM_QUIT message to Windows.
