@@ -1,20 +1,20 @@
 #include "stdafx.h"
-#include "BoundingVolume.h"
+#include "Volume.h"
 #include "MathLib.h"
 
 namespace Math 
 {
 	//****************** Sphere *********************//
-	BoundingSphere::BoundingSphere(Vector3 c,Scalar r) :
+	SphereVolume::SphereVolume(Vector3 c, Scalar r) :
 		center(c), radius(r) { }
 	
-	void BoundingSphere::SetTransform(const Transform& T) {
+	void SphereVolume::SetTransform(const Transform& T) {
 		center = T.GetTranslation();
 	}
 
-	Intersection BoundingSphere::_CollideSphere(const BoundingSphere& sphere, bool noisect) const 
+	CollisionIntersection SphereVolume::_CollideSphere(const SphereVolume& sphere, bool noisect) const 
 	{
-		Intersection ans;
+		CollisionIntersection ans;
 
 		const Vector3& a = center;
 		const Vector3& b = sphere.center;
@@ -42,9 +42,9 @@ namespace Math
 	}
 
 
-	Intersection BoundingSphere::_CollidePlane(const BoundingPlane& plane, bool noisect) const
+	CollisionIntersection SphereVolume::_CollidePlane(const PlaneVolume& plane, bool noisect) const
 	{
-		Intersection ans;
+		CollisionIntersection ans;
 
 		const Vector3& x = plane.dirX;
 		const Vector3& y = plane.dirY;
@@ -84,17 +84,57 @@ namespace Math
 	}
 
 
+	// **************************************** Axis-Aligned Box *********************************************//
+	AABoxVolume::AABoxVolume(Vector3 c, Vector3 r) : center(c), radius(r) 
+	{ }
 
-	//********************** Plane *********************//
-	const Math::Scalar BoundingPlane::DefaultLength = Scalar(10);
-
-	BoundingPlane::BoundingPlane(Vector3& c, Vector3& x, Vector3& y, Scalar& lx, Scalar& ly)
-		: center(c), dirX(x), dirY(y), lenX(lx), lenY(ly)
-	{ 
-		AssertVerticle();
+	void AABoxVolume::SetTransform(const Math::Transform& T) 
+	{
+		
 	}
 
-	void BoundingPlane::SetTransform(const Transform& T) 
+	CollisionIntersection AABoxVolume::_CollideSphere(const SphereVolume& sphere, bool noisect) const 
+	{
+		return CollisionIntersection();
+	}
+
+	CollisionIntersection AABoxVolume::_CollideAABox(const AABoxVolume& box, bool noisect) const {
+		CollisionIntersection ans;
+		const Vector3& a = center;
+		const Vector3& b = box.center;
+
+		const Vector3& r1 = radius;
+		const Vector3& r2 = box.radius;
+		
+		Vector3 ab = a - b;
+		Vector3 r = r1 + r2;
+		Vector3 T = ab > r;
+		if (T.GetX() || T.GetY() || T.GetZ()) { ans.intersect = TRUE; }
+		
+		if (ans.intersect && !noisect) {
+			// Calculate the intersection of line segment ab and two boxes
+			// TODO just simply assign the mid point now
+			ans.p1 = (a + b) / 2;
+			ans.p2 = ans.p1;
+
+			ab = Normalize(ab);
+			ans.n1 = -ab;
+			ans.n2 = ab;
+		}
+
+		return ans;
+	}
+
+	//********************** Plane *********************//
+	const Math::Scalar PlaneVolume::DefaultLength = Scalar(10);
+
+	PlaneVolume::PlaneVolume(Vector3& c, Vector3& x, Vector3& y, Scalar& lx, Scalar& ly)
+		: center(c), dirX(x), dirY(y), lenX(lx), lenY(ly)
+	{ 
+		AssertOrth();
+	}
+
+	void PlaneVolume::SetTransform(const Transform& T) 
 	{
 		// TODO slow
 		Vector3 x = T * Vector3(kXUnitVec);
@@ -105,7 +145,7 @@ namespace Math
 		dirX = x / lenX;
 		dirY = y / lenY;
 
-		AssertVerticle();
+		AssertOrth();
 	}
 
 	

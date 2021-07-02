@@ -180,8 +180,8 @@
     <ClInclude Include="src\Graphic\DepthBuffer.h" />
     <ClInclude Include="src\Graphic\GPUMemManager.h" />
     <ClInclude Include="src\Math\MathLib.h" />
-    <ClInclude Include="src\Math\BoundingVolume.h" />
     <ClInclude Include="src\Math\Ray.h" />
+    <ClInclude Include="src\Math\Volume.h" />
     <ClInclude Include="src\Physic\CollisionDetection.h" />
     <ClInclude Include="src\Physic\FFTOcean.h" />
     <ClInclude Include="src\Physic\PhysicState.h" />
@@ -242,7 +242,7 @@
     <ClCompile Include="src\Graphic\RootSignature.cpp" />
     <ClCompile Include="src\Graphic\Texture.cpp" />
     <ClCompile Include="src\Graphic\GPUMemManager.cpp" />
-    <ClCompile Include="src\Math\BoundingVolume.cpp" />
+    <ClCompile Include="src\Math\Volume.cpp" />
     <ClCompile Include="src\Utility\Input.cpp" />
     <ClCompile Include="src\Utility\MeshReader.cpp" />
     <ClCompile Include="src\World\Camera.cpp" />
