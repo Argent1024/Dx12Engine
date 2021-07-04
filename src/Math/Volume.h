@@ -54,6 +54,27 @@ namespace Math
 	/*************************************************************************************************
 	************************************* IMPLEMENTATION BELOW ***************************************
 	**************************************************************************************************/
+	class AABoxVolume : public Volume {
+	public:
+		AABoxVolume(Vector3 c, Vector3 r);
+
+		CollisionIntersection CollideWith(const Volume& bv, bool noisect = false) const override
+		{
+			return bv._CollideAABox(*this, noisect);
+		}
+
+		void SetTransform(const Math::Transform& T) override;
+
+		CollisionIntersection _CollideSphere(const SphereVolume& sphere, bool noisect) const override;
+		CollisionIntersection _CollideAABox(const AABoxVolume& box, bool noisect) const override;
+		CollisionIntersection _CollideBox(const BoxVolume& box, bool noisect) const override  { assert(FALSE && "not implemented"); return CollisionIntersection(); }
+		CollisionIntersection _CollidePlane(const PlaneVolume& plane, bool noisect) const override { assert(FALSE && "not implemented"); return CollisionIntersection(); }
+
+		Vector3 center;
+		Vector3 radius;
+	};
+
+
 
 	class SphereVolume : public Volume {
 	public:
@@ -75,26 +96,6 @@ namespace Math
 
 		Math::Vector3 center = Math::Vector3(Math::kZero);
 		Math::Scalar radius = Math::Scalar(1.0f);
-	};
-
-	class AABoxVolume : public Volume {
-	public:
-		AABoxVolume(Vector3 c, Vector3 r);
-
-		CollisionIntersection CollideWith(const Volume& bv, bool noisect = false) const override
-		{
-			return bv._CollideAABox(*this, noisect);
-		}
-
-		void SetTransform(const Math::Transform& T) override;
-
-		CollisionIntersection _CollideSphere(const SphereVolume& sphere, bool noisect) const override;
-		CollisionIntersection _CollideAABox(const AABoxVolume& box, bool noisect) const override;
-		CollisionIntersection _CollideBox(const BoxVolume& box, bool noisect) const override  { assert(FALSE && "not implemented"); return CollisionIntersection(); }
-		CollisionIntersection _CollidePlane(const PlaneVolume& plane, bool noisect) const override { assert(FALSE && "not implemented"); return CollisionIntersection(); }
-
-		Vector3 center;
-		Vector3 radius;
 	};
 
 	class PlaneVolume : public Volume {

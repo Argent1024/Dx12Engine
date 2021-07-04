@@ -25,7 +25,7 @@ namespace Game {
 
 		inline ptrMaterial Material() { return m_Material; }
 
-		inline void SetPhyState(Physic::PhysicState* state) { m_state = state; }
+		inline void SetPhyState(Physics::PhysicsState* state) { m_state = state; }
 
 		inline void SetTransform(const Math::Transform& T) { m_state->SetTransform(T); }
 		inline Math::Transform GetTransform() const { return m_state->GetTransform(); }
@@ -44,7 +44,7 @@ namespace Game {
 
 	protected:
 		// Math::Transform m_Transform;
-		Physic::PhysicState* m_state;
+		Physics::PhysicsState* m_state;
 
 		// TODO make a struct later. only model Transformation for now
 		// Store const data used in rendering ( Transformation, other settings )

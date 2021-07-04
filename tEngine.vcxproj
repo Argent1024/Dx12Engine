@@ -184,6 +184,7 @@
     <ClInclude Include="src\Math\Volume.h" />
     <ClInclude Include="src\Physic\CollisionDetection.h" />
     <ClInclude Include="src\Physic\FFTOcean.h" />
+    <ClInclude Include="src\Physic\Octree.h" />
     <ClInclude Include="src\Physic\PhysicState.h" />
     <ClInclude Include="src\Utility\ResourceMangement.h" />
     <ClInclude Include="src\World\Engine.h" />

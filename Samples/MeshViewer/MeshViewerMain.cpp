@@ -61,26 +61,25 @@ namespace Engine {
 			mat.Roughness = 0.15f;
 			mat.Specular = 0.0f;
 			m_Material->SetData(mat);
+
+			// Load textures
+			{
+				std::string texpath = "D://work/tEngine/snow.png";
+				Graphic::Texture* baseColorTex = new Graphic::Texture2D(texpath);
+
+				m_Material->SetTexture(PrincipleMaterial::DiffuseTex, baseColorTex);
+			}
+
 			m_Material->UploadCBV();
 
 			MeshReader reader;
-			reader.ReadOBJ("D://work/tEngine/bunny.obj");
+			reader.ReadOBJ("D://work/tEngine/renderball.obj");
 
 			std::vector<DefaultVertex>& vertex = reader.m_vertex;
 			std::vector<UINT>& index = reader.m_index;
 
 			m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
 			
-
-			//// Texture test
-			//m_Mesh = TriangleMesh::GetXYPlane();
-			//std::string texpath = "D://work/tEngine/snow.png";
-			//Graphic::Texture2D* tex = new Graphic::Texture2D(texpath);
-
-			//m_Material->SetTexture(PrincipleMaterial::DiffuseTex, tex);
-			//m_Material->UploadCBV();
-			//// Texture Test end
-
 
 			// TODO error C2338 aligin
 			GObject* obj0 = new Game::GObject();

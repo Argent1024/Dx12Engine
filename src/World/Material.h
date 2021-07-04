@@ -77,6 +77,7 @@ namespace Game {
 		MatData m_MatData;
 		Graphic::ConstantBuffer m_MatCBV;
 		Graphic::Texture* m_DiffuseTex;
+		Graphic::Texture* m_NormalTex;
 	};
 }
 

@@ -50,9 +50,13 @@ cbuffer MaterialInfo : register (b3)
 	float Metallic;
 	float Specular;
 	// TODO add texture stuff later
+
+	bool UseBaseTexture;
+	bool UseNormalTexture;
+
 }
 
-Texture2D Material_BaseColor : register(t0);
+Texture2D BaseColorTexture : register(t0, space1);
 // TODO Material Textures
 
 /********************** Object & Material Descriptor Table End ****************************/
@@ -167,7 +171,7 @@ float3 CalculateBRDF(float3 viewDir,
 // Pixel Shader
 float4 PSMain(PSInput input) : SV_TARGET
 {
-	// return Material_BaseColor.Sample(g_sampler, input.uv);
+	// return BaseColorTexture.Sample(g_sampler, input.uv);
 	
 	if (debugnormal) {
 		return (float4(input.normal, 1.0f) + 1.0f) / 2.0f;
@@ -191,8 +195,13 @@ float4 PSMain(PSInput input) : SV_TARGET
 
 	// Calculate surface material's data
 	IntersectionPoint isect;
-	isect.BaseColor = BaseColor;
-	//isect.BaseColor = Material_BaseColor.Sample(g_sampler, input.uv);
+	
+	if(UseBaseTexture) {
+		isect.BaseColor = BaseColorTexture.Sample(g_sampler, input.uv);
+	} else {
+		isect.BaseColor = BaseColor;
+	}
+
 	isect.Roughness = Roughness;
 	isect.Specular = Specular;
 	

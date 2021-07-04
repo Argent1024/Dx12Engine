@@ -4,7 +4,7 @@
 #include "Octree.h"
 #include "PhysicState.h"
 
-namespace Physic 
+namespace Physics 
 {
 
 	class CollisionDection {

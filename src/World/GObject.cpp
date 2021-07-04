@@ -9,7 +9,7 @@ namespace Game {
 		  m_CBV()
 	{
 		// TODO Fix this
-		m_state = new Physic::PState();
+		m_state = new Physics::PhysicsState();
 
 		// Slot 0 in the table is for const data
 		// Init CBV and put CBV to slot 0 in the descriptor table
@@ -21,7 +21,7 @@ namespace Game {
 
 	void GObject::RecordCommand(Graphic::CommandList& commandList) {
 		assert(m_Mesh && "Not initialized GameObj");
-		// (TODO may not need to do this every frame & remove it to Physic) Upload data to the cbv
+		// (TODO may not need to do this every frame & remove it to Physics) Upload data to the cbv
 		XMFLOAT4X4 modelTransform;
 		XMStoreFloat4x4(&modelTransform, XMMatrixTranspose(m_state->GetTransform()));
 		m_CBV.copyData(&modelTransform);

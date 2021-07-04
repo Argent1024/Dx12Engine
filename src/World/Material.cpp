@@ -49,14 +49,18 @@ namespace Game {
 		switch (texType)
 		{
 		case Game::PrincipleMaterial::ObjectCBV:
+			assert(FALSE && "Why ObjectCBV in set texture?");
 			break;
 		case Game::PrincipleMaterial::MatCBV:
+			assert(FALSE && "Why MatCBV in set texture?");
 			break;
 		case Game::PrincipleMaterial::DiffuseTex:
 			m_MatData.CTexture = tex != nullptr;
 			m_DiffuseTex = tex;
 			break;
 		case Game::PrincipleMaterial::NormalTex:
+			m_MatData.NTexture = tex != nullptr;
+			m_NormalTex = tex;
 			break;
 		case Game::PrincipleMaterial::RoughnessTex:
 			break;
