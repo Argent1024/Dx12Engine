@@ -12,8 +12,8 @@ void OceanPSO::Initialize()
 
 	const std::wstring path = L"D:\\work\\tEngine\\Shaders\\Ocean.hlsl";
 
-	ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", CompileFlags, 0, &VS, nullptr));
-	ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", CompileFlags, 0, &PS, nullptr));
+	ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_1", CompileFlags, 0, &VS, nullptr));
+	ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_1", CompileFlags, 0, &PS, nullptr));
 
 	D3D12_INPUT_ELEMENT_DESC  inputElementDescs[] =
 	{

@@ -41,7 +41,8 @@ namespace Graphic {
 			m_heapIndexStart = m_heap->MallocHeap(m_size);
 		}
 
-		// Only Bind SRV & UAV & CBV
+		// Bind SRV & UAV & CBV
+		// Copy the table from initheap to inuse heap
 		inline CD3DX12_GPU_DESCRIPTOR_HANDLE BindDescriptorTable() const
 		{
 			// assert(m_heap && "Descriptor Table havn't initialized");
@@ -55,6 +56,12 @@ namespace Graphic {
 		{
 			assert(index < m_size && "Accessing index out of bound");
 			return m_heap->GetCPUHandle(m_heapIndexStart + index);
+		}
+
+		inline CD3DX12_GPU_DESCRIPTOR_HANDLE GetSlotGPU(UINT index) const 
+		{
+			assert(index < m_size && "Accessing index out of bound");
+			return m_heap->GetGPUHandle(m_heapIndexStart + index);
 		}
 
 		inline DescriptorHeap* GetHeap() const {

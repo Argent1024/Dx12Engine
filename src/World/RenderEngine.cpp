@@ -36,7 +36,7 @@ namespace Engine {
 	void RenderEngine::Render(Game::Scene& scene) 
 	{
 		BeginRender();
-		scene.PrepareLights();
+		scene.PrepareSceneCBV();
 	
 		// Multi Threading maybe
 		Graphic::CommandList commandlist;

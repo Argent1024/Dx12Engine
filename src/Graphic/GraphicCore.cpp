@@ -77,6 +77,8 @@ void Engine::EnableDebug()
 // Graphic::GPU::MemoryAllocator Engine::MemoryAllocator;
 Graphic::CommandManager CopyHelper(1);
 Graphic::CommandManager GraphicsCommandManager(2);
+Graphic::CommandManager ComputeCommandManager(1);
+
 
 void Engine::InitializeEngine() {
 	// **** Graphic Stuff ******//
@@ -85,6 +87,8 @@ void Engine::InitializeEngine() {
 
 	CopyHelper.Initialize();
 	GraphicsCommandManager.Initialize();
+	ComputeCommandManager.Initialize();
+
 
 	Graphic::DescriptorHeap* initHeap = Engine::GetInitHeap();
 	initHeap->Initialize();

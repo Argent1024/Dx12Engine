@@ -5,6 +5,8 @@
 
 extern Graphic::CommandManager CopyHelper;
 extern Graphic::CommandManager GraphicsCommandManager;
+extern Graphic::CommandManager ComputeCommandManager;
+
 
 namespace Graphic {
 

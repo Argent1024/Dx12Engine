@@ -9,6 +9,8 @@
 #include "GraphicCore.h"
 
 #define ptrPSO std::shared_ptr<Graphic::GraphicsPSO>
+#define ptrComputePSO std::shared_ptr<Graphic::ComputePSO>
+
 namespace Graphic {
 
 	class PipelineStateObject {
@@ -131,10 +133,27 @@ namespace Graphic {
 		std::vector<D3D12_INPUT_ELEMENT_DESC> m_inputLayouts;
 	};
 
+
 	class ComputePSO : public PipelineStateObject {
 	public:
-		void Initialize() override {}
+		ComputePSO(const std::wstring& cs_path) : m_ComputeShaderPath(cs_path) { }
 
+		void Initialize() override 
+		{
+			assert(m_rootSignature != nullptr);
+			m_psoDesc.pRootSignature = m_rootSignature;
+
+			ComPtr<ID3DBlob> CS;
+			ThrowIfFailed(D3DCompileFromFile(m_ComputeShaderPath.c_str(), nullptr, nullptr, "CSMain", "cs_5_0", CompileFlags, 0, &CS, nullptr));
+			m_psoDesc.CS = CD3DX12_SHADER_BYTECODE(CS.Get());
+
+			ID3D12Device* device = Engine::GetDevice();
+			ThrowIfFailed(device->CreateComputePipelineState(&m_psoDesc, IID_PPV_ARGS(&m_pipelineState)));	
+		}
+
+	private:
+		D3D12_COMPUTE_PIPELINE_STATE_DESC m_psoDesc;
+		std::wstring m_ComputeShaderPath;
 	};
 
 

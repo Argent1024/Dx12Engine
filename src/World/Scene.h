@@ -9,17 +9,17 @@
 
 namespace Game
 {
-	struct SceneLightsInfo
+	struct SceneInfo
 	{
-		// TODO check memory?
 		static const UINT maxLights = 16;
-
-		LightState Lights[maxLights];
-
+		
+		BOOL UseEnvMapping = FALSE;
 		// Store num of each light
 		UINT maxDir;
 		UINT maxPoint;
 		UINT maxSpot;
+
+		LightState Lights[maxLights];	
 	};
 
 	class Scene
@@ -36,10 +36,8 @@ namespace Game
 		// Create Descriptor table for lights and put srv( for shadow map) into it
 		virtual void Initialize();
 
-		// TODO const camera, edit Camera class
 		const ProjectiveCamera& GetMainCamera() const { return m_Camera; }
 		ProjectiveCamera& GetMainCamera() { return m_Camera; }
-		// inline Graphic::ConstantBuffer* GetMainCameraCBV() { return m_MainCameraCBV; }
 
 		const std::vector<GObject*>& GetGameObjects(UINT renderType) const {
 			const auto it = m_GameObjectTable.find(renderType);
@@ -53,45 +51,52 @@ namespace Game
 		virtual void AddGameObj(GObject* obj, UINT renderType=0);
 		virtual void DeleteGameObj(GObject* obj) {}
 
-		// Light Stuff
 		
-		const Graphic::DescriptorTable* GetLightsTable() const { return m_LightsTable; }
-		Graphic::DescriptorTable* GetLightsTable()  { return m_LightsTable; }
+		const Graphic::DescriptorTable* GetSceneTable() const { return m_SceneDTable; }
+		Graphic::DescriptorTable* GetSceneTable()  { return m_SceneDTable; }
+			
+		// Environment Mapping
+		void SetEnvironmentMapping(ptrTexture envmap);
 
+		// Lights Stuff
 		virtual void AddLight(Light& light);
-
 		inline void ConfigLight(UINT nDir, UINT nPoint, UINT nSpot)
 		{
 			
-			assert(nDir + nPoint + nSpot <= SceneLightsInfo::maxLights);
+			assert(nDir + nPoint + nSpot <= SceneInfo::maxLights);
 			iDir = 0;
 			iPoint = nDir;
 			iSpot =  nDir + nPoint;
 
-			m_LightInfo.maxDir = iDir + nDir;
-			m_LightInfo.maxPoint = iPoint + nPoint;
-			m_LightInfo.maxSpot = iSpot + nSpot;
+			m_SceneInfo.maxDir = iDir + nDir;
+			m_SceneInfo.maxPoint = iPoint + nPoint;
+			m_SceneInfo.maxSpot = iSpot + nSpot;
 			
 		}
 
 		// Store Lights' data into CBV
 		// Assume all lights have put there data in the light state
-		void PrepareLights();
+		void PrepareSceneCBV();
 
 	protected:
-		static const UINT LightTableSize = 4;
+		static const UINT SceneTableSize = 16;
 
 		// Main Camera Stuff
 		ProjectiveCamera m_Camera;
 		Graphic::ConstantBuffer m_MainCameraCBV;
 
-		// Bind Light Stuff
-		SceneLightsInfo m_LightInfo;
-		Graphic::ConstantBuffer m_LightsCBV;	  // Store normal data of lights
 
-		Graphic::DescriptorTable* m_LightsTable;  // Store Shadow map
+		Graphic::DescriptorTable* m_SceneDTable;  // Store textures unique to scene(E.X. light's shadow map, env mapping)
+		ptrTexture m_EnvMapping;
 
-		std::vector<int> m_ShadowLightsIndex;   // Render Shadow Map for these lights			
+
+		SceneInfo m_SceneInfo;
+		Graphic::ConstantBuffer m_SceneCBV;	  // Store normal data of lights
+		
+
+		// TODO
+		// Lights stuff below
+		// std::vector<int> m_ShadowLightsIndex;   // Render Shadow Map for these lights			
 		// std::vector<Light*> m_Lights;			// Store the lights (maybe)
 
 		// Counter of lights

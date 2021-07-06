@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Texture.h"
 #include "Utility/Logger.h"
+#include "CommandQueue.h"
 
 #include <WICTextureLoader.h>
 
@@ -57,9 +58,47 @@ namespace Graphic {
 			
 		}
 	}
+	
+	
+	void Texture::CreateMipMap(ptrComputePSO pso, ptrTexture texture) 
+	{	
+		// Create root signatue & PSO
+		// TODO reuse root signature from else where
+		if (!MipMapPSO) {
+			MipMapRootSignature = std::make_shared<Graphic::RootSignature>();
+			MipMapRootSignature->Initialize();
 
 
-	TextureBuffer::TextureBuffer(UINT elementNum, UINT stride, UINT type) 
+		}
+
+
+		UINT16 miplevels = texture->m_textureDesc.MipLevels;
+		// Create descriptor tables
+		// ***TODO*** Since this will happen before the first frame now, so it's fine for now
+		// but need to create a GPU heap for this
+		Graphic::DescriptorHeap* heap = Engine::GetInUseHeap();
+
+		DescriptorTable table(miplevels+2, heap);
+		// Just use the table2 in the default rootsignature
+		// 0: CBV, 1: SRV, 2-Miplevels+2: UAV
+		texture->CreateView(TEXTURE_SRV, &table, 1);
+
+		// Since this descriptor table is created at the heap where shader can access, we don't need to bind it again
+		CD3DX12_GPU_DESCRIPTOR_HANDLE tableHandle = table.GetSlotGPU(0);
+
+
+		Graphic::CommandList ctx(D3D12_COMMAND_LIST_TYPE_COMPUTE);
+		ComputeCommandManager.InitCommandList(&ctx);
+		ctx.SetDescriptorHeap(*heap);
+		ctx.SetComputeRootDescriptorTable(2, tableHandle);
+
+
+
+		ComputeCommandManager.ExecuteCommandList(&ctx);
+		ComputeCommandManager.End();
+	}
+
+	/*Texture1D::Texture1D(UINT elementNum, UINT stride, UINT type) 
 		:TextureSingle(type), m_elementNum(elementNum), m_stride(stride), m_totalSize(m_elementNum * m_stride)
 	{
 		// TODO consider flags
@@ -78,7 +117,7 @@ namespace Graphic {
 		m_buffer->Initialize(m_totalSize);
 	}
 
-	TextureBuffer::TextureBuffer(UINT totalSize) : 
+	Texture1D::Texture1D(UINT totalSize) : 
 		TextureSingle(TEXTURE_CBV), m_totalSize(totalSize)
 	{
 		D3D12_RESOURCE_FLAGS flag = D3D12_RESOURCE_FLAG_NONE;
@@ -87,7 +126,7 @@ namespace Graphic {
 		m_buffer->Initialize(m_totalSize);
 	}
 
-	void TextureBuffer::CreateCBV(DescriptorTable* table, UINT tableIndex) 
+	void Texture1D::CreateCBV(DescriptorTable* table, UINT tableIndex) 
 	{
 		/*if (!m_CBV) {
 			m_CBV = new ConstantBuffer(m_buffer, m_totalSize);
@@ -96,10 +135,10 @@ namespace Graphic {
 			m_CBV->CreateView(*table, tableIndex);
 		} else {
 			m_CBV->CreateRootView();
-		}*/
+		}
 	}
 
-	void TextureBuffer::CreateSRV(DescriptorTable* table, UINT tableIndex) 
+	void Texture1D::CreateSRV(DescriptorTable* table, UINT tableIndex) 
 	{
 	
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -114,7 +153,7 @@ namespace Graphic {
 		m_SRV.CreateView(table, tableIndex, m_buffer->GetResource(), &srvDesc);
 	}
 
-	void TextureBuffer::CreateUAV(DescriptorTable* table, UINT tableIndex) 
+	void Texture1D::CreateUAV(DescriptorTable* table, UINT tableIndex) 
 	{
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -127,18 +166,21 @@ namespace Graphic {
 
 		m_UAV.CreateView(table, tableIndex, m_buffer->GetResource(), &uavDesc);
 	}
+	*/
+
 
 	Texture2D::Texture2D(UINT width, UINT height, UINT type, DXGI_FORMAT format, bool loadChessBoard)
 		: TextureSingle(type)
 	{
-		TextureDescHelper(width, height, format);
-		Initialize();
+		m_textureDesc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, ArraySize);
+		Initialize(m_textureDesc);
 
 		if (loadChessBoard) {
+			assert(format == DXGI_FORMAT_R8G8B8A8_UNORM && "Can only load chessboard for r8g8b8a8");
 			std::vector<UINT8> data;
 			LoadChessBoard(width, height, 4, data);
 			D3D12_SUBRESOURCE_DATA textureData = 
-			CreateTextureData({ (UINT)m_textureDesc.Width, (UINT)m_textureDesc.Height, 4, 1}, &data[0]);
+			CreateTextureData({ (UINT)width, (UINT)height, 4, 1}, &data[0]);
 			UploadTexture(&textureData);
 		}
 	}
@@ -155,8 +197,11 @@ namespace Graphic {
 		metadata.channelSize = 1;
 
 		D3D12_SUBRESOURCE_DATA texData = CreateTextureData(metadata, data);
-		TextureDescHelper(metadata.width, metadata.height, DXGI_FORMAT_R8G8B8A8_UNORM);
-		Initialize();
+		m_textureDesc =
+			CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, metadata.width, metadata.height, ArraySize);
+
+		// TextureDescHelper(metadata.width, metadata.height, DXGI_FORMAT_R8G8B8A8_UNORM);
+		Initialize(m_textureDesc);
 		UploadTexture(&texData);
 
 		// Using stb_image so need to free data here
@@ -165,27 +210,13 @@ namespace Graphic {
 		
 	}
 	
-	void Texture2D::TextureDescHelper(UINT width, UINT height, DXGI_FORMAT format) 
-	{
-		m_textureDesc = {};
-		m_textureDesc.MipLevels = 1;
-		m_textureDesc.Format = format;
-		m_textureDesc.Width = width;
-		m_textureDesc.Height = height;
-		m_textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-		m_textureDesc.DepthOrArraySize = 1;
-		m_textureDesc.SampleDesc.Count = 1;
-		m_textureDesc.SampleDesc.Quality = 0;
-		m_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	}
-
-	void Texture2D::Initialize() 
+	void Texture2D::Initialize(CD3DX12_RESOURCE_DESC& texDesc) 
 	{
 		m_buffer = GPU::MemoryManager::CreateTBuffer();
 		if (m_Type & TEXTURE_DSV) {
 			// Change Texture format to D32
-			m_textureDesc.Format = DXGI_FORMAT_D32_FLOAT;
-			m_textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+			texDesc.Format = DXGI_FORMAT_D32_FLOAT;
+			texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 			D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
 
@@ -195,12 +226,11 @@ namespace Graphic {
 			clearValue.DepthStencil.Depth = 1.0f;
 			clearValue.DepthStencil.Stencil = 0;
 
-			m_buffer->Initialize(&m_textureDesc, &clearValue);
+			m_buffer->Initialize(&texDesc, &clearValue);
 			// Change back to R32 from D32
-			m_textureDesc.Format = DXGI_FORMAT_R32_FLOAT;
-
+			texDesc.Format = DXGI_FORMAT_R32_FLOAT;
 		} else {
-			m_buffer->Initialize(&m_textureDesc);
+			m_buffer->Initialize(&texDesc);
 		}
 	}
 
@@ -254,17 +284,17 @@ namespace Graphic {
 		//m_RTV = new RenderTargetView(m_gpuMem, rtvDesc, Engine::GetRTVHeap())		
 	}
 
-	TextureCube::TextureCube(UINT resolution, UINT type) 
+	TextureCube::TextureCube(UINT resolution, UINT16 miplevels, UINT type) 
 		: Texture(type)
 	{
-		TextureDescHelper(resolution);
+		TextureDescHelper(resolution, miplevels);
 		Initialize();
 	}
 	
-	void TextureCube::TextureDescHelper(UINT resolution) 
+	void TextureCube::TextureDescHelper(UINT resolution, UINT16 miplevels) 
 	{
 		m_textureDesc = {};
-		m_textureDesc.MipLevels = 1;
+		m_textureDesc.MipLevels = miplevels;
 		m_textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		m_textureDesc.Width = resolution;
 		m_textureDesc.Height = resolution;
@@ -272,7 +302,7 @@ namespace Graphic {
 		m_textureDesc.DepthOrArraySize = 6; // TODO
 		m_textureDesc.SampleDesc.Count = 1;
 		m_textureDesc.SampleDesc.Quality = 0;
-		m_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE3D; // TODO is this correct?
+		m_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D; // TODO is this correct?
 	}
 
 	void TextureCube::Initialize()
@@ -288,7 +318,7 @@ namespace Graphic {
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		srvDesc.Format = m_textureDesc.Format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-		srvDesc.Texture2D.MipLevels = 1;
+		srvDesc.TextureCube.MipLevels = m_textureDesc.MipLevels;
 
 		m_SRV.CreateView(table, tableIndex, m_buffer->GetResource(), &srvDesc);
 	}

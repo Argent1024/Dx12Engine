@@ -19,70 +19,55 @@ namespace Game {
 	
 	void Scene::Initialize() 
 	{
-		m_LightsTable = new Graphic::DescriptorTable(LightTableSize);
+		m_SceneDTable = new Graphic::DescriptorTable(SceneTableSize);
 
-		UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneLightsInfo));
+		UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneInfo));
 
 		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
 		buffer->Initialize(cbvSize);
 
 		// Create CBV at slot 0 of the lightTable
-		m_LightsCBV.Initialze(buffer, cbvSize);
-		m_LightsCBV.CreateView(m_LightsTable, 0);
-	
-		// Other Textures should be bind outside
+		m_SceneCBV.Initialze(buffer, cbvSize);
+		m_SceneCBV.CreateView(m_SceneDTable, 0);
+	}
 
-	/*	// TODO remove this
-		// Set background sphere
-		GObject* background = new Game::GObject();
-		const float scale = 900.f;
-		ptrMesh backgroundSphere = TriangleMesh::GetSphere(100, 100);
-		std::string path = "D://work/tEngine/envmap.png";
-		Graphic::Texture* tex = new Graphic::Texture2D(path);
-
-		std::shared_ptr<PrincipleMaterial> mat = std::make_shared<PrincipleMaterial>();
-		mat->SetTexture(PrincipleMaterial::SlotMaps::DiffuseTex, tex);
-
-		background->SetMesh(backgroundSphere);
-		background->SetMaterial(mat);
-		background->SetTransform(Transform({ scale, 0, 0 }, 
-										{ 0, scale, 0 }, 
-										{ 0, 0, scale }, {3.0, 3.0, 0}));
-		m_BackgroundList.push_back(background);
-	*/
+	void Scene::SetEnvironmentMapping(ptrTexture envmap) 
+	{
+		m_SceneInfo.UseEnvMapping = TRUE;
+		m_EnvMapping->CreateView(Graphic::TextureType::TEXTURE_SRV, m_SceneDTable, 1);
 	}
 
 	void Scene::AddLight(Light& light) 
 	{
-		assert(iDir <= m_LightInfo.maxDir && 
-			   iPoint <= m_LightInfo.maxPoint &&
-			   iSpot <=  m_LightInfo.maxSpot &&
+		assert(iDir <= m_SceneInfo.maxDir && 
+			   iPoint <= m_SceneInfo.maxPoint &&
+			   iSpot <=  m_SceneInfo.maxSpot &&
 			   "Lights index out of ranged");
-		LightState* pos = &(m_LightInfo.Lights[iDir]);
+		LightState* pos = &(m_SceneInfo.Lights[iDir]);
 		LightType type = light.Type();
 		switch (type)
 		{
 		case Game::DIRECTION_LIGHT:
-			pos = &(m_LightInfo.Lights[iDir]);
+			pos = &(m_SceneInfo.Lights[iDir]);
 			iDir ++;
 			break;
 		case Game::POINT_LIGHT:
-			pos = &(m_LightInfo.Lights[iPoint]);
+			pos = &(m_SceneInfo.Lights[iPoint]);
 			iPoint ++;
 			break;
 		case Game::SPOT_LIGHT:
-			pos = &(m_LightInfo.Lights[iSpot]);
+			pos = &(m_SceneInfo.Lights[iSpot]);
 			iSpot ++;
 			break;
 		}
 		light.Initialize(pos);
 	}
 
-	void Scene::PrepareLights() 
+	void Scene::PrepareSceneCBV() 
 	{
 		// UINT size = sizeof(SceneLightsInfo);
 		//TODO ERROR when only copying with size
-		m_LightsCBV.copyData(&m_LightInfo);// , sizeof(SceneLightsInfo));
+		m_SceneCBV.copyData(&m_SceneInfo);// , sizeof(SceneLightsInfo));
 	}
 
 	void Scene::AddGameObj(GObject* obj, UINT renderType) 

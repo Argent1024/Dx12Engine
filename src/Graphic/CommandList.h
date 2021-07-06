@@ -114,6 +114,11 @@ namespace Graphic {
 			m_commandList->SetGraphicsRootDescriptorTable(rootSlot, handle);
 		}
 
+		inline void SetComputeRootDescriptorTable(UINT rootslot, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
+		{
+			m_commandList->SetComputeRootDescriptorTable(rootslot, handle);
+		}
+
 		// Set root signature
 		inline void SetGraphicsRootConstants(UINT ParaIndex, UINT Size32Bit, const void* data, UINT Offset32Bit=0) { m_commandList->SetGraphicsRoot32BitConstants(ParaIndex, Size32Bit, data, Offset32Bit); }
 	

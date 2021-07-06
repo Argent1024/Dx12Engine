@@ -188,6 +188,7 @@
     <ClInclude Include="src\Physic\PhysicState.h" />
     <ClInclude Include="src\Utility\ResourceMangement.h" />
     <ClInclude Include="src\World\Engine.h" />
+    <ClInclude Include="src\World\EnvironmentMapping.h" />
     <ClInclude Include="src\World\FFTOcean.h" />
     <ClInclude Include="src\World\GameInput.h" />
     <ClInclude Include="src\World\RenderEngine.h" />
