@@ -54,9 +54,6 @@ namespace Game
 		
 		const Graphic::DescriptorTable* GetSceneTable() const { return m_SceneDTable; }
 		Graphic::DescriptorTable* GetSceneTable()  { return m_SceneDTable; }
-			
-		// Environment Mapping
-		void SetEnvironmentMapping(ptrTexture envmap);
 
 		// Lights Stuff
 		virtual void AddLight(Light& light);
@@ -87,8 +84,6 @@ namespace Game
 
 
 		Graphic::DescriptorTable* m_SceneDTable;  // Store textures unique to scene(E.X. light's shadow map, env mapping)
-		ptrTexture m_EnvMapping;
-
 
 		SceneInfo m_SceneInfo;
 		Graphic::ConstantBuffer m_SceneCBV;	  // Store normal data of lights

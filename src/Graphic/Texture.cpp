@@ -58,18 +58,16 @@ namespace Graphic {
 			
 		}
 	}
-	
-	
-	void Texture::CreateMipMap(ptrComputePSO pso, ptrTexture texture) 
+
+	void Texture2D::CreateMipMap(ptrComputePSO pso, ptrTex2D texture) 
 	{	
 		// Create root signatue & PSO
 		// TODO reuse root signature from else where
-		if (!MipMapPSO) {
-			MipMapRootSignature = std::make_shared<Graphic::RootSignature>();
-			MipMapRootSignature->Initialize();
+		ptrRootSignature MipMapRootSignature = std::make_shared<Graphic::RootSignature>();
+		MipMapRootSignature->Initialize();
 
 
-		}
+		
 
 
 		UINT16 miplevels = texture->m_textureDesc.MipLevels;
@@ -81,7 +79,11 @@ namespace Graphic {
 		DescriptorTable table(miplevels+2, heap);
 		// Just use the table2 in the default rootsignature
 		// 0: CBV, 1: SRV, 2-Miplevels+2: UAV
-		texture->CreateView(TEXTURE_SRV, &table, 1);
+		texture->CreateSRV(&table, 1);
+		for (UINT16 i = 0; i < miplevels; ++i) {
+			texture->CreateUAV(&table, 1+i, i);
+		}
+
 
 		// Since this descriptor table is created at the heap where shader can access, we don't need to bind it again
 		CD3DX12_GPU_DESCRIPTOR_HANDLE tableHandle = table.GetSlotGPU(0);
@@ -170,7 +172,7 @@ namespace Graphic {
 
 
 	Texture2D::Texture2D(UINT width, UINT height, UINT type, DXGI_FORMAT format, bool loadChessBoard)
-		: TextureSingle(type)
+		: Texture(type)
 	{
 		m_textureDesc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, ArraySize);
 		Initialize(m_textureDesc);
@@ -186,7 +188,7 @@ namespace Graphic {
 	}
 
 	Texture2D::Texture2D(std::string& filename, UINT type) 
-		: TextureSingle(type)
+		: Texture(type)
 	{	
 		// Load Chess Board
 
@@ -199,9 +201,8 @@ namespace Graphic {
 		D3D12_SUBRESOURCE_DATA texData = CreateTextureData(metadata, data);
 		m_textureDesc =
 			CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, metadata.width, metadata.height, ArraySize);
-
-		// TextureDescHelper(metadata.width, metadata.height, DXGI_FORMAT_R8G8B8A8_UNORM);
 		Initialize(m_textureDesc);
+
 		UploadTexture(&texData);
 
 		// Using stb_image so need to free data here
@@ -248,21 +249,30 @@ namespace Graphic {
 		// LoadWICTextureFromFile()
 	}
 
-	void Texture2D::CreateSRV(DescriptorTable* table, UINT tableIndex)  
+	void Texture2D::CreateSRV(DescriptorTable* table, UINT tableIndex, UINT MostDetailedMip,   UINT  MipLevels) 
 	{
-		// Describe SRV
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		srvDesc.Format = m_textureDesc.Format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = 1;
+		D3D12_TEX2D_SRV test{};
+		srvDesc.Texture2D.MipLevels = MipLevels;
+		srvDesc.Texture2D.MostDetailedMip = MostDetailedMip;
 
-		m_SRV.CreateView(table, tableIndex, m_buffer->GetResource(), &srvDesc);
+		this->_CreateSRV(&srvDesc, table, tableIndex);
+	}
+	
+	void Texture2D::CreateUAV(DescriptorTable* table, UINT tableIndex, UINT MipLevels) 
+	{
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = m_textureDesc.Format;
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+		D3D12_TEX2D_UAV test{};
+		uavDesc.Texture2D.MipSlice = MipLevels;
+
+		this->_CreateUAV(&uavDesc, table, tableIndex);
 	}
 
-	/*void Texture2D::CreateUAV(DescriptorTable* table, UINT tableIndex)  {
-		assert(FALSE && "Not implemented!");
-	}*/
 
 	void Texture2D::CreateDSV() 
 	{
@@ -273,15 +283,6 @@ namespace Graphic {
 		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 
 		m_DSV.CreateView(m_buffer->GetResource(), &dsvDesc);
-	}
-
-	void Texture2D::CreateRTV()  
-	{
-		//D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-		//rtvDesc.Format = m_textureDesc.Format;
-		//rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-		throw std::runtime_error("Not Implemented!");
-		//m_RTV = new RenderTargetView(m_gpuMem, rtvDesc, Engine::GetRTVHeap())		
 	}
 
 	TextureCube::TextureCube(UINT resolution, UINT16 miplevels, UINT type) 
@@ -311,28 +312,4 @@ namespace Graphic {
 		m_buffer->Initialize(&m_textureDesc);
 	}
 
-	void TextureCube::CreateSRV(DescriptorTable* table, UINT tableIndex)
-	{
-		
-		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.Format = m_textureDesc.Format;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-		srvDesc.TextureCube.MipLevels = m_textureDesc.MipLevels;
-
-		m_SRV.CreateView(table, tableIndex, m_buffer->GetResource(), &srvDesc);
-	}
-	
-	void TextureCube::CreateRTV()
-	{
-		
-		D3D12_RENDER_TARGET_VIEW_DESC  rtvDesc = {};
-		rtvDesc.Format = m_textureDesc.Format;
-		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
-		rtvDesc.Texture2DArray.MipSlice = 0;
-		rtvDesc.Texture2DArray.ArraySize = 6;
-		// TODO ..
-
-		m_RTV.CreateView(m_buffer->GetResource(), &rtvDesc);
-	}
 }

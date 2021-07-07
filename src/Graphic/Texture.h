@@ -5,9 +5,9 @@
 #include "RootSignature.h"
 
 #define ptrTexture std::shared_ptr<Graphic::Texture>
+#define ptrTex2D std::shared_ptr<Graphic::Texture2D>
 
 namespace Graphic {
-
 	enum TextureType 
 	{
 		TEXTURE_SRV = 1,	// Create a SRV texture
@@ -35,16 +35,10 @@ namespace Graphic {
 	//		3. Load data from file and copy(upload) it to the GPU memory
 	class Texture {
 	public:
-		// Use a compute shader to create mip levels of this texture
-		static void CreateMipMap(ptrComputePSO pso, ptrTexture texture);
-		static ptrRootSignature MipMapRootSignature;
-		static ptrComputePSO MipMapPSO;
-
 		Texture(UINT type) : m_Type(type) {
 			assert(type != 0 && " At least one type is needed Are you using && instead of || when creating type?");
 			assert(!((type & TEXTURE_RTV) && (type & TEXTURE_DSV)) && "Creating RTV & DSV same time");
 		}
-
 
 		inline UINT GetType() { return m_Type; }
 			
@@ -61,58 +55,53 @@ namespace Graphic {
 			return textureData;
 		}
 
-		/*
-		// TODO Need this when writing image back to disk
-		static ImageMetadata CalculateMetaData() 
-		{
-			
-		} */
+		// TODO write back texture to disk
 
-		virtual void UploadTexture(D3D12_SUBRESOURCE_DATA* data) 
+
+		void UploadTexture(D3D12_SUBRESOURCE_DATA* data) 
 		{
-			assert(FALSE && "Not implemented");
+			GPU::MemoryManager::UploadTexure(*m_buffer, data);
 		}
 
-
-		// Create the SRV & UAV at the table at tableIndex
-		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "CBV not implemented!"); }
-		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "SRV not implemented!"); }
-		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) { assert(FALSE && "UAV not implemented!"); }
-		void CreateDSV() { assert(FALSE && "DSV not implemented!"); }
-		void CreateRTV() { assert(FALSE && "RTV not implemented!"); }
+		const DepthStencilView& DSV() const { return m_DSV; }
 
 	protected:
+		// Create the SRV & UAV at the table at tableIndex
+		void _CreateCBV(DescriptorTable* table, UINT tableIndex) 
+		{ assert(FALSE && "CBV not implemented!"); }
+
+		void _CreateSRV(const D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc, DescriptorTable* table, UINT tableIndex) 
+		{ 
+			assert(m_Type & TEXTURE_SRV && "Texture type doesn't have srv"); 
+			m_SRV.CreateView(table, tableIndex, m_buffer->GetResource(), srvDesc);
+		}
+
+		void _CreateUAV(const D3D12_UNORDERED_ACCESS_VIEW_DESC* uavDesc, DescriptorTable* table, UINT tableIndex) 
+		{ 
+			assert(m_Type & TEXTURE_UAV && "Texture type doesn't have uav"); 
+			m_UAV.CreateView(table, tableIndex, m_buffer->GetResource(), uavDesc);
+		}
+
+		void _CreateDSV(const D3D12_DEPTH_STENCIL_VIEW_DESC* dsvDesc) 
+		{
+			assert(m_Type & TEXTURE_DSV && "Texture type doesn't have dsv"); 
+			m_DSV.CreateView(m_buffer->GetResource(), dsvDesc);
+		}
+
+		void _CreateRTV() { assert(FALSE && "RTV not implemented!"); }
+
 		// Store or value for texture_type
 		// EX: m_Type = TEXUTRE_SRV | TEXTURE_UAV | TEXTURE_DSV
 		const UINT m_Type;
 
 		CD3DX12_RESOURCE_DESC m_textureDesc;
-	};
 
-	class TextureSingle : public Texture {
-	public:
-		TextureSingle(UINT type) : Texture(type) { }
-
-		const DepthStencilView& DSV() const { return m_DSV; }
-		DepthStencilView& DSV() { return m_DSV; }
-		
-
-	protected:
-		// ConstantBuffer  m_CBV;
+		ptrTBuffer m_buffer;
 		ShaderResourceView  m_SRV;
 		UnorderedAccessView m_UAV;
 		RenderTargetView    m_RTV;
 		DepthStencilView    m_DSV;
 	};
-
-	/*template<UINT N>
-	class TextureArray : public Texture 
-	{
-	public:
-		TextureArray(UINT type) : Texture(type) { }
-	private:
-
-	};*/
 
 
 	// ******************************************************************************************** //
@@ -129,10 +118,6 @@ namespace Graphic {
 		Texture1D(UINT totalSize);
 
 	private:
-		void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-
 		ptrGBuffer m_buffer;
 
 		UINT m_elementNum;
@@ -141,8 +126,12 @@ namespace Graphic {
 	};*/
 
 	// TODO dont use stb_image, only support 8-bit's channel
-	class Texture2D : public TextureSingle {
+	class Texture2D : public Texture {
 	public:
+		// Use a compute shader to create mip levels of this texture
+		static void CreateMipMap(ptrComputePSO pso, ptrTex2D texture);
+
+
 		static const UINT16 ArraySize = 1;
 
 		// TODO better way to express type?
@@ -151,27 +140,18 @@ namespace Graphic {
 
 		Texture2D(std::string& filename, UINT type=TEXTURE_SRV);
 
-		// Write texture data to gpu memory
-		// Only need to upload once since all views point to the same memory!
-		inline void UploadTexture(D3D12_SUBRESOURCE_DATA* data) override {
-			GPU::MemoryManager::UploadTexure(*m_buffer, data);
-		}
+
+		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0, UINT MostDetailedMip=0, UINT MipLevels=1);
+
+		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0, UINT MipLevels=0);
+
+		void CreateDSV();
 
 	private:
-		ptrTBuffer m_buffer;
-
-		// void TextureDescHelper(UINT width, UINT height, UINT16 miplevels, DXGI_FORMAT format);
-
 		// After we have m_textureDesc and m_Type Allocate GPU memory and create texture
 		void Initialize(CD3DX12_RESOURCE_DESC& texdesc);
 
 		ImageMetadata LoadFromImage(std::string& filename, unsigned char*& data);
-
-		//void CreateCBV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		//void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		void CreateDSV() override;
-		void CreateRTV() override;
 	};
 	
 	// Cube map helper
@@ -186,15 +166,7 @@ namespace Graphic {
 		// After we have m_textureDesc and m_Type Allocate GPU memory and create texture
 		void Initialize();
 
-		// ImageMetadata LoadFromImage(std::string& filename, unsigned char*& data);
-
-		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0) override;
-		// void CreateUAV
-		void CreateRTV() override;
-
 		ptrTBuffer m_buffer;
-		ShaderResourceView m_SRV;
-		RenderTargetView m_RTV;
 	};
 
 

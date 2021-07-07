@@ -13,7 +13,7 @@ namespace Graphic
 	void DepthBuffer::Initialize() 
 	{
 		//  TODO TEST
-		m_depthTexture.CreateView(TEXTURE_DSV);
+		m_depthTexture.CreateDSV();
 		m_dsvHandle = m_depthTexture.DSV().GetHandle();
 	}
 }

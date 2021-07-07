@@ -31,12 +31,6 @@ namespace Game {
 		m_SceneCBV.CreateView(m_SceneDTable, 0);
 	}
 
-	void Scene::SetEnvironmentMapping(ptrTexture envmap) 
-	{
-		m_SceneInfo.UseEnvMapping = TRUE;
-		m_EnvMapping->CreateView(Graphic::TextureType::TEXTURE_SRV, m_SceneDTable, 1);
-	}
-
 	void Scene::AddLight(Light& light) 
 	{
 		assert(iDir <= m_SceneInfo.maxDir && 

@@ -65,7 +65,7 @@ namespace Engine {
 			// Load textures
 			{
 				std::string texpath = "D://work/tEngine/snow.png";
-				Graphic::Texture* baseColorTex = new Graphic::Texture2D(texpath);
+				ptrTex2D baseColorTex = std::make_shared<Graphic::Texture2D>(texpath);
 
 				m_Material->SetTexture(PrincipleMaterial::DiffuseTex, baseColorTex);
 			}

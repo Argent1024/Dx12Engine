@@ -67,7 +67,7 @@ namespace Game {
 		inline void SetData(const MatData& data) { m_MatData = data; }
 
 		// Set texture to xxx, the default will remove the texture of one slot (pass a nullptr in Texture)
-		void SetTexture(SlotMaps texType, Graphic::Texture* tex=nullptr);
+		void SetTexture(SlotMaps texType, ptrTex2D tex=nullptr);
 
 		inline void UploadCBV() override { m_MatCBV.copyData(&m_MatData); }
 
@@ -76,8 +76,8 @@ namespace Game {
 
 		MatData m_MatData;
 		Graphic::ConstantBuffer m_MatCBV;
-		Graphic::Texture* m_DiffuseTex;
-		Graphic::Texture* m_NormalTex;
+		ptrTex2D m_DiffuseTex;
+		ptrTex2D m_NormalTex;
 	};
 }
 

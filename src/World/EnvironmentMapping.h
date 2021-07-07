@@ -10,7 +10,7 @@ namespace Game {
 
 
 	private:
-		ptrTexture m_Texture;
+		ptrTex2D m_Texture;
 	};
 
 

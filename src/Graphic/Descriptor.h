@@ -211,7 +211,7 @@ namespace Graphic {
 	class ShaderResourceView : public Descriptor
 	{
 	public:
-		void CreateView(DescriptorTable* table, UINT tableIndex, ID3D12Resource* resource, D3D12_SHADER_RESOURCE_VIEW_DESC* desc) 
+		void CreateView(DescriptorTable* table, UINT tableIndex, ID3D12Resource* resource, const D3D12_SHADER_RESOURCE_VIEW_DESC* desc) 
 		{
 			ID3D12Device* device = Engine::GetDevice();
 			if(table) {
@@ -230,7 +230,7 @@ namespace Graphic {
 	class UnorderedAccessView : public Descriptor
 	{
 	public:
-		void CreateView(DescriptorTable* table, UINT tableIndex, ID3D12Resource* resource, D3D12_UNORDERED_ACCESS_VIEW_DESC* desc) 
+		void CreateView(DescriptorTable* table, UINT tableIndex, ID3D12Resource* resource, const D3D12_UNORDERED_ACCESS_VIEW_DESC* desc) 
 		{
 			ID3D12Device* device = Engine::GetDevice();
 			if(table) {
@@ -249,7 +249,7 @@ namespace Graphic {
 	class RenderTargetView : public Descriptor
 	{
 	public:
-		void CreateView(ID3D12Resource* resource, D3D12_RENDER_TARGET_VIEW_DESC* desc)
+		void CreateView(ID3D12Resource* resource, const D3D12_RENDER_TARGET_VIEW_DESC* desc)
 		{
 			DescriptorHeap* heap = Engine::GetRTVHeap();
 			ID3D12Device* device = Engine::GetDevice();
@@ -267,7 +267,7 @@ namespace Graphic {
 	class DepthStencilView : public Descriptor
 	{
 	public:
-		void CreateView(ID3D12Resource* resource, D3D12_DEPTH_STENCIL_VIEW_DESC* desc)
+		void CreateView(ID3D12Resource* resource, const D3D12_DEPTH_STENCIL_VIEW_DESC* desc)
 		{
 			DescriptorHeap* heap = Engine::GetDSVHeap();
 			ID3D12Device* device = Engine::GetDevice();

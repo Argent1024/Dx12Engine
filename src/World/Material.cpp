@@ -33,7 +33,7 @@ namespace Game {
 			break;
 		case Game::PrincipleMaterial::DiffuseTex:
 			assert(m_DiffuseTex != nullptr && "Haven't set texture for diffuse color");
-			m_DiffuseTex->CreateView(Graphic::TEXTURE_SRV, &table, DiffuseTex);
+			m_DiffuseTex->CreateSRV(&table, DiffuseTex);
 			break;
 		case Game::PrincipleMaterial::NormalTex:
 			break;
@@ -44,7 +44,7 @@ namespace Game {
 		}
 	}
 
-	void PrincipleMaterial::SetTexture(SlotMaps texType, Graphic::Texture* tex)
+	void PrincipleMaterial::SetTexture(SlotMaps texType, ptrTex2D tex)
 	{
 		switch (texType)
 		{

@@ -98,16 +98,16 @@ public:
 	void BindMaterialAt(Graphic::DescriptorTable& table) 
 	{
 		assert(m_Displacement != nullptr && "Haven't set texture for diffuse color");
-		m_Displacement->CreateView(Graphic::TEXTURE_SRV, &table, DisplacementTex);
-		m_Normal->CreateView(Graphic::TEXTURE_SRV, &table, NormalTex);
-		m_Reflection->CreateView(Graphic::TEXTURE_SRV, &table, ReflectionTex);
-		m_FoamTex->CreateView(Graphic::TEXTURE_SRV, &table, FoamTex);
+		m_Displacement->CreateSRV(&table, DisplacementTex);
+		m_Normal->CreateSRV(&table, NormalTex);
+		/*m_Reflection->CreateSRV(&table, ReflectionTex);
+		m_FoamTex->CreateSRV(&table, FoamTex);*/
 	}
 
-	Graphic::Texture* m_Displacement;
-	Graphic::Texture* m_Normal;
-	Graphic::Texture* m_Reflection;
-	Graphic::Texture* m_FoamTex;
+	ptrTex2D m_Displacement;
+	ptrTex2D m_Normal;
+	/*ptrTex2D m_Reflection;
+	ptrTex2D m_FoamTex;*/
 
 	MatData m_MatData;
 	Graphic::ConstantBuffer m_MatCBV;
@@ -145,7 +145,7 @@ public:
 		generator.seed(20210312);
 		std::normal_distribution<double> distribution(0.0,1.0);
 		for (UINT n = 0; n < m_ResX; ++n) {
-			for (int m = 0; m < m_ResY; ++m) {
+			for (UINT m = 0; m < m_ResY; ++m) {
 				double r = distribution(generator);
 				double i = distribution(generator);
 				m_Random[n][m] = Complex(r, i) / std::sqrt(2.0);
@@ -156,14 +156,9 @@ public:
 		// Create Texture
 		// XMVECTOR 4 x 16 byte
 		DXGI_FORMAT format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		m_DisplacementTexture = new Graphic::Texture2D(m_ResX, m_ResY, Graphic::TEXTURE_SRV, format);
-		m_NormalTexture = new Graphic::Texture2D(m_ResX, m_ResY, Graphic::TEXTURE_SRV, format);
-		
-		std::string path1 = "D://work/tEngine/envmap.png";
-		m_EnvMapping = new Graphic::Texture2D(path1);
-
-		std::string path2 = "D://work/tEngine/foam.png";
-		m_FoamTexture = new Graphic::Texture2D(path2);
+		m_DisplacementTexture = std::make_shared<Graphic::Texture2D>(m_ResX, m_ResY, Graphic::TEXTURE_SRV, format);
+		m_NormalTexture = std::make_shared<Graphic::Texture2D>(m_ResX, m_ResY, Graphic::TEXTURE_SRV, format);
+	
 
 		// Create Mesh
 		// m_Mesh = TriangleMesh::GetXYPlane();
@@ -175,8 +170,7 @@ public:
 		m_Material = std::make_shared<OceanMaterial>(materialData);
 		m_Material->m_Displacement = m_DisplacementTexture;
 		m_Material->m_Normal = m_NormalTexture;
-		m_Material->m_Reflection = m_EnvMapping;
-		m_Material->m_FoamTex = m_FoamTexture;
+		
 		m_Material->UploadCBV();
 
 		// Test FFT
@@ -238,10 +232,10 @@ private:
 
 	ptrMesh m_Mesh;
 	std::shared_ptr<OceanMaterial> m_Material;
-	Graphic::Texture* m_DisplacementTexture;
-	Graphic::Texture* m_NormalTexture;
+	ptrTex2D m_DisplacementTexture;
+	ptrTex2D m_NormalTexture;
 	
-	Graphic::Texture* m_FoamTexture;
+	// ptrTex2D m_FoamTexture;
 
 	std::vector<Vector3> m_Displacement;
 	std::vector<Vector3> m_Normals;

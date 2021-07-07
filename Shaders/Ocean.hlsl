@@ -11,7 +11,7 @@ struct Light  // Equal to LightState Class
 
 
 // Store Camera Transformations and other settings
-cbuffer SceneInfo : register(b0) 
+cbuffer RenderPassInfo : register(b0) 
 {
 	// Camera transformation
 	float4x4 projection;
@@ -25,12 +25,16 @@ cbuffer SceneInfo : register(b0)
 
 
 //const uint maxSceneLight = 16;
-cbuffer LightInfo : register(b1)
+cbuffer SceneInfo : register(b1)
 {
-	Light SceneLights[16];
+	bool UseEnvMapping;
+
+	
 	uint maxDir;
 	uint maxPoint;
 	uint maxSpot;
+
+	Light SceneLights[16];
 }
 
 /********************** Object & Material Descriptor Table Start ***********************/
@@ -48,8 +52,8 @@ cbuffer MaterialInfo : register (b3)
 	uint TextureResolution;
 }
 
-Texture2D<float4> DisplacementTex : register(t0);
-Texture2D<float4> NormalTex : register(t1);
+Texture2D<float4> DisplacementTex : register(t0, space1);
+Texture2D<float4> NormalTex : register(t1, space1);
 Texture2D<float4> EnvMap : register(t2);
 Texture2D<float4> FoamMap : register(t3);
 

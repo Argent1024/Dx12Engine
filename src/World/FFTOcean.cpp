@@ -60,8 +60,8 @@ void FFTOcean::InitOceanMesh()
 
 	const float dx = 2.0f / vertexX;
 
-	for (int x = 0; x < vertexX; ++x) {
-		for (int y = 0; y < vertexY; ++y) {
+	for (UINT x = 0; x < vertexX; ++x) {
+		for (UINT y = 0; y < vertexY; ++y) {
 			int i = x * vertexY + y;
 			VertexData& v = vertices[i];
 			v.position = DirectX::XMFLOAT3(dx*x - 1.0f, dx*y - 1.0f, 0.0f);
@@ -70,8 +70,8 @@ void FFTOcean::InitOceanMesh()
 		}
 	}
 
-	for (int x = 0; x < (vertexX - 1); ++x) {
-		for (int y = 0; y < (vertexY - 1); ++y) {
+	for (UINT x = 0; x < (vertexX - 1); ++x) {
+		for (UINT y = 0; y < (vertexY - 1); ++y) {
 			UINT a = x * vertexY + y;
 			UINT b = (x+1) * vertexY + y;
 			UINT c = x * vertexY + (y+1);
@@ -91,8 +91,8 @@ void FFTOcean::InitOceanMesh()
 
 void FFTOcean::AmplitedeUpdate() {
 	// Calculate amplitede for every wave
-	for (int n = 0; n < m_ResX; ++n) {
-		for (int m = 0; m < m_ResY; ++m) {
+	for (UINT n = 0; n < m_ResX; ++n) {
+		for (UINT m = 0; m < m_ResY; ++m) {
 			Complex h = Amplitede(n, m);
 			m_coeff[n][m] = h;
 
@@ -109,7 +109,7 @@ std::vector<Complex> StupidFT(const std::vector<Complex>& coeff) {
 	Complex w0 = std::exp(Complex());
 	
 
-	for (int n = 0; n < coeff.size(); ++n) {
+	for (size_t n = 0; n < coeff.size(); ++n) {
 		Complex wn = std::exp(Complex(0, 2 * PI * n/ coeff.size()));
 		Complex a = 0.0;
 		Complex w = Complex(1.0, 0.0);
@@ -125,7 +125,7 @@ std::vector<Complex> StupidFT(const std::vector<Complex>& coeff) {
 
 void FFTOcean::HeightUpdate() {
 	// Solve 2d fft for height
-	for (int n = 0; n < m_ResX; ++n) {
+	for (UINT n = 0; n < m_ResX; ++n) {
 		std::vector<Complex> An = FFT(m_coeff[n]);
 		//std::vector<Complex> test = StupidFT(m_coeff[n]);
 
@@ -135,7 +135,7 @@ void FFTOcean::HeightUpdate() {
 		}
 	}
 
-	for (int m = 0; m < m_ResY; ++m) {
+	for (UINT m = 0; m < m_ResY; ++m) {
 		std::vector<Complex> hm = FFT(m_A[m]);
 		for (int n = 0; n < hm.size(); ++n) {
 			float h = hm[n].real();
@@ -147,7 +147,7 @@ void FFTOcean::HeightUpdate() {
 
 
 void FFTOcean::ShiftUpdate() {
-	for (int n = 0; n < m_ResX; ++n) {
+	for (UINT n = 0; n < m_ResX; ++n) {
 		for (int m = 0; m < m_ResY; ++m) {
 			Complex h = Amplitede(n, m);
 			Vector2 k = Normalize(WaveK(n, m));
@@ -156,14 +156,14 @@ void FFTOcean::ShiftUpdate() {
 		}
 	}
 
-	for (int n = 0; n < m_ResX; ++n) {
+	for (UINT n = 0; n < m_ResX; ++n) {
 		std::vector<Complex> An = FFT(m_coeff[n]);
 		for (int i = 0; i < An.size(); ++i) {
 			m_A[i][n] = An[i];
 		}
 	}
 
-	for (int m = 0; m < m_ResY; ++m) {
+	for (UINT m = 0; m < m_ResY; ++m) {
 		std::vector<Complex> Dm = FFT(m_A[m]);
 		for (int n = 0; n < m_ResX; ++n) {
 			float x = Dm[n].real() * m_VerticalShift;
@@ -179,7 +179,7 @@ void FFTOcean::ShiftUpdate() {
 void FFTOcean::NormalUpdate() {
 
 	const float normalScale = 9.0;
-	for (int n = 0; n < m_ResX; ++n) {
+	for (UINT n = 0; n < m_ResX; ++n) {
 		for (int m = 0; m < m_ResY; ++m) {
 			Vector2 k = WaveK(n, m);
 			double lenK = Length(k);
@@ -188,16 +188,16 @@ void FFTOcean::NormalUpdate() {
 	}
 
 	// Calculate gradient and use that as normal
-	for (int n = 0; n < m_ResX; ++n) {
+	for (UINT n = 0; n < m_ResX; ++n) {
 		std::vector<Complex> An = FFT(m_coeff[n]);
-		for (int i = 0; i < An.size(); ++i) {
+		for (size_t i = 0; i < An.size(); ++i) {
 			m_A[i][n] = An[i];
 		}
 	}
 	
-	for (int m = 0; m < m_ResY; ++m) {
+	for (UINT m = 0; m < m_ResY; ++m) {
 		std::vector<Complex> gradm = FFT(m_A[m]);
-		for (int n = 0; n < gradm.size(); ++n) {
+		for (size_t n = 0; n < gradm.size(); ++n) {
 			float x = gradm[n].real();
 			float y = gradm[n].imag();
 			int index = n * m_ResY + m;

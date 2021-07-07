@@ -10,7 +10,7 @@ struct Light  // Equal to LightState Class
 };
 
 // Store Camera Transformations and other settings
-cbuffer SceneInfo : register(b0) 
+cbuffer RenderPassInfo : register(b0) 
 {
 	// Camera transformation
 	float4x4 projection;
@@ -23,14 +23,16 @@ cbuffer SceneInfo : register(b0)
 };
 
 //const uint maxSceneLight = 16;
-cbuffer LightInfo : register(b1)
+cbuffer SceneInfo : register(b1)
 {
-	Light SceneLights[16];
+	bool UseEnvMapping;
+
 	uint maxDir;
 	uint maxPoint;
 	uint maxSpot;
+	Light SceneLights[16];
 }
-
+Texture2D EnvironmentMapping : register(t0, space0); // Store the image in sphereical coordinate
 
 /********************** Object & Material Descriptor Table Start ***********************/
 
@@ -49,11 +51,12 @@ cbuffer MaterialInfo : register (b3)
 	float Roughness;
 	float Metallic;
 	float Specular;
-	// TODO add texture stuff later
 
 	bool UseBaseTexture;
 	bool UseNormalTexture;
 
+	// Some other settings
+	// bool JustBaseColor;
 }
 
 Texture2D BaseColorTexture : register(t0, space1);
@@ -171,8 +174,6 @@ float3 CalculateBRDF(float3 viewDir,
 // Pixel Shader
 float4 PSMain(PSInput input) : SV_TARGET
 {
-	// return BaseColorTexture.Sample(g_sampler, input.uv);
-	
 	if (debugnormal) {
 		return (float4(input.normal, 1.0f) + 1.0f) / 2.0f;
 	}
@@ -207,5 +208,4 @@ float4 PSMain(PSInput input) : SV_TARGET
 	
 	float3 brdf = CalculateBRDF(viewDir, lightDir, normal, isect);
 	return 2 * float4(brdf + 0.2 * isect.BaseColor, 1.0f);
-	
 }
