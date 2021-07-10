@@ -62,6 +62,8 @@ namespace Graphic {
 		{
 			GPU::MemoryManager::UploadTexure(*m_buffer, data);
 		}
+		
+		const UINT MaxMipLevels() const { return m_textureDesc.MipLevels; }
 
 		const DepthStencilView& DSV() const { return m_DSV; }
 
@@ -129,19 +131,23 @@ namespace Graphic {
 	class Texture2D : public Texture {
 	public:
 		// Use a compute shader to create mip levels of this texture
-		static void CreateMipMap(ptrComputePSO pso, ptrTex2D texture);
+		static ptrRootSignature MipMapRootSignature;
+		static ptrComputePSO MipMapPSO;
+		static std::shared_ptr<DescriptorTable> MipDTable;
+
+		static void CreateMipMap(ptrTex2D texture, UINT srcMip, UINT numMip);
 
 
 		static const UINT16 ArraySize = 1;
 
 		// TODO better way to express type?
 		Texture2D(UINT width, UINT height, UINT type=TEXTURE_SRV, 
-			DXGI_FORMAT format=DXGI_FORMAT_R8G8B8A8_UNORM, bool loadChessBoard=false);
+			DXGI_FORMAT format=DXGI_FORMAT_R8G8B8A8_UNORM, UINT miplevels=1, bool loadChessBoard=false);
 
-		Texture2D(std::string& filename, UINT type=TEXTURE_SRV);
+		Texture2D(std::string& filename, UINT type=TEXTURE_SRV, UINT miplevels=1);
 
 
-		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0, UINT MostDetailedMip=0, UINT MipLevels=1);
+		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0, UINT MostDetailedMip=0, UINT MipLevels=-1);
 
 		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0, UINT MipLevels=0);
 

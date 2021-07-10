@@ -6,9 +6,11 @@
 */
 #pragma once
 
+#include "Utility/Logger.h"
 #include "GraphicCore.h"
 
-#define ptrPSO std::shared_ptr<Graphic::GraphicsPSO>
+#define ptrPSO std::shared_ptr<Graphic::PipelineStateObject>
+#define ptrGraphicsPSO std::shared_ptr<Graphic::GraphicsPSO>
 #define ptrComputePSO std::shared_ptr<Graphic::ComputePSO>
 
 namespace Graphic {
@@ -136,7 +138,7 @@ namespace Graphic {
 
 	class ComputePSO : public PipelineStateObject {
 	public:
-		ComputePSO(const std::wstring& cs_path) : m_ComputeShaderPath(cs_path) { }
+		ComputePSO(const std::wstring& cs_path) : m_ComputeShaderPath(cs_path), m_psoDesc() { }
 
 		void Initialize() override 
 		{
@@ -144,7 +146,12 @@ namespace Graphic {
 			m_psoDesc.pRootSignature = m_rootSignature;
 
 			ComPtr<ID3DBlob> CS;
-			ThrowIfFailed(D3DCompileFromFile(m_ComputeShaderPath.c_str(), nullptr, nullptr, "CSMain", "cs_5_0", CompileFlags, 0, &CS, nullptr));
+			ComPtr<ID3DBlob> errorMsg;
+			D3DCompileFromFile(m_ComputeShaderPath.c_str(), nullptr, nullptr, "CSMain", "cs_5_1", CompileFlags, 0, &CS, &errorMsg);
+			if (errorMsg.Get()) {
+				Logger::Log((char*)errorMsg.Get()->GetBufferPointer());
+			}
+			
 			m_psoDesc.CS = CD3DX12_SHADER_BYTECODE(CS.Get());
 
 			ID3D12Device* device = Engine::GetDevice();

@@ -22,7 +22,7 @@ namespace Engine {
 
 		for (const auto& pass_i : passes) {
 			ptrRenderPass pass = pass_i.first;
-			ptrPSO pso = pass_i.second;
+			ptrGraphicsPSO pso = pass_i.second;
 			m_RenderPasses.push_back(pass);
 			m_EnabledPasses.push_back(TRUE);
 

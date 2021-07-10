@@ -24,8 +24,6 @@ namespace
 }
 
 namespace Graphic {
-
-
 	void LoadChessBoard(const UINT width, const UINT height, const UINT pixelSize, std::vector<UINT8>& data)
 	{
 		const UINT rowPitch = width * pixelSize;
@@ -59,42 +57,89 @@ namespace Graphic {
 		}
 	}
 
-	void Texture2D::CreateMipMap(ptrComputePSO pso, ptrTex2D texture) 
+
+	ptrRootSignature Texture2D::MipMapRootSignature = nullptr;
+	ptrComputePSO Texture2D::MipMapPSO = nullptr;
+	std::shared_ptr<DescriptorTable> Texture2D::MipDTable = nullptr;
+
+	void Texture2D::CreateMipMap(ptrTex2D texture, UINT srcMip, UINT numMip) 
 	{	
+		assert((texture->m_Type & TEXTURE_SRV) && (texture->m_Type & TEXTURE_UAV) && 
+			"Createing texture without srv/uav enabled");
+
+		ptrGMem textureResouce = texture->m_buffer;
+
 		// Create root signatue & PSO
 		// TODO reuse root signature from else where
-		ptrRootSignature MipMapRootSignature = std::make_shared<Graphic::RootSignature>();
-		MipMapRootSignature->Initialize();
+		struct MipmapCB {
+			UINT SrcMipLevel;	// Texture level of source mip
+			UINT NumMipLevels;	// Number of OutMips to write: [1, 4]
+			DirectX::XMFLOAT2 TexelSize;	// 1.0 / OutMip1.Dimensions
+		};
+		UINT Width = texture->m_textureDesc.Width;
+		UINT Height = texture->m_textureDesc.Height;
+		UINT16 maxMiplevels = texture->MaxMipLevels();
+		assert(numMip <= 4 && numMip + srcMip < maxMiplevels &&
+			"Creating mipmaps larger than texture's size");
+
+		MipmapCB cbData;
+		cbData.SrcMipLevel = srcMip;
+		cbData.NumMipLevels = numMip;
+		cbData.TexelSize = {1.0f / Width, 1.0f / Height};
 
 
-		
+		// Create Constant buffer
+		const UINT MatmapCBSize = CalculateConstantBufferByteSize(sizeof(MipmapCB));
+		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
+		buffer->Initialize(MatmapCBSize);
+		ConstantBuffer cb;
+		cb.Initialze(buffer, MatmapCBSize);
 
-
-		UINT16 miplevels = texture->m_textureDesc.MipLevels;
-		// Create descriptor tables
-		// ***TODO*** Since this will happen before the first frame now, so it's fine for now
-		// but need to create a GPU heap for this
+		// ***TODO*** Since this function will only be called in load assert now,
+		// all will happen before the first frame now, so it's fine for now
+		// but need to create a GPU heap for this later
 		Graphic::DescriptorHeap* heap = Engine::GetInUseHeap();
 
-		DescriptorTable table(miplevels+2, heap);
+		if (MipMapPSO == nullptr) {
+			MipMapRootSignature = std::make_shared<Graphic::RootSignature>();
+			MipMapRootSignature->Initialize();
+
+			const std::wstring MipCsPath =  L"D:\\work\\tEngine\\Shaders\\MipmapCS.hlsl";
+			MipMapPSO = std::make_shared<Graphic::ComputePSO>(MipCsPath);
+			MipMapPSO->SetRootSigature(MipMapRootSignature->GetRootSignature());
+
+			MipMapPSO->Initialize();
+
+
+			MipDTable = std::make_shared<Graphic::DescriptorTable>(8, heap); // 8 should be enough for 4uav + 1cbv + 1srv
+		}	
+	
 		// Just use the table2 in the default rootsignature
 		// 0: CBV, 1: SRV, 2-Miplevels+2: UAV
-		texture->CreateSRV(&table, 1);
-		for (UINT16 i = 0; i < miplevels; ++i) {
-			texture->CreateUAV(&table, 1+i, i);
+		cb.CreateView(MipDTable.get(), 0);
+		texture->CreateSRV(MipDTable.get(), 1);
+		for (UINT16 i = 0; i < numMip; ++i) {
+			texture->CreateUAV(MipDTable.get(), 1+i, i);
 		}
 
 
 		// Since this descriptor table is created at the heap where shader can access, we don't need to bind it again
-		CD3DX12_GPU_DESCRIPTOR_HANDLE tableHandle = table.GetSlotGPU(0);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE tableHandle = MipDTable->GetSlotGPU(0);
 
 
 		Graphic::CommandList ctx(D3D12_COMMAND_LIST_TYPE_COMPUTE);
 		ComputeCommandManager.InitCommandList(&ctx);
 		ctx.SetDescriptorHeap(*heap);
+		ctx.SetPipelineState(MipMapPSO);
+		ctx.SetComputeRootSignature(MipMapRootSignature);
+		ctx.ResourceBarrier(*textureResouce, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
 		ctx.SetComputeRootDescriptorTable(2, tableHandle);
+		
+		// We are using group 8 x 8x 1, dividing 16 will give number of threads = pixels at miplevel1
+		ctx.Dispatch(Width / 16, Height / 16, 1);
 
-
+		ctx.ResourceBarrier(*textureResouce, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST);
 
 		ComputeCommandManager.ExecuteCommandList(&ctx);
 		ComputeCommandManager.End();
@@ -171,10 +216,10 @@ namespace Graphic {
 	*/
 
 
-	Texture2D::Texture2D(UINT width, UINT height, UINT type, DXGI_FORMAT format, bool loadChessBoard)
+	Texture2D::Texture2D(UINT width, UINT height, UINT type, DXGI_FORMAT format, UINT miplevels, bool loadChessBoard)
 		: Texture(type)
 	{
-		m_textureDesc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, ArraySize);
+		m_textureDesc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, ArraySize, miplevels);
 		Initialize(m_textureDesc);
 
 		if (loadChessBoard) {
@@ -187,7 +232,7 @@ namespace Graphic {
 		}
 	}
 
-	Texture2D::Texture2D(std::string& filename, UINT type) 
+	Texture2D::Texture2D(std::string& filename, UINT type, UINT miplevels) 
 		: Texture(type)
 	{	
 		// Load Chess Board
@@ -200,7 +245,10 @@ namespace Graphic {
 
 		D3D12_SUBRESOURCE_DATA texData = CreateTextureData(metadata, data);
 		m_textureDesc =
-			CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, metadata.width, metadata.height, ArraySize);
+			CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, 
+				metadata.width, metadata.height, 
+				ArraySize, miplevels);
+
 		Initialize(m_textureDesc);
 
 		UploadTexture(&texData);
@@ -213,6 +261,7 @@ namespace Graphic {
 	
 	void Texture2D::Initialize(CD3DX12_RESOURCE_DESC& texDesc) 
 	{
+		//TODO flags not tested
 		m_buffer = GPU::MemoryManager::CreateTBuffer();
 		if (m_Type & TEXTURE_DSV) {
 			// Change Texture format to D32
@@ -230,6 +279,9 @@ namespace Graphic {
 			m_buffer->Initialize(&texDesc, &clearValue);
 			// Change back to R32 from D32
 			texDesc.Format = DXGI_FORMAT_R32_FLOAT;
+		} else if(m_Type & TEXTURE_UAV) {
+			texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+			m_buffer->Initialize(&texDesc);
 		} else {
 			m_buffer->Initialize(&texDesc);
 		}
@@ -249,8 +301,11 @@ namespace Graphic {
 		// LoadWICTextureFromFile()
 	}
 
-	void Texture2D::CreateSRV(DescriptorTable* table, UINT tableIndex, UINT MostDetailedMip,   UINT  MipLevels) 
+	void Texture2D::CreateSRV(DescriptorTable* table, UINT tableIndex, UINT MostDetailedMip, UINT MipLevels) 
 	{
+		assert(MostDetailedMip < MaxMipLevels());
+		assert(MipLevels == -1 || MostDetailedMip + MipLevels < MaxMipLevels());
+
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		srvDesc.Format = m_textureDesc.Format;
@@ -264,6 +319,8 @@ namespace Graphic {
 	
 	void Texture2D::CreateUAV(DescriptorTable* table, UINT tableIndex, UINT MipLevels) 
 	{
+		assert(MipLevels < MaxMipLevels());
+
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = m_textureDesc.Format;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;

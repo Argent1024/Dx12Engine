@@ -11,7 +11,7 @@ namespace Game {
 	// e.x. default render pass, screen space method, transpancy ... 
 	class RenderPass {
 	public:
-		virtual void Initialize(ptrPSO pso) = 0;
+		virtual void Initialize(ptrGraphicsPSO pso) = 0;
 
 		// Prepare data for rendering(like put in the camera's data), 
 		// RenderEngine will call this function in main thread TODO ?
@@ -30,7 +30,7 @@ namespace Game {
 
 	protected:
 		ptrRootSignature m_rootSignature;
-		ptrPSO m_PSO;
+		ptrGraphicsPSO m_PSO;
 
 		Graphic::DescriptorTable* m_DescriptorTable;
 
@@ -61,7 +61,7 @@ namespace Game {
 
 		};
 
-		void Initialize(ptrPSO pso) override;
+		void Initialize(ptrGraphicsPSO pso) override;
 
 		void PrepareData(const Scene& scene) override;
 
@@ -82,7 +82,7 @@ namespace Game {
 
 		inline UINT size() { return m_DescriptorTable->size(); }
 
-		void Initialize(ptrPSO) override;
+		void Initialize(ptrGraphicsPSO) override;
 		
 		void PrepareData(const Scene& scene) override { } 
 

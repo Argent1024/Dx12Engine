@@ -139,9 +139,6 @@
     <ClCompile Include="MeshViewerMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\src\d3dx12.h" />
   </ItemGroup>
   <ItemGroup>

@@ -65,25 +65,30 @@ namespace Engine {
 			// Load textures
 			{
 				std::string texpath = "D://work/tEngine/snow.png";
-				ptrTex2D baseColorTex = std::make_shared<Graphic::Texture2D>(texpath);
 
+				auto textype = Graphic::TEXTURE_SRV | Graphic::TEXTURE_UAV;
+				ptrTex2D baseColorTex = std::make_shared<Graphic::Texture2D>(texpath, textype, 5);
+
+				Graphic::Texture2D::CreateMipMap(baseColorTex, 0, 4);
 				m_Material->SetTexture(PrincipleMaterial::DiffuseTex, baseColorTex);
 			}
 
 			m_Material->UploadCBV();
 
-			MeshReader reader;
-			reader.ReadOBJ("D://work/tEngine/renderball.obj");
+			m_Mesh = TriangleMesh::GetXYPlane();
+			//{
+			//	MeshReader reader;
+			//	reader.ReadOBJ("D://work/tEngine/renderball.obj");
 
-			std::vector<DefaultVertex>& vertex = reader.m_vertex;
-			std::vector<UINT>& index = reader.m_index;
+			//	std::vector<DefaultVertex>& vertex = reader.m_vertex;
+			//	std::vector<UINT>& index = reader.m_index;
 
-			m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
-			
+			//	m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
+			//}
 
 			// TODO error C2338 aligin
 			GObject* obj0 = new Game::GObject();
-			const float scale = 1.f;
+			const float scale = 5.f;
 			obj0->SetMesh(m_Mesh);
 			obj0->SetMaterial(m_Material);
 			obj0->SetTransform(Transform({ scale, 0, 0 }, { 0, scale, 0 }, { 0, 0, scale }, { 0.0, 0.0, 0.0 }));

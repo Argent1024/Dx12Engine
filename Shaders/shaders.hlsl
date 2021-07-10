@@ -190,7 +190,7 @@ float4 PSMain(PSInput input) : SV_TARGET
 	float4 strength = SceneLights[0].strength;
 	
 	// Get and apply Transform to normal
-	float3 normal = mul(float4(input.normal, 0.f), modelTransformation).xyz;
+	float3 normal = normalize(mul(float4(input.normal, 0.f), modelTransformation).xyz);
 	
 
 
@@ -198,7 +198,8 @@ float4 PSMain(PSInput input) : SV_TARGET
 	IntersectionPoint isect;
 	
 	if(UseBaseTexture) {
-		isect.BaseColor = BaseColorTexture.Sample(g_sampler, input.uv);
+		isect.BaseColor = BaseColorTexture.SampleLevel(g_sampler, input.uv, 0);
+		// isect.BaseColor = BaseColorTexture.Sample(g_sampler, input.uv);
 	} else {
 		isect.BaseColor = BaseColor;
 	}

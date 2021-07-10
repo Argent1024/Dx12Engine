@@ -24,7 +24,7 @@ namespace Engine {
 	void FFTOceanGE::InitRenderEngine(const HWND appHwnd) 
 	{
 		ptrRenderPass ocean_pass = std::make_shared<Game::DefaultRenderPass>();
-		ptrPSO ocean_pso = std::make_shared<OceanPSO>();
+		ptrGraphicsPSO ocean_pso = std::make_shared<OceanPSO>();
 
 		RenderPassesTable render_passes = { {ocean_pass, ocean_pso} };
 		m_RenderEngine = new RenderEngine(m_Setting.Width, m_Setting.Height);

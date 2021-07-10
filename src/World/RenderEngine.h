@@ -5,7 +5,7 @@
 namespace Engine {
 
 	using ptrRenderPass = std::shared_ptr<Game::RenderPass>;
-	using RenderPassesTable = std::vector<std::pair<ptrRenderPass, ptrPSO>>;
+	using RenderPassesTable = std::vector<std::pair<ptrRenderPass, ptrGraphicsPSO>>;
 
 	// The main renderer use(called) by the engine
 	class RenderEngine {
@@ -20,7 +20,7 @@ namespace Engine {
 
 		static RenderPassesTable CreateDefaultRenderPasses() {
 			ptrRenderPass defaultRP = std::make_shared<Game::DefaultRenderPass>();
-			ptrPSO pso = std::make_shared<Graphic::DefaultPSO>();
+			ptrGraphicsPSO pso = std::make_shared<Graphic::DefaultPSO>();
 			return { {defaultRP, pso} };
 		}
 

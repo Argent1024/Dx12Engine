@@ -6,7 +6,7 @@
 namespace Game {
 	using namespace Math;
 
-	void DefaultRenderPass::Initialize(ptrPSO pso) 
+	void DefaultRenderPass::Initialize(ptrGraphicsPSO pso) 
 	{
 		// TODO Use only one root signature
 		m_rootSignature = std::make_shared<Graphic::RootSignature>();
@@ -89,7 +89,7 @@ namespace Game {
 		  m_ScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height))
 		 { m_DescriptorTable = new Graphic::DescriptorTable(num_texture); }
 
-	void MixtureRenderPass::Initialize(ptrPSO) 
+	void MixtureRenderPass::Initialize(ptrGraphicsPSO) 
 	{
 
 		// TODO Use only one root signature

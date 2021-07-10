@@ -93,7 +93,10 @@ namespace Graphic {
 
 		void Initialize();
 
-		inline void InitCommandList(CommandList* commandList) { commandList->Initialize(m_Allocators[m_AllocatorIndex].Get()); }
+		inline void InitCommandList(CommandList* commandList) { 
+			assert(m_Type == commandList->type && "Allocating a different commandlist type");
+			commandList->Initialize(m_Allocators[m_AllocatorIndex].Get()); 
+		}
 		
 		void ExecuteCommandList(CommandList* commandList) 
 		{

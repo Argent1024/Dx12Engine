@@ -64,6 +64,9 @@ namespace Graphic {
 			m_commandList->SetGraphicsRootConstantBufferView(rootParaIndex, cbv->GetRootCBVGPUAdder()); 
 		}
 
+		inline void Dispatch(UINT ThreadX, UINT ThreadY, UINT ThreadZ) const
+		{ m_commandList->Dispatch(ThreadX, ThreadY, ThreadZ);}
+
 		inline void DrawInstanced(UINT VertexCountPerInstance, UINT InstanceCount, UINT StartVertexLocation, UINT StartInstanceLocation) const { m_commandList->DrawInstanced(VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);}
 
 		inline void DrawIndexedInstanced(UINT IndexCountPerInstance, UINT InstanceCount, UINT StartIndexLocation, INT BaseVertexLocation, UINT StartInstanceLocation) const {m_commandList->DrawIndexedInstanced(IndexCountPerInstance, InstanceCount, StartIndexLocation, BaseVertexLocation, StartInstanceLocation);}
@@ -88,9 +91,16 @@ namespace Graphic {
 		inline void SetViewPorts(const CD3DX12_VIEWPORT* viewPort) { m_commandList->RSSetViewports(1, viewPort); }
 		inline void SetScissorRects(const CD3DX12_RECT* scissorRect) { m_commandList->RSSetScissorRects(1, scissorRect); }
 		
+
+		// TODO rewrite this into a state manager
 		// GPU memory 
-		inline void ResourceBarrier(GPU::GPUMemory& gpumem, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) { m_commandList->ResourceBarrier(1, &(gpumem.Barrier(before, after))); }
+		inline void ResourceBarrier(GPU::GPUMemory& gpumem, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) 
+		{ m_commandList->ResourceBarrier(1, &(gpumem.Barrier(before, after))); }
 		
+		inline void ResourceBarrier(GPU::GPUMemory& gpumem, UINT NumBarriers, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) 
+		{ m_commandList->ResourceBarrier(NumBarriers, &(gpumem.Barrier(before, after))); }
+		
+
 		inline void CopyBufferRegion(GPU::GPUMemory& dest, UINT destOffset, GPU::GPUMemory& src, UINT srcOffset, UINT sizeBytes)  {
 			m_commandList->CopyBufferRegion(dest.GetResource(), destOffset, src.GetResource(), srcOffset, sizeBytes); 
 		}

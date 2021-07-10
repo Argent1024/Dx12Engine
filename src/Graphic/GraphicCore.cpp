@@ -77,7 +77,7 @@ void Engine::EnableDebug()
 // Graphic::GPU::MemoryAllocator Engine::MemoryAllocator;
 Graphic::CommandManager CopyHelper(1);
 Graphic::CommandManager GraphicsCommandManager(2);
-Graphic::CommandManager ComputeCommandManager(1);
+Graphic::CommandManager ComputeCommandManager(1, D3D12_COMMAND_LIST_TYPE_COMPUTE);
 
 
 void Engine::InitializeEngine() {
