@@ -85,7 +85,7 @@ namespace Graphic {
 		MipmapCB cbData;
 		cbData.SrcMipLevel = srcMip;
 		cbData.NumMipLevels = numMip;
-		cbData.TexelSize = {1.0f / Width, 1.0f / Height};
+		cbData.TexelSize = {2.0f / Width, 2.0f / Height};
 
 
 		// Create Constant buffer
@@ -94,6 +94,7 @@ namespace Graphic {
 		buffer->Initialize(MatmapCBSize);
 		ConstantBuffer cb;
 		cb.Initialze(buffer, MatmapCBSize);
+		cb.copyData(&cbData);
 
 		// ***TODO*** Since this function will only be called in load assert now,
 		// all will happen before the first frame now, so it's fine for now
@@ -111,15 +112,15 @@ namespace Graphic {
 			MipMapPSO->Initialize();
 
 
-			MipDTable = std::make_shared<Graphic::DescriptorTable>(8, heap); // 8 should be enough for 4uav + 1cbv + 1srv
+			MipDTable = std::make_shared<Graphic::DescriptorTable>(16, heap); 
 		}	
 	
 		// Just use the table2 in the default rootsignature
-		// 0: CBV, 1: SRV, 2-Miplevels+2: UAV
+		// 0-1: CBV, 2-9: SRV, 10-Miplevels+10: UAV
 		cb.CreateView(MipDTable.get(), 0);
-		texture->CreateSRV(MipDTable.get(), 1);
+		texture->CreateSRV(MipDTable.get(), 2);
 		for (UINT16 i = 0; i < numMip; ++i) {
-			texture->CreateUAV(MipDTable.get(), 1+i, i);
+			texture->CreateUAV(MipDTable.get(), 10 + i, 1+i);
 		}
 
 
@@ -137,12 +138,13 @@ namespace Graphic {
 		ctx.SetComputeRootDescriptorTable(2, tableHandle);
 		
 		// We are using group 8 x 8x 1, dividing 16 will give number of threads = pixels at miplevel1
-		ctx.Dispatch(Width / 16, Height / 16, 1);
+		ctx.Dispatch(Width /16, Height / 16 , 1);
 
 		ctx.ResourceBarrier(*textureResouce, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST);
 
 		ComputeCommandManager.ExecuteCommandList(&ctx);
 		ComputeCommandManager.End();
+		ComputeCommandManager.Start();
 	}
 
 	/*Texture1D::Texture1D(UINT elementNum, UINT stride, UINT type) 
@@ -324,7 +326,6 @@ namespace Graphic {
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = m_textureDesc.Format;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-		D3D12_TEX2D_UAV test{};
 		uavDesc.Texture2D.MipSlice = MipLevels;
 
 		this->_CreateUAV(&uavDesc, table, tableIndex);

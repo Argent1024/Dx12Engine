@@ -42,7 +42,7 @@ void CSMain( uint GI : SV_GroupIndex, uint3 DispatchThreadID : SV_DispatchThread
 {
     // Assume the size of input is power of two
     float2 UV = TexelSize * (DispatchThreadID.xy + 0.5);
-    float4 Src1 = float4(1.0, 0.0, 0.0, 0.0);//SrcMip.SampleLevel(BilinearSampler, UV, SrcMipLevel);
+    float4 Src1 = SrcMip.SampleLevel(BilinearSampler, UV, 0);
 
 
     Mip1[DispatchThreadID.xy] = Src1;

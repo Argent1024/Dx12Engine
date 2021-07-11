@@ -64,7 +64,7 @@ namespace Engine {
 
 			// Load textures
 			{
-				std::string texpath = "D://work/tEngine/snow.png";
+				std::string texpath = "D://work/tEngine/envmap.png";
 
 				auto textype = Graphic::TEXTURE_SRV | Graphic::TEXTURE_UAV;
 				ptrTex2D baseColorTex = std::make_shared<Graphic::Texture2D>(texpath, textype, 5);

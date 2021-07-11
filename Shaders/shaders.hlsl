@@ -198,7 +198,7 @@ float4 PSMain(PSInput input) : SV_TARGET
 	IntersectionPoint isect;
 	
 	if(UseBaseTexture) {
-		isect.BaseColor = BaseColorTexture.SampleLevel(g_sampler, input.uv, 0);
+		isect.BaseColor = BaseColorTexture.SampleLevel(g_sampler, input.uv, 3);
 		// isect.BaseColor = BaseColorTexture.Sample(g_sampler, input.uv);
 	} else {
 		isect.BaseColor = BaseColor;
