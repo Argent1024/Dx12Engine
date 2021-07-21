@@ -26,7 +26,7 @@ namespace Game {
 
 		ptrRootSignature GetRootSignature() { return m_rootSignature; }
 
-		UINT m_ObjRenderType; // Record the render needed game objects' position in the scene class
+		RenderType m_ObjRenderType; // Record the render needed game objects' position in the scene class
 
 	protected:
 		ptrRootSignature m_rootSignature;

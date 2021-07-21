@@ -21,7 +21,12 @@ namespace Engine {
 		static RenderPassesTable CreateDefaultRenderPasses() {
 			ptrRenderPass defaultRP = std::make_shared<Game::DefaultRenderPass>();
 			ptrGraphicsPSO pso = std::make_shared<Graphic::DefaultPSO>();
-			return { {defaultRP, pso} };
+
+			ptrRenderPass backGroundRP = std::make_shared<Game::DefaultRenderPass>();
+			backGroundRP->m_ObjRenderType = RenderTypeSkyBox;
+			const std::wstring background_shader = L"D:\\work\\tEngine\\Shaders\\Background.hlsl";
+			ptrGraphicsPSO b_pso = std::make_shared<Graphic::DefaultPSO>(background_shader);
+			return { {defaultRP, pso}, {backGroundRP, b_pso} };
 		}
 
 		RenderEngine(const UINT width, const UINT height);

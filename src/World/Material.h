@@ -2,7 +2,7 @@
 
 #include "Math/MathLib.h"
 #include "Graphic/Texture.h"
-#include "SimpleUI.h"
+#include "UiEngine.h"
 
 namespace Game {
 		
@@ -60,7 +60,7 @@ namespace Game {
 
 		PrincipleMaterial();
 
-		void BindMaterialAt(Graphic::DescriptorTable& table);
+		void BindMaterialAt(Graphic::DescriptorTable& table) override;
 
 		inline MatData& GetData() { return m_MatData; }
 		
@@ -78,6 +78,50 @@ namespace Game {
 		Graphic::ConstantBuffer m_MatCBV;
 		ptrTex2D m_DiffuseTex;
 		ptrTex2D m_NormalTex;
+	};
+
+
+	class PureColorCube : public Material  {
+	public:
+		static constexpr UINT MaxTextures = 4;
+		struct MatData
+		{ 
+			BOOL Tex[MaxTextures];
+		};
+
+
+		void BindMaterialAt(Graphic::DescriptorTable& table) override 
+		{
+			m_MatCBV.CreateView(&table, 1);
+			for (UINT i = 0; i < MaxTextures; ++i) {
+				if (m_MatData.Tex[i] && m_Textures[i]) {
+					m_Textures[i]->CreateSRV(&table, 2);
+					break;
+				}
+			}
+		};
+
+		void UseTexture(UINT slot) 
+		{
+			for (UINT i = 0; i < MaxTextures; ++i) {
+				m_MatData.Tex[slot] = FALSE;
+			}
+			m_MatData.Tex[slot] = TRUE;
+		}
+
+		void SetTexture(UINT slot, ptrTexCube tex, BOOL Use=TRUE) 
+		{
+			assert(slot < MaxTextures);
+			m_Textures[slot] = tex;
+			if(Use) UseTexture(slot);
+		}
+
+		inline void UploadCBV() override { m_MatCBV.copyData(&m_MatData); }
+
+	private:
+		MatData m_MatData;
+		Graphic::ConstantBuffer m_MatCBV;
+		ptrTexCube m_Textures[MaxTextures];
 	};
 }
 

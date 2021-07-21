@@ -25,12 +25,18 @@ namespace Graphic {
 		
 		ID3D12RootSignature* GetRootSignature() const { return m_RootSignature.Get(); }
 
+		void Initialize() {
+			if (m_initialized) { return; }
+			m_initialized = true;
+			_Initialize();
+		}
+
 		// Create a default layout of root signature
-		virtual void Initialize();
+		virtual void _Initialize();
 
 	protected:
 		ComPtr<ID3D12RootSignature> m_RootSignature;
-		
+		bool m_initialized = false;
 	};
 
 
@@ -39,7 +45,7 @@ namespace Graphic {
 	public:
 		MixRootSignature(const UINT num) : RootSignature(), m_textureCount(num) {}
 
-		void Initialize() override;
+		void _Initialize() override;
 
 	private:
 		UINT m_textureCount;

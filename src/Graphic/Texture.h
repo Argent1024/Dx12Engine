@@ -6,6 +6,7 @@
 
 #define ptrTexture std::shared_ptr<Graphic::Texture>
 #define ptrTex2D std::shared_ptr<Graphic::Texture2D>
+#define ptrTexCube std::shared_ptr<Graphic::TextureCube>
 
 namespace Graphic {
 	enum TextureType 
@@ -35,6 +36,30 @@ namespace Graphic {
 	//		3. Load data from file and copy(upload) it to the GPU memory
 	class Texture {
 	public:
+		// Use a compute shader to create mip levels of this texture
+		static ptrRootSignature TextureRootSignature;
+		static ptrComputePSO MipMapPSO;
+
+		// RootSignature for creating mipmaps or something use uav
+		class TRootSignature : public RootSignature {
+		public:
+			static constexpr UINT nCBV = 1;
+			static constexpr UINT nSRV = 1;
+			static constexpr UINT nUAV = 8;
+
+			void _Initialize() override;
+
+		};
+
+		// TODO just call this somewhere when initializing the engine
+		static void InitTextureRootSignature() {
+			if (TextureRootSignature == nullptr) {
+				TextureRootSignature = std::make_shared<Graphic::Texture::TRootSignature>();
+				TextureRootSignature->Initialize();
+			}
+		}
+
+
 		Texture(UINT type) : m_Type(type) {
 			assert(type != 0 && " At least one type is needed Are you using && instead of || when creating type?");
 			assert(!((type & TEXTURE_RTV) && (type & TEXTURE_DSV)) && "Creating RTV & DSV same time");
@@ -130,11 +155,6 @@ namespace Graphic {
 	// TODO dont use stb_image, only support 8-bit's channel
 	class Texture2D : public Texture {
 	public:
-		// Use a compute shader to create mip levels of this texture
-		static ptrRootSignature MipMapRootSignature;
-		static ptrComputePSO MipMapPSO;
-		static std::shared_ptr<DescriptorTable> MipDTable;
-
 		static void CreateMipMap(ptrTex2D texture, UINT srcMip, UINT numMip);
 
 
@@ -153,6 +173,11 @@ namespace Graphic {
 
 		void CreateDSV();
 
+		UINT GetWidth() { return m_textureDesc.Width; }
+		UINT GetHeight() { return m_textureDesc.Height; }
+
+		
+
 	private:
 		// After we have m_textureDesc and m_Type Allocate GPU memory and create texture
 		void Initialize(CD3DX12_RESOURCE_DESC& texdesc);
@@ -164,15 +189,30 @@ namespace Graphic {
 	class TextureCube : public Texture
 	{
 	public:
-		TextureCube(UINT resolution, UINT16 miplevels, UINT type=TEXTURE_SRV);
+		TextureCube(UINT resolution, UINT type=TEXTURE_SRV, DXGI_FORMAT format=DXGI_FORMAT_R8G8B8A8_UNORM, UINT16 miplevels=1);
+		
+		static ptrComputePSO CreateFromTex2DPSO;
+		
+		void CreateFromTex2D(ptrTex2D tex2d);
+
+		// Create TextureCube
+		void CreateSRV(DescriptorTable* table=nullptr, UINT tableIndex=0, UINT MostDetailedMip=0, UINT MipLevels=-1);
+
+		// This will create an UAV Array
+		void CreateUAV(DescriptorTable* table=nullptr, UINT tableIndex=0, UINT MipLevels=0);
+
+		UINT GetResolution() { return m_textureDesc.Width; }
+
+		void LoadFromImage(std::string path) {
+			ptrTex2D tex2d = std::make_shared<Texture2D>(path);
+			CreateFromTex2D(tex2d);
+		}
 
 	private:
 		void TextureDescHelper(UINT resolution, UINT16 miplevels);
 
 		// After we have m_textureDesc and m_Type Allocate GPU memory and create texture
 		void Initialize();
-
-		ptrTBuffer m_buffer;
 	};
 
 

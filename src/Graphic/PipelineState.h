@@ -9,6 +9,9 @@
 #include "Utility/Logger.h"
 #include "GraphicCore.h"
 
+//TODO fix this and Solution dir
+#define SHADER_DIR SOLUTION_DIR"Shaders\\"
+
 #define ptrPSO std::shared_ptr<Graphic::PipelineStateObject>
 #define ptrGraphicsPSO std::shared_ptr<Graphic::GraphicsPSO>
 #define ptrComputePSO std::shared_ptr<Graphic::ComputePSO>
@@ -38,9 +41,12 @@ namespace Graphic {
 	// 5. Call pso->Initialize()
 	class GraphicsPSO : public PipelineStateObject {
 	public:
-		GraphicsPSO(): m_psoDesc() {}
+		GraphicsPSO(std::wstring path): 
+			m_ShaderPath(path), m_psoDesc() { }
 
 	protected:
+		std::wstring m_ShaderPath;
+
 		// Compile and set shaders
 		//TODO fix string problems, doesn't work yet
 		inline void SetVertexShader(const std::wstring& path, const std::string& funcName) 
@@ -172,6 +178,9 @@ namespace Graphic {
 
 	class DefaultPSO : public GraphicsPSO {
 	public:
+		DefaultPSO(std::wstring shaderpath=L"D:\\work\\tEngine\\Shaders\\shaders.hlsl") 
+			: GraphicsPSO(shaderpath) { }
+
 		void Initialize() override;
 	};
 
@@ -179,6 +188,8 @@ namespace Graphic {
 	class MixturePSO : public Graphic::GraphicsPSO 
 	{
 	public:
+		MixturePSO() : GraphicsPSO(L"D:\\work\\tEngine\\Shaders\\MixTexture.hlsl") { }
+
 		void Initialize() override;
 	};
 

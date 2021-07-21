@@ -6,6 +6,11 @@
 #include "GObject.h"
 #include "Camera.h"
 #include "Light.h"
+#include "EnvironmentMapping.h"
+
+// TODO = = how to make a good key
+using RenderType = UINT;
+constexpr RenderType RenderTypeSkyBox=-1;
 
 namespace Game
 {
@@ -24,10 +29,9 @@ namespace Game
 
 	class Scene
 	{
-	using GameObjectTable = std::map<UINT, std::vector<GObject*>>;
+	using GameObjectTable = std::map<RenderType, std::vector<GObject*>>;
 
 	public:
-
 		Scene(const UINT width, const UINT height);
 
 		// Weird to create camera before scene = =
@@ -38,17 +42,22 @@ namespace Game
 
 		const ProjectiveCamera& GetMainCamera() const { return m_Camera; }
 		ProjectiveCamera& GetMainCamera() { return m_Camera; }
+		
+		void SetSkyBox(std::shared_ptr<SkyBox> box) { m_SkyBox = box; }
+		std::shared_ptr<SkyBox> GetSkyBox() const { return m_SkyBox; }
 
-		const std::vector<GObject*>& GetGameObjects(UINT renderType) const {
+
+		const std::vector<GObject*>& GetGameObjects(RenderType renderType) const {
 			const auto it = m_GameObjectTable.find(renderType);
 			if (it == m_GameObjectTable.end()) {
-				return { };
+				Logger::Log("Querying render type not exist");
+				return {};
 			}
 			return it->second;
 		}
 
 		// TODO accel structure
-		virtual void AddGameObj(GObject* obj, UINT renderType=0);
+		virtual void AddGameObj(GObject* obj, RenderType renderType=0);
 		virtual void DeleteGameObj(GObject* obj) {}
 
 		
@@ -101,5 +110,6 @@ namespace Game
 
 		// Game Objects
 		GameObjectTable m_GameObjectTable;
+		std::shared_ptr<SkyBox> m_SkyBox;
 	};
 }

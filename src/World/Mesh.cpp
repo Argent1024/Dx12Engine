@@ -45,6 +45,37 @@ namespace Game {
 		return std::make_shared<TriangleMesh>(triangleVertices, index_list);
 	}
 
+	ptrMesh TriangleMesh::GetSkyBox()	
+	{
+
+		std::vector<DirectX::XMFLOAT3> Cube =
+		{
+			{1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, {1.0f, -1.0f, 1.0f}, {1.0f, -1.0f, -1.0f},    // 0: +X
+			{-1.0f, 1.0f, 1.0f}, {-1.0f, 1.0f, -1.0f}, {-1.0f, -1.0f, 1.0f}, {-1.0f, -1.0f, -1.0f},// 1: -X
+			{1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, -1.0f}, {-1.0f, 1.0f, 1.0f}, {-1.0f, 1.0f, -1.0f},    // 2: +Y
+			{1.0f, -1.0f, 1.0f}, {1.0f, -1.0f, -1.0f}, {-1.0f, -1.0f, 1.0f}, {-1.0f, -1.0f, -1.0f},// 3: -Y
+			{1.0f, 1.0f, 1.0f}, {1.0f, -1.0f, 1.0f}, {-1.0f, 1.0f, 1.0f}, {-1.0f, -1.0f, 1.0f},    // 4: +Z
+			{1.0f, 1.0f, -1.0f}, {1.0f, -1.0f, -1.0f}, {-1.0f, 1.0f, -1.0f}, {-1.0f, -1.0f, -1.0f} // 5: -Z
+		};
+
+		std::vector<DefaultVertex> triangleVertices;
+		for (auto pos : Cube) {
+			DefaultVertex v = { pos, pos, {0.0, 0.0} }; // Does not use UV
+			triangleVertices.push_back(v);
+		}
+		
+		std::vector<UINT> index = { 0, 1, 2, 3, 2, 1 };
+		std::vector<UINT> index_list = {};
+		for (UINT i = 0; i < 6; ++i) {
+			for (auto& in : index) {
+				index_list.push_back(6 * i + in);
+			}
+		}
+
+		return std::make_shared<TriangleMesh>(triangleVertices, index_list);
+	}
+
+
 	ptrMesh TriangleMesh::GetSphere(UINT numU, UINT numV) 
 	{
 		float u, v;

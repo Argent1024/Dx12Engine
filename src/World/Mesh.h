@@ -62,7 +62,9 @@ namespace Game {
 
 		static ptrMesh GetXYPlane(UINT subdivision = 0);
 
-		// TODO test
+		// Will use normal in the vertex data to represent uv
+		static ptrMesh GetSkyBox();
+
 		static ptrMesh GetSphere(UINT numU, UINT numV);
 
 	protected:

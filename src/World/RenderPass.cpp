@@ -74,14 +74,19 @@ namespace Game {
 
 		const Camera& camera = scene.GetMainCamera();
 		camera.UseCamera(commandList);
-
-		const std::vector<GObject*>& objList = scene.GetGameObjects(m_ObjRenderType);
-		for (auto const& g_obj : objList)
-		{
-			g_obj->RecordCommand(commandList);
-			g_obj->Draw(commandList);
-		}
 		
+		if (m_ObjRenderType == RenderTypeSkyBox) {
+			auto const& skybox = scene.GetSkyBox();
+			skybox->RecordCommand(commandList);
+			skybox->Draw(commandList);
+		} else {
+			const std::vector<GObject*>& objList = scene.GetGameObjects(m_ObjRenderType);
+			for (auto const& g_obj : objList)
+			{
+				g_obj->RecordCommand(commandList);
+				g_obj->Draw(commandList);
+			}
+		}
 	}
 
 	MixtureRenderPass::MixtureRenderPass(UINT num_texture, const UINT width, const UINT height)

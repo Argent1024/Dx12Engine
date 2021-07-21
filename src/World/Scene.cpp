@@ -64,8 +64,9 @@ namespace Game {
 		m_SceneCBV.copyData(&m_SceneInfo);// , sizeof(SceneLightsInfo));
 	}
 
-	void Scene::AddGameObj(GObject* obj, UINT renderType) 
+	void Scene::AddGameObj(GObject* obj, RenderType renderType) 
 	{
+		assert(renderType != RenderTypeSkyBox);
 		m_GameObjectTable[renderType].push_back(obj);
 	}
 }

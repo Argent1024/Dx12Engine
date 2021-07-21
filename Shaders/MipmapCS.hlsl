@@ -1,12 +1,12 @@
 // A simple copy of https://github.com/Microsoft/DirectX-Graphics-Samples/blob/master/MiniEngine/Core/Shaders/GenerateMipsCS.hlsli
 
-RWTexture2D<float4> Mip1 : register(u0, space1);
-RWTexture2D<float4> Mip2 : register(u1, space1);
-RWTexture2D<float4> Mip3 : register(u2, space1);
-RWTexture2D<float4> Mip4 : register(u3, space1);
+RWTexture2D<float4> Mip1 : register(u0);
+RWTexture2D<float4> Mip2 : register(u1);
+RWTexture2D<float4> Mip3 : register(u2);
+RWTexture2D<float4> Mip4 : register(u3);
 
 
-Texture2D<float4> SrcMip : register(t0, space1);
+Texture2D<float4> SrcMip : register(t0);
 
 SamplerState BilinearSampler : register(s0);
 
@@ -16,7 +16,7 @@ groupshared float gs_G[64];
 groupshared float gs_B[64];
 groupshared float gs_A[64];
 
-cbuffer InfoBuffer : register(b2) 
+cbuffer InfoBuffer : register(b0) 
 {
     uint SrcMipLevel;	// Texture level of source mip
     uint NumMipLevels;	// Number of OutMips to write: [1, 4]
@@ -42,7 +42,7 @@ void CSMain( uint GI : SV_GroupIndex, uint3 DispatchThreadID : SV_DispatchThread
 {
     // Assume the size of input is power of two
     float2 UV = TexelSize * (DispatchThreadID.xy + 0.5);
-    float4 Src1 = SrcMip.SampleLevel(BilinearSampler, UV, 0);
+    float4 Src1 = SrcMip.SampleLevel(BilinearSampler, UV, SrcMipLevel);
 
 
     Mip1[DispatchThreadID.xy] = Src1;

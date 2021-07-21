@@ -9,16 +9,13 @@ namespace Graphic {
 
 		ComPtr<ID3DBlob> VS;
 		ComPtr<ID3DBlob> PS;
-		const std::wstring path = L"D:\\work\\tEngine\\Shaders\\shaders.hlsl";
-		//const std::wstring path = L"D:\\work\\tEngine\\Shaders\\Ocean.hlsl";
-		// const std::wstring path = L"D:\\work\\tEngine\\Shaders\\Background.hlsl";
-
+	
 		ComPtr<ID3DBlob> errMsg;
-		D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_1", CompileFlags, 0, &VS, &errMsg);
+		D3DCompileFromFile(m_ShaderPath.c_str(), nullptr, nullptr, "VSMain", "vs_5_1", CompileFlags, 0, &VS, &errMsg);
 		if (errMsg.Get()) {
 				Logger::Log((char*)errMsg.Get()->GetBufferPointer());
 		}
-		D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_1", CompileFlags, 0, &PS, &errMsg);
+		D3DCompileFromFile(m_ShaderPath.c_str(), nullptr, nullptr, "PSMain", "ps_5_1", CompileFlags, 0, &PS, &errMsg);
 		if (errMsg.Get()) {
 				Logger::Log((char*)errMsg.Get()->GetBufferPointer());
 		}
@@ -56,9 +53,8 @@ namespace Graphic {
 
 		ComPtr<ID3DBlob> VS;
 		ComPtr<ID3DBlob> PS;
-		const std::wstring path =  L"D:\\work\\tEngine\\Shaders\\MixTexture.hlsl";
-		ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", CompileFlags, 0, &VS, nullptr));
-		ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", CompileFlags, 0, &PS, nullptr));
+		ThrowIfFailed(D3DCompileFromFile(m_ShaderPath.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", CompileFlags, 0, &VS, nullptr));
+		ThrowIfFailed(D3DCompileFromFile(m_ShaderPath.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", CompileFlags, 0, &PS, nullptr));
 
 		D3D12_INPUT_ELEMENT_DESC  inputElementDescs[] =
 		{

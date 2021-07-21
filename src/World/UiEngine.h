@@ -8,6 +8,16 @@
 #include "ext/imgui/backends/imgui_impl_win32.h"
 #include "ext/imgui/backends/imgui_impl_dx12.h"
 
+namespace UI {
+	// Inherient this to show UI 
+	class UiObject {
+	public:
+		virtual void UiWindow() {}
+	};
+
+}
+
+
 namespace Engine {
 	class UiEngine {
 	private:

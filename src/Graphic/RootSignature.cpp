@@ -3,8 +3,9 @@
 
 namespace Graphic {
 
-	void RootSignature::Initialize() 
+	void RootSignature::_Initialize() 
 	{
+
 		ID3D12Device* device = Engine::GetDevice();
 		D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
 		// This is the highest version the sample supports. If CheckFeatureSupport succeeds, the HighestVersion returned will not be greater than this.
@@ -70,7 +71,7 @@ namespace Graphic {
 		NAME_D3D12_OBJECT(m_RootSignature);
 	}
 
-	void MixRootSignature::Initialize()
+	void MixRootSignature::_Initialize()
 	{
 		ID3D12Device* device = Engine::GetDevice();
 		D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
