@@ -412,7 +412,7 @@ namespace Graphic {
 		m_textureDesc.SampleDesc.Quality = 0;
 		m_textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
-		if (m_Type | TEXTURE_UAV) m_textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		if (m_Type & TEXTURE_UAV) m_textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 	}
 
 	void TextureCube::Initialize()
@@ -436,19 +436,30 @@ namespace Graphic {
 		}
 
 		struct ConstBufferData {
-		
+			FLOAT InvResolution;
+			BOOL Padding[3];
 		};
 
 		UINT resolution = GetResolution();
 		ptrGMem textureResouce = this->m_buffer;
 
 		ConstBufferData cbData;
-		
+		cbData.InvResolution = 1.0f / resolution;
+
+		const UINT CBSize = CalculateConstantBufferByteSize(sizeof(ConstBufferData));
+		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
+		buffer->Initialize(CBSize);
+
+		ConstantBuffer cb;
+		cb.Initialze(buffer, CBSize);
+		cb.copyData(&cbData);
+
 		// ***TODO*** Move to another heap
 		Graphic::DescriptorHeap* heap = Engine::GetInUseHeap();
 
-		DescriptorTable DTable(3, heap); 
+		DescriptorTable DTable(16, heap); 
 		// 0 CbV, 1 SRV, 2 UAV
+		cb.CreateView(&DTable, 0);
 		tex2d->CreateSRV(&DTable, 1);
 		this->CreateUAV(&DTable, 2);
 
@@ -461,13 +472,13 @@ namespace Graphic {
 		Graphic::CommandList ctx(D3D12_COMMAND_LIST_TYPE_COMPUTE);
 		ComputeCommandManager.InitCommandList(&ctx);
 		ctx.SetDescriptorHeap(*heap);
-		ctx.SetPipelineState(MipMapPSO);
+		ctx.SetPipelineState(CreateFromTex2DPSO);
 		ctx.SetComputeRootSignature(TextureRootSignature);
 		ctx.ResourceBarrier(*textureResouce, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 		ctx.SetComputeRootDescriptorTable(0, tableHandle);
 		
-		// We are using group 8 x 8x 1, dividing 16 will give number of threads = pixels at miplevel1
+		// We are using group 8 x 8 x 1 
 		ctx.Dispatch(resolution / 8, resolution / 8, 1);
 
 		ctx.ResourceBarrier(*textureResouce, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST);
@@ -506,6 +517,8 @@ namespace Graphic {
 		uavDesc.Texture2DArray.FirstArraySlice = 0;
 		uavDesc.Texture2DArray.ArraySize = 6;
 		uavDesc.Texture2DArray.PlaneSlice = 0; // TODO?
+
+	
 		this->_CreateUAV(&uavDesc, table, tableIndex);
 	}
 

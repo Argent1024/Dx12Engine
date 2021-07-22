@@ -1,5 +1,7 @@
 #define EPLISION 0.00005f
 
+#define PI 3.141592653589793f
+#define TwoPI 6.283185307179586f
 
 // Store Camera Transformations and other settings
 cbuffer SceneInfo : register(b0) 
@@ -16,7 +18,7 @@ cbuffer ObjectInfo : register(b2)
 	float4x4 modelTransformation;
 }
 
-TextureCube EnvMapping : register(t0);
+TextureCube EnvMapping : register(t0, space1);
 SamplerState g_sampler : register(s0);
 
 struct VSInput 
@@ -48,9 +50,18 @@ PSInput VSMain(VSInput input)
 }
 
 
+float2 Dir2Sphere(float3 coor) {
+    float theta = acos(coor.z);
+    float sinT = sin(theta);
+    float phi = atan2(coor.y / sinT, coor.x / sinT);
+    return float2(phi / PI, theta / PI);
+}
+
+
+
 float4 PSMain(PSInput input) : SV_TARGET
 {
-    float3 uv = input.uv;
+    float3 uv = normalize(input.uv);
 	float3 baseCol = EnvMapping.Sample(g_sampler, uv).xyz;
 	return float4(baseCol, 1.0);
 }

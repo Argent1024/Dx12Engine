@@ -77,8 +77,10 @@ namespace Game {
 		
 		if (m_ObjRenderType == RenderTypeSkyBox) {
 			auto const& skybox = scene.GetSkyBox();
-			skybox->RecordCommand(commandList);
-			skybox->Draw(commandList);
+			if (skybox != nullptr) {
+				skybox->RecordCommand(commandList);
+				skybox->Draw(commandList);
+			}
 		} else {
 			const std::vector<GObject*>& objList = scene.GetGameObjects(m_ObjRenderType);
 			for (auto const& g_obj : objList)

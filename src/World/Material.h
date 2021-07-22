@@ -83,37 +83,33 @@ namespace Game {
 
 	class PureColorCube : public Material  {
 	public:
-		static constexpr UINT MaxTextures = 4;
+		// static constexpr UINT MaxTextures = 4;
 		struct MatData
 		{ 
-			BOOL Tex[MaxTextures];
+			BOOL Padding[4];
 		};
+		static constexpr UINT MatCBVSize = CalculateConstantBufferByteSize(sizeof(PureColorCube::MatData));
+		
+		PureColorCube() 
+		{
+			assert(sizeof(PureColorCube::MatData) % 16 == 0);
 
+			ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
+			buffer->Initialize(MatCBVSize);
+			m_MatCBV.Initialze(buffer, MatCBVSize);
+		}
 
 		void BindMaterialAt(Graphic::DescriptorTable& table) override 
 		{
 			m_MatCBV.CreateView(&table, 1);
-			for (UINT i = 0; i < MaxTextures; ++i) {
-				if (m_MatData.Tex[i] && m_Textures[i]) {
-					m_Textures[i]->CreateSRV(&table, 2);
-					break;
-				}
-			}
+			m_Textures->CreateSRV(&table, 2);
 		};
 
-		void UseTexture(UINT slot) 
-		{
-			for (UINT i = 0; i < MaxTextures; ++i) {
-				m_MatData.Tex[slot] = FALSE;
-			}
-			m_MatData.Tex[slot] = TRUE;
-		}
 
-		void SetTexture(UINT slot, ptrTexCube tex, BOOL Use=TRUE) 
+		void SetTexture(UINT slot, ptrTexCube tex) 
 		{
-			assert(slot < MaxTextures);
-			m_Textures[slot] = tex;
-			if(Use) UseTexture(slot);
+			// assert(slot < MaxTextures);
+			m_Textures = tex;
 		}
 
 		inline void UploadCBV() override { m_MatCBV.copyData(&m_MatData); }
@@ -121,7 +117,7 @@ namespace Game {
 	private:
 		MatData m_MatData;
 		Graphic::ConstantBuffer m_MatCBV;
-		ptrTexCube m_Textures[MaxTextures];
+		ptrTexCube m_Textures;
 	};
 }
 

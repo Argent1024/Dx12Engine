@@ -86,9 +86,16 @@ namespace Engine {
 			//	m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
 			//}
 
+			// Skybox
+			{
+				 std::string envmap_path = "D://work/tEngine/envmap.png";
+				 auto skybox = CreateSkyBoxFromFile(envmap_path, 1024, 1);
+				 m_Scene->SetSkyBox(skybox);
+			}
+
 			// TODO error C2338 aligin
 			GObject* obj0 = new Game::GObject();
-			const float scale = 5.f;
+			const float scale = 0.5f;
 			obj0->SetMesh(m_Mesh);
 			obj0->SetMaterial(m_Material);
 			obj0->SetTransform(Transform({ scale, 0, 0 }, { 0, scale, 0 }, { 0, 0, scale }, { 0.0, 0.0, 0.0 }));
