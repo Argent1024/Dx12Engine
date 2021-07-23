@@ -66,7 +66,7 @@ namespace Game {
 		
 		std::vector<UINT> index = { 0, 1, 2, 3, 2, 1 };
 		std::vector<UINT> index_list = {};
-		for (UINT i = 0; i < 4; ++i) {
+		for (UINT i = 0; i < 6; ++i) {
 			for (auto& in : index) {
 				index_list.push_back(4 * i + in);
 			}

@@ -87,7 +87,7 @@ namespace Graphic {
 		D3D12_STATIC_SAMPLER_DESC sampler = {};
         // sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
         sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-		sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // Using warp because will handle envmapping stuff
         sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
         sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
         sampler.MipLODBias = 0;

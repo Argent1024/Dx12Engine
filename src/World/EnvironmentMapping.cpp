@@ -38,7 +38,7 @@ namespace Game {
 		Mat->UploadCBV();
 
 		auto skybox = std::make_shared<SkyBox>();
-		const float defaultScale = 3.f;
+		const float defaultScale = 10.f;
 		skybox->SetTransform(
 			Math::Transform({ defaultScale, 0, 0 }, { 0, defaultScale, 0 }, { 0, 0, defaultScale }, Math::Vector3(Math::kZero))
 		);
