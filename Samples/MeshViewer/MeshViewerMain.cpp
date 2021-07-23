@@ -63,7 +63,7 @@ namespace Engine {
 			m_Material->SetData(mat);
 
 			// Load textures
-			{
+			/*{
 				std::string texpath = "D://work/tEngine/envmap.png";
 
 				auto textype = Graphic::TEXTURE_SRV | Graphic::TEXTURE_UAV;
@@ -71,31 +71,31 @@ namespace Engine {
 
 				Graphic::Texture2D::CreateMipMap(baseColorTex, 0, 4);
 				m_Material->SetTexture(PrincipleMaterial::DiffuseTex, baseColorTex);
-			}
+			}*/
 
 			m_Material->UploadCBV();
 
-			m_Mesh = TriangleMesh::GetXYPlane();
-			//{
-			//	MeshReader reader;
-			//	reader.ReadOBJ("D://work/tEngine/renderball.obj");
+			// m_Mesh = TriangleMesh::GetXYPlane();
+			{
+				MeshReader reader;
+				reader.ReadOBJ("D://work/tEngine/renderball.obj");
 
-			//	std::vector<DefaultVertex>& vertex = reader.m_vertex;
-			//	std::vector<UINT>& index = reader.m_index;
+				std::vector<DefaultVertex>& vertex = reader.m_vertex;
+				std::vector<UINT>& index = reader.m_index;
 
-			//	m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
-			//}
+				m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
+			}
 
 			// Skybox
 			{
 				 std::string envmap_path = "D://work/tEngine/envmap.png";
-				 auto skybox = CreateSkyBoxFromFile(envmap_path, 1024, 1);
+				 auto skybox = CreateSkyBoxFromFile(envmap_path, 1024, 4);
 				 m_Scene->SetSkyBox(skybox);
 			}
 
 			// TODO error C2338 aligin
 			GObject* obj0 = new Game::GObject();
-			const float scale = 0.5f;
+			const float scale = 2.0f;
 			obj0->SetMesh(m_Mesh);
 			obj0->SetMaterial(m_Material);
 			obj0->SetTransform(Transform({ scale, 0, 0 }, { 0, scale, 0 }, { 0, 0, scale }, { 0.0, 0.0, 0.0 }));

@@ -185,6 +185,7 @@ namespace Graphic {
 		ImageMetadata LoadFromImage(std::string& filename, unsigned char*& data);
 	};
 	
+	// TODO change this to array directly
 	// Cube map helper
 	class TextureCube : public Texture
 	{

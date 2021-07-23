@@ -3,7 +3,19 @@
 #include "Graphic/Texture.h"
 #include "GObject.h"
 
+#define ptrEnvMap std::shared_ptr<Game::EnvironmentMap>
+
 namespace Game {
+
+	class EnvironmentMap : public Graphic::TextureCube {
+	public:
+		static ptrComputePSO RoughnessMipmapPSO;
+
+		EnvironmentMap(UINT resolution, UINT texType, DXGI_FORMAT format, UINT16 miplevels);
+
+		void CreateRoughnessMipmap();
+	
+	};
 
 	class SkyBox : public GObject {
 	public:

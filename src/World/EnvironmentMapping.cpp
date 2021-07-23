@@ -1,37 +1,96 @@
 #include "stdafx.h"
 #include "EnvironmentMapping.h"
+#include "CommandQueue.h"
+
 using namespace Graphic;
 
 namespace Game {
+	ptrComputePSO EnvironmentMap::RoughnessMipmapPSO = nullptr;
 
 
-	//void EnvMapping::CreateCubeMap(ptrTex2D texture) {
-	//	assert(m_Texture);
-	//	assert((texture->GetType() & TEXTURE_SRV) && (m_Texture->GetType() & TEXTURE_UAV));
+	EnvironmentMap::EnvironmentMap(UINT resolution, UINT texType, DXGI_FORMAT format, UINT16 miplevels) 
+		: TextureCube(resolution, texType, format, miplevels)
+	{
+
+	}
+	
+	void EnvironmentMap::CreateRoughnessMipmap() {
+		InitTextureRootSignature();
+
+		if (RoughnessMipmapPSO == nullptr) {
+		
+			const std::wstring CsPath =  L"D:\\work\\tEngine\\Shaders\\RoughnessEnvironmentMipmapCS.hlsl";
+			
+			RoughnessMipmapPSO = std::make_shared<Graphic::ComputePSO>(CsPath);
+			RoughnessMipmapPSO->SetRootSigature(TextureRootSignature->GetRootSignature());
+
+			RoughnessMipmapPSO->Initialize();
+		}
+
+		UINT resolution =this->GetResolution();
+
+		struct ConstBufferData {
+			UINT NumMips;
+			FLOAT InvResolution;
+			BOOL padding[2];
+		};	
+		const UINT cbDataSize = CalculateConstantBufferByteSize(sizeof(ConstBufferData));
+
+		ConstBufferData cbData;
+		cbData.NumMips = this->MaxMipLevels() - 1;
+		cbData.InvResolution = 1.0 / resolution;
+
+		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
+		buffer->Initialize(cbDataSize);
+		ConstantBuffer cb;
+		cb.Initialze(buffer, cbDataSize);
+		cb.copyData(&cbData);
+
+		Graphic::DescriptorHeap* heap = Engine::GetInUseHeap();
 
 
+		DescriptorTable DTable(16, heap);
+		// 0: CBV, 1: SRV, 2-MipLevels+2:UAV
+		cb.CreateView(&DTable, 0);
+		this->CreateSRV(&DTable, 1);
+		for (UINT16 i = 0; i < cbData.NumMips; ++i) {
+			this->CreateUAV(&DTable, 2 + i, 1 + i);
+		}
 
-	//	
+		// Since this descriptor table is created at the heap where shader can access, we don't need to bind it again
+		CD3DX12_GPU_DESCRIPTOR_HANDLE tableHandle = DTable.GetSlotGPU(0);
 
-	//}
+
+		Graphic::CommandList ctx(D3D12_COMMAND_LIST_TYPE_COMPUTE);
+		ComputeCommandManager.InitCommandList(&ctx);
+		ctx.SetDescriptorHeap(*heap);
+		ctx.SetPipelineState(RoughnessMipmapPSO);
+		ctx.SetComputeRootSignature(TextureRootSignature);
+		ctx.ResourceBarrier(*m_buffer, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+		ctx.SetComputeRootDescriptorTable(0, tableHandle);
+		
+		// We are using group 8 x 8x 1, dividing 16 will give number of threads = pixels at miplevel1
+		ctx.Dispatch(resolution / 16, resolution / 16 , 1);
+
+		ctx.ResourceBarrier(*m_buffer, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST);
+
+		ComputeCommandManager.ExecuteCommandList(&ctx);
+		ComputeCommandManager.End();
+		ComputeCommandManager.Start();
+	}
+
 
 	std::shared_ptr<SkyBox> CreateSkyBoxFromFile(std::string path, UINT resolution, UINT16 miplevels) {
 		assert(resolution % 8 == 0);
 
 		UINT texType = TEXTURE_SRV | TEXTURE_UAV;
 		DXGI_FORMAT format=DXGI_FORMAT_R8G8B8A8_UNORM;
-		ptrTexCube texCube = std::make_shared<Graphic::TextureCube>(resolution, texType, format, miplevels);
+		auto texCube = std::make_shared<Game::EnvironmentMap>(resolution, texType, format, miplevels);
 		texCube->LoadFromImage(path);
-
+		texCube->CreateRoughnessMipmap();
 		// TODO roughness mipmap
 		
-		//test 
-		/*std::string texpath = "D://work/tEngine/envmap.png";
-		auto textype = Graphic::TEXTURE_SRV | Graphic::TEXTURE_UAV;
-		ptrTex2D test = std::make_shared<Graphic::Texture2D>(texpath, textype, 5);
-		Graphic::Texture2D::CreateMipMap(test, 0, 4);*/
-		
-
 
 		auto Mat = std::make_shared<PureColorCube>();
 		Mat->SetTexture(0, texCube);
