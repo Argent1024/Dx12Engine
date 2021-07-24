@@ -151,7 +151,7 @@ namespace Graphic {
 		// but need to create a GPU heap for this later
 		Graphic::DescriptorHeap* heap = Engine::GetInUseHeap();
 
-		InitTextureRootSignature();
+		GetTextureRootSignature();
 
 		if (MipMapPSO == nullptr) {
 
@@ -425,7 +425,7 @@ namespace Graphic {
 	void TextureCube::CreateFromTex2D(ptrTex2D tex2d)
 	{
 		assert((tex2d->GetType() & TEXTURE_SRV) && (GetType() & TEXTURE_UAV));
-		InitTextureRootSignature();
+		GetTextureRootSignature();
 
 		// Create root signatue & PSO
 		if (CreateFromTex2DPSO == nullptr) {

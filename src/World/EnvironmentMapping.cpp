@@ -14,13 +14,12 @@ namespace Game {
 
 	}
 	
-	void EnvironmentMap::CreateRoughnessMipmap() {
-		InitTextureRootSignature();
+	void EnvironmentMap::CalculatePrefilterEnvMap() {
+		GetTextureRootSignature();
 
 		if (RoughnessMipmapPSO == nullptr) {
 		
-			const std::wstring CsPath =  L"D:\\work\\tEngine\\Shaders\\RoughnessEnvironmentMipmapCS.hlsl";
-			
+			const std::wstring CsPath = L"D:\\work\\tEngine\\Shaders\\PBR\\PbrPrefilterEnvMapCS.hlsl";
 			RoughnessMipmapPSO = std::make_shared<Graphic::ComputePSO>(CsPath);
 			RoughnessMipmapPSO->SetRootSigature(TextureRootSignature->GetRootSignature());
 
@@ -88,7 +87,7 @@ namespace Game {
 		DXGI_FORMAT format=DXGI_FORMAT_R8G8B8A8_UNORM;
 		auto texCube = std::make_shared<Game::EnvironmentMap>(resolution, texType, format, miplevels);
 		texCube->LoadFromImage(path);
-		texCube->CreateRoughnessMipmap();
+		texCube->CalculatePrefilterEnvMap();
 		// TODO roughness mipmap
 		
 

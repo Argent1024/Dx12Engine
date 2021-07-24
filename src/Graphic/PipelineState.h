@@ -153,11 +153,11 @@ namespace Graphic {
 
 			ComPtr<ID3DBlob> CS;
 			ComPtr<ID3DBlob> errorMsg;
-			D3DCompileFromFile(m_ComputeShaderPath.c_str(), nullptr, nullptr, "CSMain", "cs_5_1", CompileFlags, 0, &CS, &errorMsg);
+			HRESULT hr = D3DCompileFromFile(m_ComputeShaderPath.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE , "CSMain", "cs_5_1", CompileFlags, 0, &CS, &errorMsg);
 			if (errorMsg.Get()) {
 				Logger::Log((char*)errorMsg.Get()->GetBufferPointer());
 			}
-			
+			ThrowIfFailed(hr);
 			m_psoDesc.CS = CD3DX12_SHADER_BYTECODE(CS.Get());
 
 			ID3D12Device* device = Engine::GetDevice();

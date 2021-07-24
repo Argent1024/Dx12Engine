@@ -32,8 +32,9 @@ namespace Game {
 			ObjectCBV, // 0: useless, since Material class doesn't store this CBV
 			
 			MatCBV,    // 1: Slot store material information. E.X. Diffuse Color, Use Normal map?, ... 
+			DiffuseTex,	// 2: 
+			PbrBrdf, // 3 TODO change the order of textures later
 
-			DiffuseTex,	
 			NormalTex,
 			RoughnessTex
 		};
@@ -57,6 +58,7 @@ namespace Game {
 
 		static const UINT MatCBVSize = CalculateConstantBufferByteSize(sizeof(PrincipleMaterial::MatData));
 
+		static ptrTex2D brdfTex;
 
 		PrincipleMaterial();
 
@@ -72,6 +74,10 @@ namespace Game {
 		inline void UploadCBV() override { m_MatCBV.copyData(&m_MatData); }
 
 	private:
+		static constexpr UINT BRDF_TEX_Width = 1024;
+		static constexpr UINT BRDF_TEX_Height = 1024;
+		static void InitBRDFTexture();
+
 		void BindTexture(SlotMaps slot, Graphic::DescriptorTable& table);
 
 		MatData m_MatData;

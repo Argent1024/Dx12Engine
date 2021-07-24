@@ -51,12 +51,12 @@ namespace Graphic {
 
 		};
 
-		// TODO just call this somewhere when initializing the engine
-		static void InitTextureRootSignature() {
+		static ptrRootSignature GetTextureRootSignature() {
 			if (TextureRootSignature == nullptr) {
 				TextureRootSignature = std::make_shared<Graphic::Texture::TRootSignature>();
 				TextureRootSignature->Initialize();
 			}
+			return TextureRootSignature;
 		}
 
 
@@ -91,6 +91,9 @@ namespace Graphic {
 		const UINT MaxMipLevels() const { return m_textureDesc.MipLevels; }
 
 		const DepthStencilView& DSV() const { return m_DSV; }
+
+		// TODO remove this function, only should be used when doing fence
+		ptrTBuffer GetBuffer() { return m_buffer; }
 
 	protected:
 		// Create the SRV & UAV at the table at tableIndex

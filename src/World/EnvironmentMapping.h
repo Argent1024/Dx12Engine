@@ -13,7 +13,7 @@ namespace Game {
 
 		EnvironmentMap(UINT resolution, UINT texType, DXGI_FORMAT format, UINT16 miplevels);
 
-		void CreateRoughnessMipmap();
+		void CalculatePrefilterEnvMap();
 	
 	};
 

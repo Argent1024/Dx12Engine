@@ -88,7 +88,7 @@ namespace Engine {
 
 			// Skybox
 			{
-				 std::string envmap_path = "D://work/tEngine/envmap.png";
+				 std::string envmap_path = "D://work/tEngine/envmap.hdr";
 				 auto skybox = CreateSkyBoxFromFile(envmap_path, 1024, 4);
 				 m_Scene->SetSkyBox(skybox);
 			}
