@@ -54,6 +54,6 @@ PSInput VSMain(VSInput input)
 float4 PSMain(PSInput input) : SV_TARGET
 {
     float3 uv = normalize(input.uv);
-	float3 baseCol = EnvMapping.SampleLevel(g_sampler, uv, 0).xyz;
+	float3 baseCol = EnvMapping.SampleLevel(g_sampler, uv, 1).xyz;
 	return float4(baseCol, 1.0); //float4((uv + 1.0) / 2.0, 1.0);
 }

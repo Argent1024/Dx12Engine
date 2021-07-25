@@ -82,7 +82,7 @@ PSInput VSMain(VSInput input)
 
 float3 PrefilterEnvMap(float Roughness, float3 N)
 {
-    const uint MAX_REFLECTION_LOD = 3.0;
+    const float MAX_REFLECTION_LOD = 4.0;
     float level = Roughness * MAX_REFLECTION_LOD;
     level = min(level, MAX_REFLECTION_LOD);
     return EnvMap.SampleLevel(g_sampler, N, level);

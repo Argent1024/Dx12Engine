@@ -2,7 +2,7 @@
 
 cbuffer InfoBuffer : register(b0) 
 {
-    uint NumMips;	// How many mipmap we are going to use
+    uint NumRoughness;	// How many mipmap we are going to use
     float InvResolution;
 };
 
@@ -13,9 +13,6 @@ RWTexture2DArray<float4> Mip1 : register(u0);
 RWTexture2DArray<float4> Mip2 : register(u1);
 RWTexture2DArray<float4> Mip3 : register(u2);
 RWTexture2DArray<float4> Mip4 : register(u3);
-RWTexture2DArray<float4> Mip5 : register(u4);
-RWTexture2DArray<float4> Mip6 : register(u5);
-RWTexture2DArray<float4> Mip7 : register(u6);
 
 
 
@@ -76,9 +73,6 @@ MapMipFactory(1);
 MapMipFactory(2);
 MapMipFactory(3);
 MapMipFactory(4);
-MapMipFactory(5);
-MapMipFactory(6);
-MapMipFactory(7);
 
 
 [numthreads( 8, 8, 1 )]
@@ -88,25 +82,32 @@ void CSMain(uint3 DispatchThreadID : SV_DispatchThreadID,  uint GI : SV_GroupInd
     float2 uv = 2.0 * (2.0 * DispatchThreadID.xy * InvResolution - 0.5);
     uv.y = -uv.y;
 
-    PrefiterMapMip1(cube_coor, uv, 0.1);
+    PrefiterMapMip1(cube_coor, uv, 0.125);
+    if (NumRoughness == 1) { return; }
+    
     
     // checks x & y are even
     if ((GI & 0x9) == 0)
     {
         cube_coor = DispatchThreadID.xy / 2;
-        PrefiterMapMip2(cube_coor, uv, 0.3);
+        PrefiterMapMip2(cube_coor, uv, 0.25);
     }
+    if (NumRoughness == 2) { return; }
     
-    // TODO error when using this miplevel
+    
     // This bit mask (binary: 011011) checks that X and Y are multiples of four.
     if ((GI & 0x1B) == 0)
     {
         cube_coor = DispatchThreadID.xy / 4;
-        PrefiterMapMip2(cube_coor, uv, 0.5);
+        PrefiterMapMip3(cube_coor, uv, 0.5);
     }
+    if (NumRoughness == 3) { return; }
     
     
-	// PrefiterMapMip3(cube_coor, uv, 0.6);
-	// PrefiterMapMip4(cube_coor, uv, 1.0);
-	// PrefiterMapMip5(cube_coor, uv, 0.5);
+     // This bit mask (binary: 011011) checks that X and Y are multiples of 8.
+    if ((GI & 0x1B) == 0)
+    {
+        cube_coor = DispatchThreadID.xy / 8;
+        PrefiterMapMip4(cube_coor, uv, 1.0);
+    }
 }

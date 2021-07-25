@@ -29,12 +29,12 @@ namespace Game {
 		UINT resolution =this->GetResolution();
 
 		struct ConstBufferData {
-			UINT NumMips;
+			UINT NumRoughness;
 			FLOAT InvResolution;
 			BOOL padding[2];
 		};	
 		ConstBufferData cbData;
-		cbData.NumMips = this->MaxMipLevels() - 1;
+		cbData.NumRoughness = this->MaxMipLevels() - 1;
 		cbData.InvResolution = 1.0 / resolution;
 
 		
@@ -49,7 +49,7 @@ namespace Game {
 		// 0: CBV, 1: SRV, 2-MipLevels+2:UAV
 		cb.CreateView(&DTable, 0);
 		this->CreateSRV(&DTable, 1);
-		for (UINT16 i = 0; i < cbData.NumMips; ++i) {
+		for (UINT16 i = 0; i < cbData.NumRoughness; ++i) {
 			this->CreateUAV(&DTable, 2 + i, 1 + i);
 		}
 

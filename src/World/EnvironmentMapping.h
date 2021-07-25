@@ -31,5 +31,5 @@ namespace Game {
 		std::shared_ptr<SkyBox> skybox;
 		ptrEnvMap envMap;
 	};
-	SkyBoxAndEnvMap CreateSkyBoxFromFile(std::string path, UINT resolution, UINT16 miplevels);
+	SkyBoxAndEnvMap CreateSkyBoxFromFile(std::string path, UINT resolution, UINT16 miplevels=5);
 }
