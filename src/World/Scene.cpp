@@ -21,36 +21,35 @@ namespace Game {
 	{
 		m_SceneDTable = new Graphic::DescriptorTable(SceneTableSize);
 
-		UINT cbvSize = CalculateConstantBufferByteSize(sizeof(SceneInfo));
-
-		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
-		buffer->Initialize(cbvSize);
-
-		// Create CBV at slot 0 of the lightTable
-		m_SceneCBV.Initialze(buffer, cbvSize);
+		m_SceneCBV.Initialize();
 		m_SceneCBV.CreateView(m_SceneDTable, 0);
+		
+		m_MainCameraCB.Initialize();
+		m_MainCameraCB.CreateRootView();
+		
 	}
 
 	void Scene::AddLight(Light& light) 
 	{
-		assert(iDir <= m_SceneInfo.maxDir && 
-			   iPoint <= m_SceneInfo.maxPoint &&
-			   iSpot <=  m_SceneInfo.maxSpot &&
+		SceneInfo& info = m_SceneCBV.GetData();
+		assert(iDir <= info.maxDir && 
+			   iPoint <= info.maxPoint &&
+			   iSpot <=  info.maxSpot &&
 			   "Lights index out of ranged");
-		LightState* pos = &(m_SceneInfo.Lights[iDir]);
+		LightState* pos = &(info.Lights[iDir]);
 		LightType type = light.Type();
 		switch (type)
 		{
 		case Game::DIRECTION_LIGHT:
-			pos = &(m_SceneInfo.Lights[iDir]);
+			pos = &(info.Lights[iDir]);
 			iDir ++;
 			break;
 		case Game::POINT_LIGHT:
-			pos = &(m_SceneInfo.Lights[iPoint]);
+			pos = &(info.Lights[iPoint]);
 			iPoint ++;
 			break;
 		case Game::SPOT_LIGHT:
-			pos = &(m_SceneInfo.Lights[iSpot]);
+			pos = &(info.Lights[iSpot]);
 			iSpot ++;
 			break;
 		}
@@ -59,9 +58,21 @@ namespace Game {
 
 	void Scene::PrepareSceneCBV() 
 	{
-		// UINT size = sizeof(SceneLightsInfo);
-		//TODO ERROR when only copying with size
-		m_SceneCBV.copyData(&m_SceneInfo);// , sizeof(SceneLightsInfo));
+		m_SceneCBV.UpdateData();
+
+		{	// Update Camera CB
+			auto& cameraData = m_MainCameraCB.GetData();
+			const Transform& view = m_Camera.GetView();
+			const Transform& proj = m_Camera.GetToScreen();
+			const Vector3& cameraPos = m_Camera.Position();
+
+			// Need to transpose
+			XMStoreFloat4x4(&cameraData.projection, XMMatrixTranspose((XMMATRIX)proj));
+			XMStoreFloat4x4(&cameraData.view, XMMatrixTranspose((XMMATRIX)view));
+			XMStoreFloat3(&cameraData.CameraPos, cameraPos);
+
+			m_MainCameraCB.UpdateData();
+		}
 	}
 
 	void Scene::AddGameObj(GObject* obj, RenderType renderType) 

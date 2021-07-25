@@ -5,7 +5,7 @@
 
 namespace Game {
 	using namespace Math;
-
+	using namespace Graphic;
 	void DefaultRenderPass::Initialize(ptrGraphicsPSO pso) 
 	{
 		// TODO Use only one root signature
@@ -27,14 +27,8 @@ namespace Game {
 	
 
 		// Creata CBV 
-		
-		const UINT cbvSize = CalculateConstantBufferByteSize(sizeof(DefaultRenderPass::ConstBufferData));
-		
-		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
-		buffer->Initialize(cbvSize);	// TODO need upload? or default is fine?
-
-		m_CBV.Initialze(buffer, cbvSize);
-		m_CBV.CreateView(m_DescriptorTable, 0);
+		m_ConstBuffer.Initialize();
+		m_ConstBuffer.CreateView(m_DescriptorTable, 0);
 		
 
 		// The other textures needed is binded outside by render engine
@@ -42,19 +36,9 @@ namespace Game {
 
 	void DefaultRenderPass::PrepareData(const Scene& scene)
 	{
-		const Camera& camera = scene.GetMainCamera();
-		const Transform& view = camera.GetView();
-		const Transform& proj = camera.GetToScreen();
-		const Vector3& cameraPos = camera.Position();
-
-		// Need to transpose
-		XMStoreFloat4x4(&m_CBVData.projection, XMMatrixTranspose((XMMATRIX)proj));
-		XMStoreFloat4x4(&m_CBVData.view, XMMatrixTranspose((XMMATRIX)view));
-
-		XMStoreFloat3(&m_CBVData.CameraPos, cameraPos);
-		
+		// TODO no need to update this frequently
 		// Copy to CBV
-		m_CBV.copyData(&m_CBVData);//, sizeof(CameraBufferData));
+		m_ConstBuffer.UpdateData();//, sizeof(CameraBufferData));
 	}
 
 	void DefaultRenderPass::Render(Graphic::CommandList& commandList, const Scene& scene) {
@@ -63,17 +47,19 @@ namespace Game {
 		commandList.SetPipelineState(m_PSO);
 		commandList.SetGraphicsRootSignature(m_rootSignature);
 		
+		auto& CameraCB = scene.GetCameraCB();
+		commandList.SetGraphicsRootCBV(RootSignature::CameraCBV, CameraCB);
+		const Camera& camera = scene.GetMainCamera();
+		camera.UseCamera(commandList);
 
-		CD3DX12_GPU_DESCRIPTOR_HANDLE cameraTableHandle = m_DescriptorTable->BindDescriptorTable();
-		// Slot 0 in root signature is for camera
-		commandList.SetGraphicsRootDescriptorTable(0, cameraTableHandle);
+
+		CD3DX12_GPU_DESCRIPTOR_HANDLE RenderPassTable = m_DescriptorTable->BindDescriptorTable();
+		commandList.SetGraphicsRootDescriptorTable(RootSignature::RenderpassDTable, RenderPassTable);
 		
 		const Graphic::DescriptorTable* sceneTable = scene.GetSceneTable();
 		CD3DX12_GPU_DESCRIPTOR_HANDLE sceneTableHandle = sceneTable->BindDescriptorTable();
-		commandList.SetGraphicsRootDescriptorTable(1, sceneTableHandle);
+		commandList.SetGraphicsRootDescriptorTable(RootSignature::SceneDTable, sceneTableHandle);
 
-		const Camera& camera = scene.GetMainCamera();
-		camera.UseCamera(commandList);
 		
 		if (m_ObjRenderType == RenderTypeSkyBox) {
 			auto const& skybox = scene.GetSkyBox();

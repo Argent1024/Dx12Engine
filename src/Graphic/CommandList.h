@@ -60,10 +60,6 @@ namespace Graphic {
 
 		inline void SetVertexBuffer(const VertexBuffer& vb) const {m_commandList->IASetVertexBuffers(0, 1, vb.GetBufferView());}
 
-		inline void SetGraphicRootCBV(ConstantBuffer* cbv, UINT rootParaIndex) const {
-			m_commandList->SetGraphicsRootConstantBufferView(rootParaIndex, cbv->GetRootCBVGPUAdder()); 
-		}
-
 		inline void Dispatch(UINT ThreadX, UINT ThreadY, UINT ThreadZ) const
 		{ m_commandList->Dispatch(ThreadX, ThreadY, ThreadZ);}
 
@@ -128,6 +124,12 @@ namespace Graphic {
 		{
 			m_commandList->SetComputeRootDescriptorTable(rootslot, handle);
 		}
+
+		template <class T>
+		inline void SetGraphicsRootCBV( UINT rootslot, const ConstantBuffer<T>& cbv) const {
+			m_commandList->SetGraphicsRootConstantBufferView(rootslot, cbv.GetRootCBVGPUAdder()); 
+		}
+
 
 		// Set root signature
 		inline void SetGraphicsRootConstants(UINT ParaIndex, UINT Size32Bit, const void* data, UINT Offset32Bit=0) { m_commandList->SetGraphicsRoot32BitConstants(ParaIndex, Size32Bit, data, Offset32Bit); }

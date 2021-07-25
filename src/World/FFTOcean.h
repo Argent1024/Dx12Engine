@@ -84,24 +84,23 @@ public:
 	static const UINT MatCBVSize = CalculateConstantBufferByteSize(sizeof(OceanMaterial::MatData));
 
 
-	OceanMaterial(MatData data) : m_MatData(data) 
+	OceanMaterial(MatData data) : m_MatCBV(data), m_DTable(8)
 	{ 
 		assert(sizeof(MatData) % 16 == 0);
-		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
-		buffer->Initialize(MatCBVSize);
-		m_MatCBV.Initialze(buffer, MatCBVSize);
+		m_MatCBV.Initialize();
 	}
 
 	// not using
-	void UploadCBV() { m_MatCBV.copyData(&m_MatData); }
+	void UploadCBV() { m_MatCBV.UpdateData(); }
 
-	void BindMaterialAt(Graphic::DescriptorTable& table) 
+	Graphic::DescriptorTable& BindMaterialAt() override
 	{
 		assert(m_Displacement != nullptr && "Haven't set texture for diffuse color");
-		m_Displacement->CreateSRV(&table, DisplacementTex);
-		m_Normal->CreateSRV(&table, NormalTex);
+		m_Displacement->CreateSRV(&m_DTable, DisplacementTex);
+		m_Normal->CreateSRV(&m_DTable, NormalTex);
 		/*m_Reflection->CreateSRV(&table, ReflectionTex);
 		m_FoamTex->CreateSRV(&table, FoamTex);*/
+		return m_DTable;
 	}
 
 	ptrTex2D m_Displacement;
@@ -109,8 +108,8 @@ public:
 	/*ptrTex2D m_Reflection;
 	ptrTex2D m_FoamTex;*/
 
-	MatData m_MatData;
-	Graphic::ConstantBuffer m_MatCBV;
+	Graphic::ConstantBuffer<MatData> m_MatCBV;
+	Graphic::DescriptorTable m_DTable;
 };
 
 

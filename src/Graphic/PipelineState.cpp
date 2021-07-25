@@ -11,14 +11,18 @@ namespace Graphic {
 		ComPtr<ID3DBlob> PS;
 	
 		ComPtr<ID3DBlob> errMsg;
-		D3DCompileFromFile(m_ShaderPath.c_str(), nullptr, nullptr, "VSMain", "vs_5_1", CompileFlags, 0, &VS, &errMsg);
+		HRESULT hr;
+		hr = D3DCompileFromFile(m_ShaderPath.c_str(), nullptr, nullptr, "VSMain", "vs_5_1", CompileFlags, 0, &VS, &errMsg);
 		if (errMsg.Get()) {
 				Logger::Log((char*)errMsg.Get()->GetBufferPointer());
 		}
-		D3DCompileFromFile(m_ShaderPath.c_str(), nullptr, nullptr, "PSMain", "ps_5_1", CompileFlags, 0, &PS, &errMsg);
+		ThrowIfFailed(hr);
+		hr = D3DCompileFromFile(m_ShaderPath.c_str(), nullptr, nullptr, "PSMain", "ps_5_1", CompileFlags, 0, &PS, &errMsg);
 		if (errMsg.Get()) {
 				Logger::Log((char*)errMsg.Get()->GetBufferPointer());
 		}
+		ThrowIfFailed(hr);
+
 		D3D12_INPUT_ELEMENT_DESC  inputElementDescs[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },

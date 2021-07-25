@@ -7,6 +7,9 @@
 #define ptrRootSignature std::shared_ptr<Graphic::RootSignature>
 
 namespace Graphic {
+
+
+
 	// TODO better way to creat root signature layout
 	class RootSignatureBinder {
 	public:
@@ -21,6 +24,15 @@ namespace Graphic {
 	// Default root signature
 	class RootSignature {
 	public:
+		// TODO move to the binder later
+		enum ResourceBinding {
+			CameraCBV,	
+			ObjectCBV,
+			SceneDTable,
+			MaterialDTable,
+			RenderpassDTable
+		};
+
 		RootSignature() { }
 		
 		ID3D12RootSignature* GetRootSignature() const { return m_RootSignature.Get(); }

@@ -23,11 +23,4 @@ namespace Graphic {
 		m_view.Format = DXGI_FORMAT_R32_UINT;
 		m_view.SizeInBytes = size;
 	}
-
-	void ConstantBuffer::CreateView(DescriptorTable* table, UINT slot) 
-	{
-		assert(IsCreated() && "Constant Buffer not created");
-		// m_Offset = m_Buffer->MemAlloc(m_Size);
-		m_CBV.CreateView(table, slot, m_Buffer, m_Size, m_Offset);
-	}
 }

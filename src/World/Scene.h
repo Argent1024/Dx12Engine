@@ -27,6 +27,16 @@ namespace Game
 		LightState Lights[maxLights];	
 	};
 
+
+	struct CameraData 
+	{
+		DirectX::XMFLOAT4X4 projection;
+		DirectX::XMFLOAT4X4 view;
+		DirectX::XMFLOAT3 CameraPos;
+		BOOL padding[1];
+	};
+
+
 	class Scene
 	{
 	using GameObjectTable = std::map<RenderType, std::vector<GObject*>>;
@@ -46,6 +56,11 @@ namespace Game
 		void SetSkyBox(std::shared_ptr<SkyBox> box) { m_SkyBox = box; }
 		std::shared_ptr<SkyBox> GetSkyBox() const { return m_SkyBox; }
 
+		void SetEnvMapping(UINT slot, ptrEnvMap env) 
+		{
+			assert(0 < slot && slot < 4 && "Slot of Env map out of range");
+			env->CreateSRV(m_SceneDTable, slot);
+		}
 
 		const std::vector<GObject*>& GetGameObjects(RenderType renderType) const {
 			const auto it = m_GameObjectTable.find(renderType);
@@ -60,7 +75,8 @@ namespace Game
 		virtual void AddGameObj(GObject* obj, RenderType renderType=0);
 		virtual void DeleteGameObj(GObject* obj) {}
 
-		
+		const Graphic::ConstantBuffer<CameraData>& GetCameraCB() const { return m_MainCameraCB; }
+
 		const Graphic::DescriptorTable* GetSceneTable() const { return m_SceneDTable; }
 		Graphic::DescriptorTable* GetSceneTable()  { return m_SceneDTable; }
 
@@ -73,10 +89,10 @@ namespace Game
 			iDir = 0;
 			iPoint = nDir;
 			iSpot =  nDir + nPoint;
-
-			m_SceneInfo.maxDir = iDir + nDir;
-			m_SceneInfo.maxPoint = iPoint + nPoint;
-			m_SceneInfo.maxSpot = iSpot + nSpot;
+			SceneInfo& info = m_SceneCBV.GetData();
+			info.maxDir = iDir + nDir;
+			info.maxPoint = iPoint + nPoint;
+			info.maxSpot = iSpot + nSpot;
 			
 		}
 
@@ -89,13 +105,12 @@ namespace Game
 
 		// Main Camera Stuff
 		ProjectiveCamera m_Camera;
-		Graphic::ConstantBuffer m_MainCameraCBV;
+		Graphic::ConstantBuffer<CameraData> m_MainCameraCB;
 
 
 		Graphic::DescriptorTable* m_SceneDTable;  // Store textures unique to scene(E.X. light's shadow map, env mapping)
 
-		SceneInfo m_SceneInfo;
-		Graphic::ConstantBuffer m_SceneCBV;	  // Store normal data of lights
+		Graphic::ConstantBuffer<SceneInfo> m_SceneCBV;	  // Store normal data of lights
 		
 
 		// TODO

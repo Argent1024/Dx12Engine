@@ -76,14 +76,37 @@ MapMipFactory(1);
 MapMipFactory(2);
 MapMipFactory(3);
 MapMipFactory(4);
+MapMipFactory(5);
+MapMipFactory(6);
+MapMipFactory(7);
 
 
 [numthreads( 8, 8, 1 )]
 void CSMain(uint3 DispatchThreadID : SV_DispatchThreadID,  uint GI : SV_GroupIndex)
 {
     uint2 cube_coor = DispatchThreadID.xy;
-    float2 uv =  2.0 * (2.0 * DispatchThreadID.xy * InvResolution - 0.5);
+    float2 uv = 2.0 * (2.0 * DispatchThreadID.xy * InvResolution - 0.5);
     uv.y = -uv.y;
 
     PrefiterMapMip1(cube_coor, uv, 0.1);
+    
+    // checks x & y are even
+    if ((GI & 0x9) == 0)
+    {
+        cube_coor = DispatchThreadID.xy / 2;
+        PrefiterMapMip2(cube_coor, uv, 0.3);
+    }
+    
+    // TODO error when using this miplevel
+    // This bit mask (binary: 011011) checks that X and Y are multiples of four.
+    if ((GI & 0x1B) == 0)
+    {
+        cube_coor = DispatchThreadID.xy / 4;
+        PrefiterMapMip2(cube_coor, uv, 0.5);
+    }
+    
+    
+	// PrefiterMapMip3(cube_coor, uv, 0.6);
+	// PrefiterMapMip4(cube_coor, uv, 1.0);
+	// PrefiterMapMip5(cube_coor, uv, 0.5);
 }

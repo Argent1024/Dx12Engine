@@ -5,33 +5,32 @@ namespace Game {
 	using namespace Math;
 	
 	GObject::GObject() 
-		: m_table(32), // TODO table size according to material
-		  m_CBV()
+		: m_CBV()
 	{
 		// TODO Fix this
 		m_state = new Physics::PhysicsState();
 
-		// Slot 0 in the table is for const data
-		// Init CBV and put CBV to slot 0 in the descriptor table
-		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
-		buffer->Initialize(cbSize);	// TODO need upload? or default is fine?
-		m_CBV.Initialze(buffer, cbSize);
-		m_CBV.CreateView(&m_table, 0);
+		m_CBV.Initialize();
+		m_CBV.CreateRootView();
 	}
 
-	void GObject::RecordCommand(Graphic::CommandList& commandList) {
+	void GObject::RecordCommand(Graphic::CommandList& commandList) 
+	{
 		assert(m_Mesh && "Not initialized GameObj");
 		// (TODO may not need to do this every frame & remove it to Physics) Upload data to the cbv
-		XMFLOAT4X4 modelTransform;
-		XMStoreFloat4x4(&modelTransform, XMMatrixTranspose(m_state->GetTransform()));
-		m_CBV.copyData(&modelTransform);
+		auto& cbdata = m_CBV.GetData();
+		XMStoreFloat4x4(&cbdata.T, XMMatrixTranspose(m_state->GetTransform()));
+		m_CBV.UpdateData();
 
-		commandList.SetDescriptorHeap(*Engine::GetInUseHeap());
-		
-		CD3DX12_GPU_DESCRIPTOR_HANDLE tableHandle = m_table.BindDescriptorTable();
-		commandList.SetGraphicsRootDescriptorTable(2, tableHandle);  //  slot 2  in root signature is reversed for object
-			
+		commandList.SetGraphicsRootCBV(Graphic::RootSignature::ObjectCBV, m_CBV);
+
+		// Mesh
 		m_Mesh->UseMesh(commandList);
+
+		// Material 
+		Graphic::DescriptorTable& matTable = m_Material->BindMaterialAt();
+		CD3DX12_GPU_DESCRIPTOR_HANDLE matTableHandle = matTable.BindDescriptorTable();
+		commandList.SetGraphicsRootDescriptorTable(Graphic::RootSignature::MaterialDTable, matTableHandle);
 	}
 
 		

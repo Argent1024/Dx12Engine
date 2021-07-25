@@ -11,7 +11,7 @@ namespace Game {
 	public:
 
 		// Bind views, textures to the descriptor table
-		virtual void BindMaterialAt(Graphic::DescriptorTable& table) = 0;
+		virtual Graphic::DescriptorTable& BindMaterialAt() = 0;
 
 		// TODO not every material need one ?
 		// Copy data to cbv
@@ -29,14 +29,13 @@ namespace Game {
 		// Mapping for Textures
 		enum SlotMaps
 		{
-			ObjectCBV, // 0: useless, since Material class doesn't store this CBV
-			
-			MatCBV,    // 1: Slot store material information. E.X. Diffuse Color, Use Normal map?, ... 
-			DiffuseTex,	// 2: 
-			PbrBrdf, // 3 TODO change the order of textures later
+			MatCBV = 0,
+			DiffuseTex = 1,
+			NormalTex = 2, 
+			RoughnessTex = 3,
 
-			NormalTex,
-			RoughnessTex
+			// TODO reconsider this
+			BrdfTex = 4
 		};
 		
 
@@ -62,16 +61,16 @@ namespace Game {
 
 		PrincipleMaterial();
 
-		void BindMaterialAt(Graphic::DescriptorTable& table) override;
+		Graphic::DescriptorTable& BindMaterialAt() override;
 
-		inline MatData& GetData() { return m_MatData; }
+		inline MatData& GetData() { return m_MatCBV.GetData(); }
 		
-		inline void SetData(const MatData& data) { m_MatData = data; }
+		inline void SetData(const MatData& data) { m_MatCBV.SetData(data); }
 
 		// Set texture to xxx, the default will remove the texture of one slot (pass a nullptr in Texture)
 		void SetTexture(SlotMaps texType, ptrTex2D tex=nullptr);
 
-		inline void UploadCBV() override { m_MatCBV.copyData(&m_MatData); }
+		inline void UploadCBV() override { m_MatCBV.UpdateData(); }
 
 	private:
 		static constexpr UINT BRDF_TEX_Width = 1024;
@@ -80,8 +79,9 @@ namespace Game {
 
 		void BindTexture(SlotMaps slot, Graphic::DescriptorTable& table);
 
-		MatData m_MatData;
-		Graphic::ConstantBuffer m_MatCBV;
+		Graphic::ConstantBuffer<MatData> m_MatCBV;
+		Graphic::DescriptorTable m_DTable;
+
 		ptrTex2D m_DiffuseTex;
 		ptrTex2D m_NormalTex;
 	};
@@ -96,19 +96,16 @@ namespace Game {
 		};
 		static constexpr UINT MatCBVSize = CalculateConstantBufferByteSize(sizeof(PureColorCube::MatData));
 		
-		PureColorCube() 
+		PureColorCube() : m_DTable(4)
 		{
-			assert(sizeof(PureColorCube::MatData) % 16 == 0);
-
-			ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
-			buffer->Initialize(MatCBVSize);
-			m_MatCBV.Initialze(buffer, MatCBVSize);
+			m_MatCBV.Initialize();
 		}
 
-		void BindMaterialAt(Graphic::DescriptorTable& table) override 
+		Graphic::DescriptorTable& BindMaterialAt() override 
 		{
-			m_MatCBV.CreateView(&table, 1);
-			m_Textures->CreateSRV(&table, 2);
+			m_MatCBV.CreateView(&m_DTable, 0);
+			m_Textures->CreateSRV(&m_DTable, 1);
+			return m_DTable;
 		};
 
 
@@ -118,11 +115,12 @@ namespace Game {
 			m_Textures = tex;
 		}
 
-		inline void UploadCBV() override { m_MatCBV.copyData(&m_MatData); }
+		inline void UploadCBV() override { m_MatCBV.UpdateData(); }
 
 	private:
-		MatData m_MatData;
-		Graphic::ConstantBuffer m_MatCBV;
+		Graphic::ConstantBuffer<MatData> m_MatCBV;
+		Graphic::DescriptorTable m_DTable;
+
 		ptrTexCube m_Textures;
 	};
 }

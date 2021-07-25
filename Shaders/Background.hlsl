@@ -3,22 +3,24 @@
 #define PI 3.141592653589793f
 #define TwoPI 6.283185307179586f
 
-// Store Camera Transformations and other settings
-cbuffer SceneInfo : register(b0) 
+cbuffer CameraData : register(b0)
 {
-	// Camera transformation
 	float4x4 projection;
 	float4x4 view;
 	float3 CameraPos;
-};
+}
 
-
-cbuffer ObjectInfo : register(b2)
+cbuffer ObjectInfo : register(b1)
 {
 	float4x4 modelTransformation;
 }
 
+
+cbuffer MaterialInfo : register(b0, space1)
+{ }
 TextureCube EnvMapping : register(t0, space1);
+
+
 SamplerState g_sampler : register(s0);
 
 struct VSInput 

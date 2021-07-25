@@ -33,17 +33,14 @@ namespace Game {
 			FLOAT InvResolution;
 			BOOL padding[2];
 		};	
-		const UINT cbDataSize = CalculateConstantBufferByteSize(sizeof(ConstBufferData));
-
 		ConstBufferData cbData;
 		cbData.NumMips = this->MaxMipLevels() - 1;
 		cbData.InvResolution = 1.0 / resolution;
 
-		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
-		buffer->Initialize(cbDataSize);
-		ConstantBuffer cb;
-		cb.Initialze(buffer, cbDataSize);
-		cb.copyData(&cbData);
+		
+		ConstantBuffer<ConstBufferData> cb(cbData);
+		cb.Initialize();
+		cb.UpdateData();
 
 		Graphic::DescriptorHeap* heap = Engine::GetInUseHeap();
 
@@ -80,7 +77,7 @@ namespace Game {
 	}
 
 
-	std::shared_ptr<SkyBox> CreateSkyBoxFromFile(std::string path, UINT resolution, UINT16 miplevels) {
+	SkyBoxAndEnvMap CreateSkyBoxFromFile(std::string path, UINT resolution, UINT16 miplevels) {
 		assert(resolution % 8 == 0);
 
 		UINT texType = TEXTURE_SRV | TEXTURE_UAV;
@@ -102,6 +99,6 @@ namespace Game {
 		);
 
 		skybox->SetMaterial(Mat);
-		return skybox;
+		return { skybox, texCube };
 	}
 }

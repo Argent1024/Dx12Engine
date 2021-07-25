@@ -51,13 +51,9 @@ namespace Game {
 		
 		struct ConstBufferData 
 		{
-			DirectX::XMFLOAT4X4 projection;
-			DirectX::XMFLOAT4X4 view;
-			DirectX::XMFLOAT3 CameraPos;
-
 			BOOL debugnormal = FALSE;
 			BOOL debugpos = FALSE;
-			BOOL padding0[3]; // Align
+			BOOL padding0[2]; // Align
 
 		};
 
@@ -68,11 +64,10 @@ namespace Game {
 		void Render(Graphic::CommandList& commandList,const Scene& scene) override;
 
 		// Settings of the renderpass
-		ConstBufferData& GetCBVData() { return m_CBVData; }
+		ConstBufferData& GetCBVData() { return m_ConstBuffer.GetData(); }
 
 	private:
-		ConstBufferData m_CBVData;
-		Graphic::ConstantBuffer m_CBV;
+		Graphic::ConstantBuffer<ConstBufferData> m_ConstBuffer;
 	};
 
 	class MixtureRenderPass : public RenderPass {

@@ -17,6 +17,15 @@ namespace GPU
 			return buffer;
 		}
 
+		// Create and init
+		static ptrGBuffer CreateGBuffer(UINT size) 
+		{
+			ptrGBuffer buffer = std::make_shared<GPU::GPUBuffer>();
+			buffer->Initialize(size);
+			return buffer;
+		}
+
+
 		static ptrTBuffer CreateTBuffer()
 		{
 			ptrTBuffer buffer = std::make_shared<GPU::TextureBuffer>();

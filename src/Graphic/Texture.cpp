@@ -137,14 +137,9 @@ namespace Graphic {
 		cbData.NumMipLevels = numMip;
 		cbData.TexelSize = {2.0f / Width, 2.0f / Height};
 
-
-		// Create Constant buffer
-		const UINT MatmapCBSize = CalculateConstantBufferByteSize(sizeof(MipmapCB));
-		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
-		buffer->Initialize(MatmapCBSize);
-		ConstantBuffer cb;
-		cb.Initialze(buffer, MatmapCBSize);
-		cb.copyData(&cbData);
+		ConstantBuffer<MipmapCB> cb(cbData);
+		cb.Initialize();
+		cb.UpdateData();
 
 		// ***TODO*** Since this function will only be called in load assert now,
 		// all will happen before the first frame now, so it's fine for now
@@ -446,13 +441,9 @@ namespace Graphic {
 		ConstBufferData cbData;
 		cbData.InvResolution = 1.0f / resolution;
 
-		const UINT CBSize = CalculateConstantBufferByteSize(sizeof(ConstBufferData));
-		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
-		buffer->Initialize(CBSize);
-
-		ConstantBuffer cb;
-		cb.Initialze(buffer, CBSize);
-		cb.copyData(&cbData);
+		ConstantBuffer<ConstBufferData> cb(cbData);
+		cb.Initialize();
+		cb.UpdateData();
 
 		// ***TODO*** Move to another heap
 		Graphic::DescriptorHeap* heap = Engine::GetInUseHeap();

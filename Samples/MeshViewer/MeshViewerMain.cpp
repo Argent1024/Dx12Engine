@@ -63,7 +63,7 @@ namespace Engine {
 			m_Material->SetData(mat);
 
 			// Load textures
-			/*{
+			{
 				std::string texpath = "D://work/tEngine/envmap.png";
 
 				auto textype = Graphic::TEXTURE_SRV | Graphic::TEXTURE_UAV;
@@ -71,26 +71,31 @@ namespace Engine {
 
 				Graphic::Texture2D::CreateMipMap(baseColorTex, 0, 4);
 				m_Material->SetTexture(PrincipleMaterial::DiffuseTex, baseColorTex);
-			}*/
+			}
 
 			m_Material->UploadCBV();
 
-			// m_Mesh = TriangleMesh::GetXYPlane();
-			{
+			//m_Mesh = TriangleMesh::GetXYPlane();
+			m_Mesh = TriangleMesh::GetSphere(48, 32);
+			/*{
 				MeshReader reader;
-				reader.ReadOBJ("D://work/tEngine/renderball.obj");
+				reader.ReadOBJ("D://work/tEngine/bunny.obj");
 
 				std::vector<DefaultVertex>& vertex = reader.m_vertex;
 				std::vector<UINT>& index = reader.m_index;
 
 				m_Mesh = std::make_shared<TriangleMesh>(vertex, index);
-			}
+			}*/
 
 			// Skybox
 			{
 				 std::string envmap_path = "D://work/tEngine/envmap.hdr";
-				 auto skybox = CreateSkyBoxFromFile(envmap_path, 1024, 4);
+				 auto skybox_envmap = CreateSkyBoxFromFile(envmap_path, 2048, 4);
+				 auto skybox = skybox_envmap.skybox;
+				 auto envmap = skybox_envmap.envMap;
+
 				 m_Scene->SetSkyBox(skybox);
+				 m_Scene->SetEnvMapping(1, envmap);
 			}
 
 			// TODO error C2338 aligin

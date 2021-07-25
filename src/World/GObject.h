@@ -18,7 +18,6 @@ namespace Game {
 		inline void SetMaterial(ptrMaterial mat)
 		{ 
 			m_Material = mat; 
-			m_Material->BindMaterialAt(m_table);
 		}
 
 		inline void SetMesh(ptrMesh mesh) { m_Mesh = mesh; }
@@ -46,12 +45,14 @@ namespace Game {
 		// Math::Transform m_Transform;
 		Physics::PhysicsState* m_state;
 
-		// TODO make a struct later. only model Transformation for now
-		// Store const data used in rendering ( Transformation, other settings )
-		static const UINT cbSize = CalculateConstantBufferByteSize(sizeof(DirectX::XMMATRIX));
-		Graphic::ConstantBuffer m_CBV;
+		struct ObjectCBdata {
+			DirectX::XMFLOAT4X4 T;
+		};
 
-		Graphic::DescriptorTable m_table;
+		// Store const data used in rendering ( Transformation, other settings )
+		// static const UINT cbSize = CalculateConstantBufferByteSize(sizeof(DirectX::XMMATRIX));
+		Graphic::ConstantBuffer<ObjectCBdata> m_CBV;
+
 		
 		ptrMaterial m_Material;
 		ptrMesh m_Mesh;

@@ -15,40 +15,42 @@ namespace Graphic {
 			featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 		}
 
-		CD3DX12_DESCRIPTOR_RANGE1 ranges[7];
-		CD3DX12_ROOT_PARAMETER1 rootParameters[3];
+		CD3DX12_DESCRIPTOR_RANGE1 ranges[6];
+		CD3DX12_ROOT_PARAMETER1 rootParameters[5];
 		
 	
 
-		// Descriptor table 0 for Camera / Renderpass
-		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b0
-		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t7 space 1
+		// Descriptor table 2 for the Scene
+		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b2 space 0
+		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t7 space 0
 
-		// Descriptor table 1 for Lights
-		ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b1
-		ranges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 16, 8, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t8 - t24 space 1
+		// Descriptor table 3 for the Material
+		ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b0 space 1
+		ranges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t7 space 1
 
-		// Descriptor Table 2 for the object
-		ranges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 2, 2, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b2 b3, for object and material
-		ranges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t8 space 1
-		ranges[6].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 8, 0, 1, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // u0 - u8 space 1
+		// Descriptor Table 4 for the Render pass
+		ranges[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 2, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // b0 space 2
+		ranges[5].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0, 2, D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE); // t0 - t7 space 2
 
-		// Descriptor table (Camera/Renderpass) : b0, t0 - t7 [Space 1]
-		//rootParameters[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
-		rootParameters[0].InitAsDescriptorTable(2, &ranges[0], D3D12_SHADER_VISIBILITY_ALL);
 
-		// Descriptor table (Lights) : b1, t8 - t24 [Space 1]
-		rootParameters[1].InitAsDescriptorTable(2, &ranges[2], D3D12_SHADER_VISIBILITY_ALL);
+		rootParameters[RootSignature::CameraCBV].InitAsConstantBufferView(0);	// b0 Camera's Data
+		rootParameters[RootSignature::ObjectCBV].InitAsConstantBufferView(1);	// b1 Object's Data
 
-		// Descriptor table (Object): b2, t0-t8, u0-u8 [Space 0]
-		rootParameters[2].InitAsDescriptorTable(3, &ranges[4], D3D12_SHADER_VISIBILITY_ALL);
+		// Descriptor table (Scene) : b2, t0 - t7 [Space 0]
+		rootParameters[RootSignature::SceneDTable].InitAsDescriptorTable(2, &ranges[0], D3D12_SHADER_VISIBILITY_PIXEL);
+
+		// Descriptor table (Material) : b0, t0 - t7 [Space 1]
+		rootParameters[RootSignature::MaterialDTable].InitAsDescriptorTable(2, &ranges[2], D3D12_SHADER_VISIBILITY_PIXEL);
+
+		// Descriptor table (Render pass): b0, t0-t8 [Space 2]
+		rootParameters[RootSignature::RenderpassDTable].InitAsDescriptorTable(2, &ranges[4], D3D12_SHADER_VISIBILITY_ALL);
 
 		D3D12_STATIC_SAMPLER_DESC sampler = {};
         // sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
         sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-		sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-        sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-        sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
         sampler.MipLODBias = 0;
         sampler.MaxAnisotropy = 0;
         sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;

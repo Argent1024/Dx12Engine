@@ -178,7 +178,7 @@ namespace Graphic {
 
 	class DefaultPSO : public GraphicsPSO {
 	public:
-		DefaultPSO(std::wstring shaderpath=L"D:\\work\\tEngine\\Shaders\\shaders.hlsl") 
+		DefaultPSO(std::wstring shaderpath=L"D:\\work\\tEngine\\Shaders\\PBR\\PbrShader.hlsl") 
 			: GraphicsPSO(shaderpath) { }
 
 		void Initialize() override;

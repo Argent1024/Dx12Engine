@@ -93,7 +93,7 @@ namespace Graphic {
 		D3D12_CPU_DESCRIPTOR_HANDLE GetHandle() const { return m_handle; }
 
 		// For debug/assert use
-		virtual bool IsCreated() { return  m_handle.ptr != D3D12_GPU_VIRTUAL_ADDRESS_NULL;  }
+		virtual bool IsCreated() const { return  m_handle.ptr != D3D12_GPU_VIRTUAL_ADDRESS_NULL;  }
 
 		// Bind Root descriptor, not sure if useful
 		/*inline void BindDescriptor(UINT destIndex) const
@@ -117,8 +117,8 @@ namespace Graphic {
 
 		void copyData(const void* data, UINT size);
 
-		virtual UINT Size() = 0;
-		virtual bool IsCreated() = 0;
+		virtual UINT Size() const = 0;
+		virtual bool IsCreated() const = 0;
 
 		inline void copyData(const void* data) { copyData(data, Size()); }
 		UINT Offset() const { return m_Offset; }
@@ -140,8 +140,8 @@ namespace Graphic {
 	public:
 		VertexBuffer(ptrGBuffer gpubuffer, const UINT bufferSize, const UINT stride);
 		
-		UINT Size() override { return m_view.SizeInBytes; }
-		bool IsCreated() override { return m_view.SizeInBytes != 0; };
+		UINT Size() const override { return m_view.SizeInBytes; }
+		bool IsCreated() const override { return m_view.SizeInBytes != 0; };
 
 		const D3D12_VERTEX_BUFFER_VIEW* GetBufferView() const { return &m_view; }
 
@@ -164,8 +164,8 @@ namespace Graphic {
 		//      3. When rendering, we're going to use the m_start variable
 		// IndexBuffer(IndexBuffer& buffer, const UINT start, const UINT end);
 
-		UINT Size() override { return m_view.SizeInBytes; }
-		bool IsCreated() override { return m_view.SizeInBytes != 0; };
+		UINT Size() const override { return m_view.SizeInBytes; }
+		bool IsCreated() const override { return m_view.SizeInBytes != 0; };
 
 		const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &m_view; }
 
@@ -177,8 +177,6 @@ namespace Graphic {
 	//************************** CBV, SRV, RTV, DSV ********************************//
 	class ConstantBufferView : public Descriptor
 	{
-	friend class ConstantBuffer;
-
 	public:
 
 		// Create view 
@@ -200,6 +198,11 @@ namespace Graphic {
 				m_handle = initheap->GetCPUHandle(HeapIndex);
 				device->CreateConstantBufferView(&m_cbvDesc, m_handle);
 			}
+		}
+
+		D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocation() const
+		{
+			return m_cbvDesc.BufferLocation;
 		}
 
 	protected:
@@ -280,44 +283,81 @@ namespace Graphic {
 	};
 	//*****************************************************************************************
 
+	// TODO use template here and dont inheriet from descriptors
 	// Simple class that contain a cbv and it's GPUmemory
-	class ConstantBuffer : public BufferDescriptor, Descriptor
+	template<class Data>
+	class ConstantBuffer : public BufferDescriptor
 	{
 	public:
 		// Simple constructor, call init later
-		ConstantBuffer() : m_Size(0) { }
-
-		// Create a CBV, descriptor Heap is nullptr if we are creating a normal cbv, 
-		// if provide decriptorHeap, we are creaing a root CBV
-		ConstantBuffer(ptrGBuffer buffer, UINT size)
-			: BufferDescriptor(buffer), Descriptor()
-		{
-			m_Size = CalculateConstantBufferByteSize(size);
-			m_Offset = buffer->MemAlloc(size);
-			// m_CBV.c
+		ConstantBuffer() 
+		{ 
+			assert(sizeof(Data) % 16 == 0);
+			m_Size = CalculateConstantBufferByteSize(sizeof(Data));
 		}
 
-		void Initialze(ptrGBuffer buffer, UINT size)
+		ConstantBuffer(const Data& data) 
+		{ 
+			assert(sizeof(Data) % 16 == 0);
+			m_Size = CalculateConstantBufferByteSize(sizeof(Data));
+			m_data = data;
+		}
+		
+		ConstantBuffer(ptrGBuffer buffer)
+			: BufferDescriptor(buffer)
 		{
+			assert(sizeof(Data) % 16 == 0);
+			m_Size = CalculateConstantBufferByteSize(sizeof(Data));
+			Initialize(buffer);
+		}
+
+		void Initialize() 
+		{
+			ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer(m_Size);
+			Initialize(buffer);
+		}
+
+		void Initialize(ptrGBuffer buffer)
+		{
+			assert(m_initialized == FALSE && "initializing constant buffer twice");
 			m_Buffer = buffer;
-			m_Size = CalculateConstantBufferByteSize(size);
-			m_Offset = buffer->MemAlloc(size);
+			m_Offset = buffer->MemAlloc(m_Size);
+			m_initialized = true;
 		}
 
-		UINT Size() override { return m_Size; }
-		bool IsCreated() override { return m_Size != 0; };
+		UINT Size() const override { return m_Size; }
+		bool IsCreated() const override { return m_initialized; };
 
-		void CreateView(DescriptorTable* table, UINT slot);
+		void CreateView(DescriptorTable* table, UINT slot) 
+		{
+			assert(IsCreated() && "Constant Buffer not created");
+			m_CBV.CreateView(table, slot, m_Buffer, m_Size, m_Offset);
+		}
+
+		void CreateRootView() {
+			assert(IsCreated() && "Constant Buffer not created");
+			m_isRootCBV = TRUE;
+			m_CBV.CreateView(nullptr, 0, m_Buffer, m_Size, m_Offset);
+		}
 
 		// Method to use this CBV as a root CBV
 		inline D3D12_GPU_VIRTUAL_ADDRESS GetRootCBVGPUAdder() const 
 		{
-			// assert(m_isRootCBV && "CBV should be a root CBV to call this function");
-			return m_CBV.m_cbvDesc.BufferLocation; 
+			assert(IsCreated() && "Constant Buffer not created");
+			return m_CBV.GetBufferLocation(); 
 		}
 
+		Data& GetData() { return m_data; }
+		const Data& GetData() const {return m_data; }
+
+		void UpdateData() { copyData(&m_data); }
+		void SetData(const Data& d) { m_data = d; }
+
 	private:
+		bool m_initialized = false;
+		bool m_isRootCBV = false;
 		UINT m_Size;
 		ConstantBufferView m_CBV;
+		Data m_data;
 	};
 }

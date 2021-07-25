@@ -15,7 +15,7 @@ namespace Game {
 		brdfTex = std::make_shared<Graphic::Texture2D>(BRDF_TEX_Width, BRDF_TEX_Height, type, format);
 
 
-		const std::wstring cs_path =  L"D:\\work\\tEngine\\Shaders\\GenerateCubeMap.hlsl";
+		const std::wstring cs_path =  L"D:\\work\\tEngine\\Shaders\\PBR\\PbrIntegrateBrdfCS.hlsl";
 		ptrComputePSO pso = std::make_shared<Graphic::ComputePSO>(cs_path);
 		ptrRootSignature rootsignature = Texture::GetTextureRootSignature();
 		pso->SetRootSigature(rootsignature->GetRootSignature());
@@ -23,20 +23,15 @@ namespace Game {
 
 
 		struct ConstBufferData {
-			UINT width;
-			UINT height;
+			FLOAT InvWidth;
+			FLOAT InvHeight;
 			BOOL padding[2];
 		};
-		constexpr UINT CBSize = CalculateConstantBufferByteSize(sizeof(ConstBufferData));
-
-		ConstBufferData cbData {BRDF_TEX_Width, BRDF_TEX_Height};
-
-		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
-		buffer->Initialize(CBSize);
-
-		ConstantBuffer cb;
-		cb.Initialze(buffer, CBSize);
-		cb.copyData(&cbData);
+	
+		ConstBufferData cbData {1.0f / BRDF_TEX_Width, 1.0 / BRDF_TEX_Height};
+		ConstantBuffer<ConstBufferData> cb(cbData);
+		cb.Initialize();
+		cb.UpdateData();
 
 
 		// ***TODO*** Move to another heap
@@ -72,35 +67,32 @@ namespace Game {
 	}
 
 
-	PrincipleMaterial::PrincipleMaterial() 
+	PrincipleMaterial::PrincipleMaterial() : m_DTable(8)
 	{
-		assert(sizeof(PrincipleMaterial::MatData) % 16 == 0);
 
 		// Create the BRDF Texture
 		InitBRDFTexture();
+		m_MatCBV.Initialize();
 
-		ptrGBuffer buffer = GPU::MemoryManager::CreateGBuffer();
-		buffer->Initialize(MatCBVSize);
-		m_MatCBV.Initialze(buffer, MatCBVSize);
-
+		// TODO move later
+		brdfTex->CreateSRV(&m_DTable, PrincipleMaterial::BrdfTex);
 	}
 
-	void PrincipleMaterial::BindMaterialAt(Graphic::DescriptorTable& table) 
+	Graphic::DescriptorTable& PrincipleMaterial::BindMaterialAt()
 	{
-		m_MatCBV.CreateView(&table, MatCBV);
-
-		if (m_MatData.CTexture) { BindTexture(DiffuseTex, table); }
-		if (m_MatData.NTexture) { BindTexture(NormalTex, table); }
+		m_MatCBV.CreateView(&m_DTable, MatCBV);
+		const auto& matData = m_MatCBV.GetData();
+		if (matData.CTexture) { BindTexture(DiffuseTex, m_DTable); }
+		if (matData.NTexture) { BindTexture(NormalTex, m_DTable); }
 		
 		// TODO other textures
+		return m_DTable;
 	}
 
 	void PrincipleMaterial::BindTexture(SlotMaps slot, Graphic::DescriptorTable& table) 
 	{
 		switch (slot)
 		{
-		case Game::PrincipleMaterial::ObjectCBV:
-			break;
 		case Game::PrincipleMaterial::MatCBV:
 			break;
 		case Game::PrincipleMaterial::DiffuseTex:
@@ -118,20 +110,18 @@ namespace Game {
 
 	void PrincipleMaterial::SetTexture(SlotMaps texType, ptrTex2D tex)
 	{
+		auto& matData = m_MatCBV.GetData();
 		switch (texType)
 		{
-		case Game::PrincipleMaterial::ObjectCBV:
-			assert(FALSE && "Why ObjectCBV in set texture?");
-			break;
 		case Game::PrincipleMaterial::MatCBV:
 			assert(FALSE && "Why MatCBV in set texture?");
 			break;
 		case Game::PrincipleMaterial::DiffuseTex:
-			m_MatData.CTexture = tex != nullptr;
+			matData.CTexture = tex != nullptr;
 			m_DiffuseTex = tex;
 			break;
 		case Game::PrincipleMaterial::NormalTex:
-			m_MatData.NTexture = tex != nullptr;
+			matData.NTexture = tex != nullptr;
 			m_NormalTex = tex;
 			break;
 		case Game::PrincipleMaterial::RoughnessTex:

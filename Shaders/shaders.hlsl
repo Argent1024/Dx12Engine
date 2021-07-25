@@ -9,24 +9,21 @@ struct Light  // Equal to LightState Class
 	float4x4 proj;		// store projective(point spot) / orthnormal(dir) matrix
 };
 
-// Store Camera Transformations and other settings
-cbuffer RenderPassInfo : register(b0) 
+cbuffer CameraData : register(b0)
 {
-	// Camera transformation
 	float4x4 projection;
 	float4x4 view;
 	float3 CameraPos;
+}
 
-	// Debug settings
-	bool debugnormal;
-	bool debugpos;
-};
+cbuffer ObjectInfo : register(b1)
+{
+	float4x4 modelTransformation;
+}
 
 //const uint maxSceneLight = 16;
-cbuffer SceneInfo : register(b1)
+cbuffer SceneInfo : register(b2)
 {
-	bool UseEnvMapping;
-
 	uint maxDir;
 	uint maxPoint;
 	uint maxSpot;
@@ -36,15 +33,7 @@ Texture2D EnvironmentMapping : register(t0, space0); // Store the image in spher
 
 /********************** Object & Material Descriptor Table Start ***********************/
 
-// Store Object information
-//		Transformation
-//		Materials' data
-cbuffer ObjectInfo : register(b2)
-{
-	float4x4 modelTransformation;
-}
-
-cbuffer MaterialInfo : register (b3) 
+cbuffer MaterialInfo : register (b0, space1) 
 {
 	float3 BaseColor;
 
@@ -61,6 +50,15 @@ cbuffer MaterialInfo : register (b3)
 
 Texture2D BaseColorTexture : register(t0, space1);
 // TODO Material Textures
+
+
+// Store Camera Transformations and other settings
+cbuffer RenderPassInfo : register(b0, space2)
+{
+	// Debug settings
+	bool debugnormal;
+	bool debugpos;
+};
 
 /********************** Object & Material Descriptor Table End ****************************/
 
