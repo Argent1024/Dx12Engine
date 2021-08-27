@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshViewer", "Samples\MeshV
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFT Ocean", "Samples\FFT Ocean\FFT Ocean.vcxproj", "{0762ED40-26F9-4578-97CE-B6BF7327C421}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests_MathPhysics", "Tests\MathPhysicsTests\MathPhysicsTests.vcxproj", "{11699A3C-B386-4973-BEB8-A1DC5CF6F621}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -57,6 +59,18 @@ Global
 		{0762ED40-26F9-4578-97CE-B6BF7327C421}.Release|x64.Build.0 = Release|x64
 		{0762ED40-26F9-4578-97CE-B6BF7327C421}.Release|x86.ActiveCfg = Release|Win32
 		{0762ED40-26F9-4578-97CE-B6BF7327C421}.Release|x86.Build.0 = Release|Win32
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Debug|ARM.ActiveCfg = Debug|Win32
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Debug|x64.ActiveCfg = Debug|x64
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Debug|x64.Build.0 = Debug|x64
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Debug|x86.ActiveCfg = Debug|Win32
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Debug|x86.Build.0 = Debug|Win32
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Release|ARM.ActiveCfg = Release|Win32
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Release|ARM64.ActiveCfg = Release|Win32
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Release|x64.ActiveCfg = Release|x64
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Release|x64.Build.0 = Release|x64
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Release|x86.ActiveCfg = Release|Win32
+		{11699A3C-B386-4973-BEB8-A1DC5CF6F621}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

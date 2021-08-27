@@ -120,5 +120,21 @@ namespace Math
 			os << v.GetX() << " " << v.GetY() << " ";
 			return os;
 		}
-	};	
+	};
+
+
+	// Helper for chooseing vector based on template
+	template<int dim> class Vector;
+
+	template <> 
+	struct Vector<2>
+	{
+	  using Type = Vector2;
+	};
+
+	template <> 
+	struct Vector<3>
+	{
+	  using Type = Vector3;
+	};
 }

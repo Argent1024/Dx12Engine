@@ -3,11 +3,17 @@
 #include "Math/MathLib.h"
 
 
+
 template <int dim, class T>
 class Octree {
+public:
+	constexpr UINT8 NumChildren = 1 << dim;
+	using VectorD = typename Vector<dim>::Type;
+
 
 
 };
+
 
 template <class T>
 class UniformGrid {

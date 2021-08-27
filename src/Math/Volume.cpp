@@ -1,48 +1,10 @@
-#include "stdafx.h"
-#include "Volume.h"
-#include "MathLib.h"
 
+/*
 namespace Math 
 {
-	//****************** Sphere *********************//
-	SphereVolume::SphereVolume(Vector3 c, Scalar r) :
-		center(c), radius(r) { }
-	
-	void SphereVolume::SetTransform(const Transform& T) {
-		center = T.GetTranslation();
-	}
-
-	CollisionIntersection SphereVolume::_CollideSphere(const SphereVolume& sphere, bool noisect) const 
-	{
-		CollisionIntersection ans;
-
-		const Vector3& a = center;
-		const Vector3& b = sphere.center;
-
-		const Scalar& r1 = radius;
-		const Scalar& r2 = sphere.radius;
-
-		Vector3 d = a - b;
-		Scalar dis2 = Dot(d, d);
-		Scalar sumRadius = r1 + r2;
-
-		ans.intersect = dis2 <= sumRadius * sumRadius;
-		if (!ans.intersect || noisect) {
-			return ans;
-		}
-		
-		// Have an intersection here, calculate normal and position
-		d = Normalize(d);
-		ans.p1 = a - r1 * d; 
-		ans.p2 = b + r2 * d;
-		assert(Length2(ans.p1 - ans.p2) < TOLERENCE && "Two isect points too far away");
-		ans.n1 = -d;
-		ans.n2 = d;
-		return ans;
-	}
 
 
-	CollisionIntersection SphereVolume::_CollidePlane(const PlaneVolume& plane, bool noisect) const
+	CollisionIntersection<Dim> SphereVolume::_CollidePlane(const PlaneVolume& plane, bool noisect) const
 	{
 		CollisionIntersection ans;
 
@@ -84,7 +46,7 @@ namespace Math
 	}
 
 
-	// **************************************** Axis-Aligned Box *********************************************//
+	
 	AABoxVolume::AABoxVolume(Vector3 c, Vector3 r) : center(c), radius(r) 
 	{ }
 
@@ -93,13 +55,13 @@ namespace Math
 		
 	}
 
-	CollisionIntersection AABoxVolume::_CollideSphere(const SphereVolume& sphere, bool noisect) const 
+	CollisionIntersection<Dim> AABoxVolume::_CollideSphere(const SphereVolume& sphere, bool noisect) const 
 	{
-		return CollisionIntersection();
+		return CollisionIntersection<Dim>();
 	}
 
-	CollisionIntersection AABoxVolume::_CollideAABox(const AABoxVolume& box, bool noisect) const {
-		CollisionIntersection ans;
+	CollisionIntersection<Dim> AABoxVolume::_CollideAABox(const AABoxVolume& box, bool noisect) const {
+		CollisionIntersection<Dim> ans;
 		const Vector3& a = center;
 		const Vector3& b = box.center;
 
@@ -125,7 +87,7 @@ namespace Math
 		return ans;
 	}
 
-	//********************** Plane *********************//
+	
 	const Math::Scalar PlaneVolume::DefaultLength = Scalar(10);
 
 	PlaneVolume::PlaneVolume(Vector3& c, Vector3& x, Vector3& y, Scalar& lx, Scalar& ly)
@@ -150,3 +112,4 @@ namespace Math
 
 	
 }
+*/

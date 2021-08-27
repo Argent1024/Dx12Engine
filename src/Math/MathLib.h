@@ -9,6 +9,7 @@
 namespace Math {
 	
 	const float PI = 3.1415926f;
+	// TODO move to someplace else
 	const Scalar TOLERENCE = Scalar(0.01f);
 
 	INLINE Scalar Abs(const Scalar& s) 
